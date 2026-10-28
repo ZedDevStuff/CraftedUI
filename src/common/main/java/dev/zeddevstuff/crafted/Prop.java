@@ -4,10 +4,16 @@ import java.util.ArrayList;
 import java.util.Objects;
 import java.util.function.BiFunction;
 
-public class Prop<T>
+/**
+ * Implementation of {@link IProp} that stores a value and notifies listeners when it changes.
+ * @param <T>
+ */
+public class Prop<T> implements IProp<T>
 {
-	public final Class<T> type;
-	public final String name;
+	private final Class<T> type;
+	public final Class<T> getType() { return type; }
+	private final String name;
+	public final String getName() { return name; }
 	private T value;
 	public final BiFunction<String, T, T> parser;
 	public T get() { return value; }
@@ -22,33 +28,12 @@ public class Prop<T>
 		for(var listener : listeners)
 			listener.onPropChanged(this, oldValue, newValue);
 	}
-	public void setUnchecked(T newValue)
-	{
-		if(Objects.equals(this.value, newValue))
-			return;
-		T oldValue = this.value;
-		this.value = newValue;
-		for(var listener : listeners)
-			listener.onPropChanged(this, oldValue, newValue);
-	}
+
 	public void setFromString(String str)
 	{
 		set(parser.apply(str, value));
 	}
-	public void setFromStringOrDefault(String str, T defaultValue)
-	{
-		set(parser.apply(str, defaultValue));
-	}
-	public void setFromStringOrDefaultObject(String str, Object defaultValue)
-	{
-		if(!type.isAssignableFrom(defaultValue.getClass()))
-			throw new IllegalArgumentException("Invalid default value type for prop " + name + ": " + defaultValue);
-		set(parser.apply(str, type.cast(defaultValue)));
-	}
-	public void setFromStringOrDefaultObjectUnchecked(String str, Object defaultValue)
-	{
-		set(parser.apply(str, type.cast(defaultValue)));
-	}
+
 	private final ArrayList<PropChangeListener<T>> listeners = new ArrayList<>();
 
 	public Prop(Class<T> type, String name, T value)

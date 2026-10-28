@@ -1,6 +1,7 @@
 package dev.zeddevstuff.crafted.utils;
 
 import dev.zeddevstuff.crafted.Crafted;
+import dev.zeddevstuff.crafted.IProp;
 import dev.zeddevstuff.crafted.Prop;
 import dev.zeddevstuff.crafted.annotations.DefineElement;
 import dev.zeddevstuff.crafted.annotations.Description;
@@ -51,7 +52,7 @@ public class SchemaGenerator
 		var elDoc = elementClass.getAnnotation(Description.class);
 		if(elDoc != null)
 			elementNode.addChild(documentNode(elDoc));
-		var properties = Arrays.stream(elementClass.getFields()).filter(f -> Prop.class.isAssignableFrom(f.getType())).toList();
+		var properties = Arrays.stream(elementClass.getFields()).filter(f -> IProp.class.isAssignableFrom(f.getType())).toList();
 		boolean isComplexType = !properties.isEmpty() || element.contentType() != DefineElement.ContentType.NONE;
 		if(isComplexType)
 		{

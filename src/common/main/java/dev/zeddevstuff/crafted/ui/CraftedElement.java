@@ -1,6 +1,8 @@
 package dev.zeddevstuff.crafted.ui;
 
+import dev.zeddevstuff.crafted.IProp;
 import dev.zeddevstuff.crafted.Prop;
+import dev.zeddevstuff.crafted.ProxyProp;
 import dev.zeddevstuff.crafted.annotations.Description;
 import dev.zeddevstuff.crafted.parsing.Parsers;
 import dev.zeddevstuff.crafted.platform.ICanvas;
@@ -8,6 +10,7 @@ import dev.zeddevstuff.crafted.rendering.IRenders;
 import dev.zeddevstuff.crafted.types.EdgeInsets;
 import dev.zeddevstuff.crafted.types.StyleLength2;
 import dev.zeddevstuff.crafted.types.StyleLength4;
+import dev.zeddevstuff.crafted.types.StyleSizeLength2;
 import org.appliedenergistics.yoga.*;
 import org.appliedenergistics.yoga.style.StyleLength;
 import org.appliedenergistics.yoga.style.StyleSizeLength;
@@ -15,12 +18,13 @@ import org.appliedenergistics.yoga.style.YogaStyle;
 
 import java.util.*;
 import java.util.function.BiFunction;
+import java.util.function.Consumer;
+import java.util.function.Supplier;
 
 public abstract class CraftedElement
 {
 	private final CraftedContext ctx;
-	private final YogaNode node;
-
+	private final YogaNode node = new YogaNode();
 
 	protected CraftedElement parent;
 	public CraftedElement getParent() { return parent; }
@@ -29,16 +33,56 @@ public abstract class CraftedElement
 	private LayoutResult layout;
 	public LayoutResult getLayout() { return layout; }
 
-	protected final HashMap<String, Prop<?>> props = new HashMap<>();
+	protected final HashMap<String, IProp<?>> props = new HashMap<>();
+
+	/**
+	 * Registers a property for this element. <br>
+	 * This will allow the property to be set via attributes in the XML.
+	 * @return The registered property.
+	 */
+	protected <T, TProp extends IProp<T>> TProp registerProp(TProp prop)
+	{
+		if(props.containsKey(prop.getName()))
+			throw new IllegalArgumentException("Property with name '" + prop.getName() + "' is already registered for this element.");
+		props.put(prop.getName(), prop);
+		return prop;
+	}
+	/**
+	 * Registers a property for this element. <br>
+	 * This will allow the property to be set via attributes in the XML.
+	 * @return The registered property.
+	 */
 	protected <T> Prop<T> registerProp(String name, T value, BiFunction<String, T, T> parser)
 	{
+		if(props.containsKey(name))
+			throw new IllegalArgumentException("Property with name '" + name + "' is already registered for this element.");
 		var prop = new Prop<>(name, value, parser);
 		props.put(name, prop);
 		return prop;
 	}
+	/**
+	 * Registers a property for this element. <br>
+	 * This will allow the property to be set via attributes in the XML.
+	 * @return The registered property.
+	 */
 	protected <T> Prop<T> registerProp(Class<T> type, String name, T value, BiFunction<String, T, T> parser)
 	{
+		if(props.containsKey(name))
+			throw new IllegalArgumentException("Property with name '" + name + "' is already registered for this element.");
 		var prop = new Prop<>(type, name, value, parser);
+		props.put(name, prop);
+		return prop;
+	}
+	/**
+	 * Registers a property for this element. <br>
+	 * This will allow the property to be set via attributes in the XML.
+	 * @return The registered property.
+	 */
+	protected <T> ProxyProp<T> registerProp(Class<T> type, String name, Supplier<T> getter, Consumer<T> setter, BiFunction<String, T, T> parser)
+	{
+		if(props.containsKey(name))
+			throw new IllegalArgumentException("Property with name '" + name + "' is already registered for this element.");
+		var prop = new ProxyProp<>(type, name, setter, getter, parser);
 		props.put(name, prop);
 		return prop;
 	}
@@ -46,57 +90,139 @@ public abstract class CraftedElement
 	public final Prop<String> id = registerProp("id", "", Parsers::parseString);
 	public final Prop<Integer> zIndex = registerProp("zIndex", 0, Parsers::parseInt);
 
-	public final Prop<YogaDirection> direction = registerProp("direction", YogaDirection.INHERIT, Parsers::parseYogaDirection);
-	public final Prop<YogaFlexDirection> flexDirection = registerProp("flexDirection", YogaFlexDirection.COLUMN, Parsers::parseYogaFlexDirection);
-	public final Prop<YogaJustify> justifyContent = registerProp("justifyContent", YogaJustify.FLEX_START, Parsers::parseYogaJustify);
-	public final Prop<YogaAlign> alignContent = registerProp("alignContent", YogaAlign.FLEX_START, Parsers::parseYogaAlign);
-	public final Prop<YogaAlign> alignItems = registerProp("alignItems", YogaAlign.STRETCH, Parsers::parseYogaAlign);
-	public final Prop<YogaAlign> alignSelf = registerProp("alignSelf", YogaAlign.AUTO, Parsers::parseYogaAlign);
-	public final Prop<YogaPositionType> positionType = registerProp("positionType", YogaPositionType.RELATIVE, Parsers::parseYogaPositionType);
-	public final Prop<YogaWrap> flexWrap = registerProp("flexWrap", YogaWrap.NO_WRAP, Parsers::parseYogaWrap);
-	public final Prop<YogaOverflow> overflow = registerProp("overflow", YogaOverflow.VISIBLE, Parsers::parseYogaOverflow);
-	public final Prop<YogaDisplay> display = registerProp("display", YogaDisplay.FLEX, Parsers::parseYogaDisplay);
-	public final Prop<YogaBoxSizing> boxSizing = registerProp("boxSizing", YogaBoxSizing.BORDER_BOX, Parsers::parseYogaBoxSizing);
+	public final ProxyProp<YogaDirection> direction = registerProp(YogaDirection.class, "direction", node::getLayoutDirection, node::setDirection, Parsers::parseYogaDirection);
+	public final ProxyProp<YogaFlexDirection> flexDirection = registerProp(YogaFlexDirection.class, "flexDirection", node::getFlexDirection, node::setFlexDirection, Parsers::parseYogaFlexDirection);
+	public final ProxyProp<YogaJustify> justifyContent = registerProp(YogaJustify.class, "justifyContent", node::getJustifyContent, node::setJustifyContent, Parsers::parseYogaJustify);
+	public final ProxyProp<YogaAlign> alignContent = registerProp(YogaAlign.class, "alignContent", node::getAlignContent, node::setAlignContent, Parsers::parseYogaAlign);
+	public final ProxyProp<YogaAlign> alignItems = registerProp(YogaAlign.class, "alignItems", node::getAlignItems, node::setAlignItems, Parsers::parseYogaAlign);
+	public final ProxyProp<YogaAlign> alignSelf = registerProp(YogaAlign.class, "alignSelf", node::getAlignSelf, node::setAlignSelf, Parsers::parseYogaAlign);
+	public final ProxyProp<YogaPositionType> positionType = registerProp(YogaPositionType.class, "positionType", node::getPositionType, node::setPositionType, Parsers::parseYogaPositionType);
+	public final ProxyProp<YogaWrap> flexWrap = registerProp(YogaWrap.class, "flexWrap", node::getWrap, node::setWrap, Parsers::parseYogaWrap);
+	public final ProxyProp<YogaOverflow> overflow = registerProp(YogaOverflow.class, "overflow", node::getOverflow, node::setOverflow, Parsers::parseYogaOverflow);
+	public final ProxyProp<YogaDisplay> display = registerProp(YogaDisplay.class, "display", node::getDisplay, node::setDisplay, Parsers::parseYogaDisplay);
+	public final ProxyProp<YogaBoxSizing> boxSizing = registerProp(YogaBoxSizing.class, "boxSizing", node::getBoxSizing, node::setBoxSizing, Parsers::parseYogaBoxSizing);
 
-	public final Prop<Float> flex = registerProp("flex", 0f, Parsers::parseFloat);
-	public final Prop<Float> flexGrow = registerProp("flexGrow", 0f, Parsers::parseFloat);
-	public final Prop<Float> flexShrink = registerProp("flexShrink", 1f, Parsers::parseFloat);
-	public final Prop<StyleSizeLength> flexBasis =  registerProp("flexBasis", StyleSizeLength.ofAuto(), Parsers::parseStyleSizeLength);
+	public final ProxyProp<Float> flex = registerProp(Float.class, "flex", node::getFlex, node::setFlex, Parsers::parseFloat);
+	public final ProxyProp<Float> flexGrow = registerProp(Float.class, "flexGrow", node::getFlexGrow, node::setFlexGrow, Parsers::parseFloat);
+	public final ProxyProp<Float> flexShrink = registerProp(Float.class, "flexShrink", node::getFlexShrink, node::setFlexShrink, Parsers::parseFloat);
+	public final ProxyProp<StyleSizeLength> flexBasis = registerProp(StyleSizeLength.class, "flexBasis", () -> node.getStyle().getFlexBasis(), val -> node.getStyle().setFlexBasis(val), Parsers::parseStyleSizeLength);
 
-	public final Prop<StyleLength4> margin = registerProp("margin", new StyleLength4(StyleLength.ofAuto(), StyleLength.ofAuto(), StyleLength.ofAuto(), StyleLength.ofAuto()), Parsers::parseStyleLength4);
-	public final Prop<StyleLength> marginTop = registerProp("marginTop", StyleLength.ofAuto(), Parsers::parseStyleLength);
-	public final Prop<StyleLength> marginRight = registerProp("marginRight", StyleLength.ofAuto(), Parsers::parseStyleLength);
-	public final Prop<StyleLength> marginBottom = registerProp("marginBottom", StyleLength.ofAuto(), Parsers::parseStyleLength);
-	public final Prop<StyleLength> marginLeft = registerProp("marginLeft", StyleLength.ofAuto(), Parsers::parseStyleLength);
+	public final ProxyProp<StyleLength4> margin = registerProp(StyleLength4.class, "margin",
+		() -> {
+			var style = node.getStyle();
+			return new StyleLength4(style.getMargin(YogaEdge.TOP), style.getMargin(YogaEdge.RIGHT), style.getMargin(YogaEdge.BOTTOM), style.getMargin(YogaEdge.LEFT));
+		},
+		val -> {
+			if (val == null)
+				val = new StyleLength4(StyleLength.ofAuto(), StyleLength.ofAuto(), StyleLength.ofAuto(), StyleLength.ofAuto());
+			node.setMargin(YogaEdge.TOP, val.top());
+			node.setMargin(YogaEdge.RIGHT, val.right());
+			node.setMargin(YogaEdge.BOTTOM, val.bottom());
+			node.setMargin(YogaEdge.LEFT, val.left());
+		}, Parsers::parseStyleLength4);
+	public final ProxyProp<StyleLength> marginTop = registerProp(StyleLength.class, "marginTop", () -> node.getStyle().getMargin(YogaEdge.TOP), val -> node.setMargin(YogaEdge.TOP, val), Parsers::parseStyleLength);
+	public final ProxyProp<StyleLength> marginRight = registerProp(StyleLength.class, "marginRight", () -> node.getStyle().getMargin(YogaEdge.RIGHT), val -> node.setMargin(YogaEdge.RIGHT, val), Parsers::parseStyleLength);
+	public final ProxyProp<StyleLength> marginBottom = registerProp(StyleLength.class, "marginBottom", () -> node.getStyle().getMargin(YogaEdge.BOTTOM), val -> node.setMargin(YogaEdge.BOTTOM, val), Parsers::parseStyleLength);
+	public final ProxyProp<StyleLength> marginLeft = registerProp(StyleLength.class, "marginLeft", () -> node.getStyle().getMargin(YogaEdge.LEFT), val -> node.setMargin(YogaEdge.LEFT, val), Parsers::parseStyleLength);
 
-	public final Prop<StyleLength4> position = registerProp("position", new StyleLength4(StyleLength.ofAuto(), StyleLength.ofAuto(), StyleLength.ofAuto(), StyleLength.ofAuto()), Parsers::parseStyleLength4);
-	public final Prop<StyleLength> top = registerProp("top", StyleLength.ofAuto(), Parsers::parseStyleLength);
-	public final Prop<StyleLength> right = registerProp("right", StyleLength.ofAuto(), Parsers::parseStyleLength);
-	public final Prop<StyleLength> bottom = registerProp("bottom", StyleLength.ofAuto(), Parsers::parseStyleLength);
-	public final Prop<StyleLength> left = registerProp("left", StyleLength.ofAuto(), Parsers::parseStyleLength);
+	public final ProxyProp<StyleLength4> position = registerProp(StyleLength4.class, "position",
+		() -> {
+			var style = node.getStyle();
+			return new StyleLength4(style.getPosition(YogaEdge.TOP), style.getPosition(YogaEdge.RIGHT), style.getPosition(YogaEdge.BOTTOM), style.getPosition(YogaEdge.LEFT));
+		},
+		val -> {
+			if (val == null)
+				val = new StyleLength4(StyleLength.ofAuto(), StyleLength.ofAuto(), StyleLength.ofAuto(), StyleLength.ofAuto());
+			node.setPosition(YogaEdge.TOP, val.top());
+			node.setPosition(YogaEdge.RIGHT, val.right());
+			node.setPosition(YogaEdge.BOTTOM, val.bottom());
+			node.setPosition(YogaEdge.LEFT, val.left());
+		}, Parsers::parseStyleLength4);
+	public final ProxyProp<StyleLength> top = registerProp(StyleLength.class, "top", () -> node.getStyle().getPosition(YogaEdge.TOP), val -> node.setPosition(YogaEdge.TOP, val), Parsers::parseStyleLength);
+	public final ProxyProp<StyleLength> right = registerProp(StyleLength.class, "right", () -> node.getStyle().getPosition(YogaEdge.RIGHT), val -> node.setPosition(YogaEdge.RIGHT, val), Parsers::parseStyleLength);
+	public final ProxyProp<StyleLength> bottom = registerProp(StyleLength.class, "bottom", () -> node.getStyle().getPosition(YogaEdge.BOTTOM), val -> node.setPosition(YogaEdge.BOTTOM, val), Parsers::parseStyleLength);
+	public final ProxyProp<StyleLength> left = registerProp(StyleLength.class, "left", () -> node.getStyle().getPosition(YogaEdge.LEFT), val -> node.setPosition(YogaEdge.LEFT, val), Parsers::parseStyleLength);
 
-	public final Prop<StyleLength4> padding = registerProp("padding", new StyleLength4(StyleLength.ofAuto(), StyleLength.ofAuto(), StyleLength.ofAuto(), StyleLength.ofAuto()), Parsers::parseStyleLength4);
-	public final Prop<StyleLength> paddingTop = registerProp("paddingTop", StyleLength.ofAuto(), Parsers::parseStyleLength);
-	public final Prop<StyleLength> paddingRight = registerProp("paddingRight", StyleLength.ofAuto(), Parsers::parseStyleLength);
-	public final Prop<StyleLength> paddingBottom = registerProp("paddingBottom", StyleLength.ofAuto(), Parsers::parseStyleLength);
-	public final Prop<StyleLength> paddingLeft = registerProp("paddingLeft", StyleLength.ofAuto(), Parsers::parseStyleLength);
+	public final ProxyProp<StyleLength4> padding = registerProp(StyleLength4.class, "padding",
+		() -> {
+			var style = node.getStyle();
+			return new StyleLength4(style.getPadding(YogaEdge.TOP), style.getPadding(YogaEdge.RIGHT), style.getPadding(YogaEdge.BOTTOM), style.getPadding(YogaEdge.LEFT));
+		},
+		val -> {
+			if (val == null)
+				val = new StyleLength4(StyleLength.ofAuto(), StyleLength.ofAuto(), StyleLength.ofAuto(), StyleLength.ofAuto());
+			node.setPadding(YogaEdge.TOP, val.top());
+			node.setPadding(YogaEdge.RIGHT, val.right());
+			node.setPadding(YogaEdge.BOTTOM, val.bottom());
+			node.setPadding(YogaEdge.LEFT, val.left());
+		}, Parsers::parseStyleLength4);
+	public final ProxyProp<StyleLength> paddingTop = registerProp(StyleLength.class, "paddingTop", () -> node.getStyle().getPadding(YogaEdge.TOP), val -> node.setPadding(YogaEdge.TOP, val), Parsers::parseStyleLength);
+	public final ProxyProp<StyleLength> paddingRight = registerProp(StyleLength.class, "paddingRight", () -> node.getStyle().getPadding(YogaEdge.RIGHT), val -> node.setPadding(YogaEdge.RIGHT, val), Parsers::parseStyleLength);
+	public final ProxyProp<StyleLength> paddingBottom = registerProp(StyleLength.class, "paddingBottom", () -> node.getStyle().getPadding(YogaEdge.BOTTOM), val -> node.setPadding(YogaEdge.BOTTOM, val), Parsers::parseStyleLength);
+	public final ProxyProp<StyleLength> paddingLeft = registerProp(StyleLength.class, "paddingLeft", () -> node.getStyle().getPadding(YogaEdge.LEFT), val -> node.setPadding(YogaEdge.LEFT, val), Parsers::parseStyleLength);
 
-	public final Prop<StyleLength4> border = registerProp("border", new StyleLength4(StyleLength.ofAuto(), StyleLength.ofAuto(), StyleLength.ofAuto(), StyleLength.ofAuto()), Parsers::parseStyleLength4);
-	public final Prop<StyleLength> borderTop = registerProp("borderTop", StyleLength.ofAuto(), Parsers::parseStyleLength);
-	public final Prop<StyleLength> borderRight = registerProp("borderRight", StyleLength.ofAuto(), Parsers::parseStyleLength);
-	public final Prop<StyleLength> borderBottom = registerProp("borderBottom", StyleLength.ofAuto(), Parsers::parseStyleLength);
-	public final Prop<StyleLength> borderLeft = registerProp("borderLeft", StyleLength.ofAuto(), Parsers::parseStyleLength);
+	public final ProxyProp<StyleLength4> border = registerProp(StyleLength4.class, "border",
+		() -> {
+			var style = node.getStyle();
+			return new StyleLength4(style.getBorder(YogaEdge.TOP), style.getBorder(YogaEdge.RIGHT), style.getBorder(YogaEdge.BOTTOM), style.getBorder(YogaEdge.LEFT));
+		},
+		val -> {
+			if (val == null)
+				val = new StyleLength4(StyleLength.ofAuto(), StyleLength.ofAuto(), StyleLength.ofAuto(), StyleLength.ofAuto());
+			var style = node.getStyle();
+			style.setBorder(YogaEdge.TOP, val.top());
+			style.setBorder(YogaEdge.RIGHT, val.right());
+			style.setBorder(YogaEdge.BOTTOM, val.bottom());
+			style.setBorder(YogaEdge.LEFT, val.left());
+		}, Parsers::parseStyleLength4);
+	public final ProxyProp<StyleLength> borderTop = registerProp(StyleLength.class, "borderTop", () -> node.getStyle().getBorder(YogaEdge.TOP), val -> node.getStyle().setBorder(YogaEdge.TOP, val), Parsers::parseStyleLength);
+	public final ProxyProp<StyleLength> borderRight = registerProp(StyleLength.class, "borderRight", () -> node.getStyle().getBorder(YogaEdge.RIGHT), val -> node.getStyle().setBorder(YogaEdge.RIGHT, val), Parsers::parseStyleLength);
+	public final ProxyProp<StyleLength> borderBottom = registerProp(StyleLength.class, "borderBottom", () -> node.getStyle().getBorder(YogaEdge.BOTTOM), val -> node.getStyle().setBorder(YogaEdge.BOTTOM, val), Parsers::parseStyleLength);
+	public final ProxyProp<StyleLength> borderLeft = registerProp(StyleLength.class, "borderLeft", () -> node.getStyle().getBorder(YogaEdge.LEFT), val -> node.getStyle().setBorder(YogaEdge.LEFT, val), Parsers::parseStyleLength);
 
-	public final Prop<StyleLength2> gap = registerProp("gap", new StyleLength2(StyleLength.ofAuto(), StyleLength.ofAuto()), Parsers::parseStyleLength2);
-	public final Prop<StyleLength> rowGap = registerProp("rowGap", StyleLength.ofAuto(), Parsers::parseStyleLength);
-	public final Prop<StyleLength> columnGap = registerProp("columnGap", StyleLength.ofAuto(), Parsers::parseStyleLength);
+	public final ProxyProp<StyleLength2> gap = registerProp(StyleLength2.class, "gap",
+		() -> new StyleLength2(node.getStyle().getGap(YogaGutter.ROW), node.getStyle().getGap(YogaGutter.COLUMN)),
+		val -> {
+			if (val == null)
+				val = new StyleLength2(StyleLength.ofAuto(), StyleLength.ofAuto());
+			node.setGap(YogaGutter.ROW, val.x());
+			node.setGap(YogaGutter.COLUMN, val.y());
+		}, Parsers::parseStyleLength2);
+	public final ProxyProp<StyleLength> rowGap = registerProp(StyleLength.class, "rowGap", () -> node.getStyle().getGap(YogaGutter.ROW), val -> node.setGap(YogaGutter.ROW, val), Parsers::parseStyleLength);
+	public final ProxyProp<StyleLength> columnGap = registerProp(StyleLength.class, "columnGap", () -> node.getStyle().getGap(YogaGutter.COLUMN), val -> node.setGap(YogaGutter.COLUMN, val), Parsers::parseStyleLength);
 
-	public final Prop<StyleSizeLength> width = registerProp("width", StyleSizeLength.ofAuto(), Parsers::parseStyleSizeLength);
-	public final Prop<StyleSizeLength> height = registerProp("height", StyleSizeLength.ofAuto(), Parsers::parseStyleSizeLength);
-	public final Prop<StyleSizeLength> minWidth = registerProp("minWidth", StyleSizeLength.ofAuto(), Parsers::parseStyleSizeLength);
-	public final Prop<StyleSizeLength> minHeight = registerProp("minHeight", StyleSizeLength.ofAuto(), Parsers::parseStyleSizeLength);
-	public final Prop<StyleSizeLength> maxWidth = registerProp("maxWidth", StyleSizeLength.ofAuto(), Parsers::parseStyleSizeLength);
-	public final Prop<StyleSizeLength> maxHeight = registerProp("maxHeight", StyleSizeLength.ofAuto(), Parsers::parseStyleSizeLength);
+	public final ProxyProp<StyleSizeLength2> size = registerProp(StyleSizeLength2.class, "size",
+		() -> new StyleSizeLength2(node.getStyle().getDimension(YogaDimension.WIDTH), node.getStyle().getDimension(YogaDimension.HEIGHT)),
+		val -> {
+			if (val == null)
+				val = new StyleSizeLength2(StyleSizeLength.ofAuto(), StyleSizeLength.ofAuto());
+			node.setWidth(val.width());
+			node.setHeight(val.height());
+		}, Parsers::parseStyleSizeLength2);
+	public final ProxyProp<StyleSizeLength> width = registerProp(StyleSizeLength.class, "width", () -> node.getStyle().getDimension(YogaDimension.WIDTH), node::setWidth, Parsers::parseStyleSizeLength);
+	public final ProxyProp<StyleSizeLength> height = registerProp(StyleSizeLength.class, "height", () -> node.getStyle().getDimension(YogaDimension.HEIGHT), node::setHeight, Parsers::parseStyleSizeLength);
+
+	public final ProxyProp<StyleSizeLength2> minSize = registerProp(StyleSizeLength2.class, "minSize",
+		() -> new StyleSizeLength2(node.getStyle().getMinDimension(YogaDimension.WIDTH), node.getStyle().getMinDimension(YogaDimension.HEIGHT)),
+		val -> {
+			if (val == null)
+				val = new StyleSizeLength2(StyleSizeLength.ofAuto(), StyleSizeLength.ofAuto());
+			node.setMinWidth(val.width());
+			node.setMinHeight(val.height());
+		}, Parsers::parseStyleSizeLength2);
+	public final ProxyProp<StyleSizeLength> minWidth = registerProp(StyleSizeLength.class, "minWidth", () -> node.getStyle().getMinDimension(YogaDimension.WIDTH), node::setMinWidth, Parsers::parseStyleSizeLength);
+	public final ProxyProp<StyleSizeLength> minHeight = registerProp(StyleSizeLength.class, "minHeight", () -> node.getStyle().getMinDimension(YogaDimension.HEIGHT), node::setMinHeight, Parsers::parseStyleSizeLength);
+
+	public final ProxyProp<StyleSizeLength2> maxSize = registerProp(StyleSizeLength2.class, "maxSize",
+		() -> new StyleSizeLength2(node.getStyle().getMaxDimension(YogaDimension.WIDTH), node.getStyle().getMaxDimension(YogaDimension.HEIGHT)),
+		val -> {
+			if (val == null)
+				val = new StyleSizeLength2(StyleSizeLength.ofAuto(), StyleSizeLength.ofAuto());
+			node.setMaxWidth(val.width());
+			node.setMaxHeight(val.height());
+		}, Parsers::parseStyleSizeLength2);
+	public final ProxyProp<StyleSizeLength> maxWidth = registerProp(StyleSizeLength.class, "maxWidth", () -> node.getStyle().getMaxDimension(YogaDimension.WIDTH), node::setMaxWidth, Parsers::parseStyleSizeLength);
+	public final ProxyProp<StyleSizeLength> maxHeight = registerProp(StyleSizeLength.class, "maxHeight", () -> node.getStyle().getMaxDimension(YogaDimension.HEIGHT), node::setMaxHeight, Parsers::parseStyleSizeLength);
 
 	private IRenders<?> renderer;
 
@@ -104,83 +230,6 @@ public abstract class CraftedElement
 	{
 		this.ctx = ctx;
 		this.renderer = ctx.crafted.renderers.getRenderer(this.getClass(), attributes.getOrDefault("renderer", "default"));
-		this.node = new YogaNode();
-
-		direction.addListener((prop, oldValue, newValue) -> node.setDirection(newValue));
-		flexDirection.addListener((prop, oldValue, newValue) -> node.setFlexDirection(newValue));
-		justifyContent.addListener((prop, oldValue, newValue) -> node.setJustifyContent(newValue));
-		alignContent.addListener((prop, oldValue, newValue) -> node.setAlignContent(newValue));
-		alignItems.addListener((prop, oldValue, newValue) -> node.setAlignItems(newValue));
-		alignSelf.addListener((prop, oldValue, newValue) -> node.setAlignSelf(newValue));
-		positionType.addListener((prop, oldValue, newValue) -> node.setPositionType(newValue));
-		flexWrap.addListener((prop, oldValue, newValue) -> node.setWrap(newValue));
-		overflow.addListener((prop, oldValue, newValue) -> node.setOverflow(newValue));
-		display.addListener((prop, oldValue, newValue) -> node.setDisplay(newValue));
-		boxSizing.addListener((prop, oldValue, newValue) -> node.setBoxSizing(newValue));
-
-		flex.addListener((prop, oldValue, newValue) -> node.setFlex(newValue));
-		flexGrow.addListener((prop, oldValue, newValue) -> node.setFlexGrow(newValue));
-		flexShrink.addListener((prop, oldValue, newValue) -> node.setFlexShrink(newValue));
-		flexBasis.addListener((prop, oldValue, newValue) -> node.getStyle().setFlexBasis(newValue));
-
-		margin.addListener((prop, oldValue, newValue) -> {
-			node.setMargin(YogaEdge.TOP, newValue.top());
-			node.setMargin(YogaEdge.RIGHT, newValue.right());
-			node.setMargin(YogaEdge.BOTTOM, newValue.bottom());
-			node.setMargin(YogaEdge.LEFT, newValue.left());
-		});
-		marginTop.addListener((prop, oldValue, newValue) -> node.setMargin(YogaEdge.TOP, newValue));
-		marginRight.addListener((prop, oldValue, newValue) -> node.setMargin(YogaEdge.RIGHT, newValue));
-		marginBottom.addListener((prop, oldValue, newValue) -> node.setMargin(YogaEdge.BOTTOM, newValue));
-		marginLeft.addListener((prop, oldValue, newValue) -> node.setMargin(YogaEdge.LEFT, newValue));
-
-		position.addListener((prop, oldValue, newValue) -> {
-			node.setPosition(YogaEdge.TOP, newValue.top());
-			node.setPosition(YogaEdge.RIGHT, newValue.right());
-			node.setPosition(YogaEdge.BOTTOM, newValue.bottom());
-			node.setPosition(YogaEdge.LEFT, newValue.left());
-		});
-		top.addListener((prop, oldValue, newValue) -> node.setPosition(YogaEdge.TOP, newValue));
-		right.addListener((prop, oldValue, newValue) -> node.setPosition(YogaEdge.RIGHT, newValue));
-		bottom.addListener((prop, oldValue, newValue) -> node.setPosition(YogaEdge.BOTTOM, newValue));
-		left.addListener((prop, oldValue, newValue) -> node.setPosition(YogaEdge.LEFT, newValue));
-
-		padding.addListener((prop, oldValue, newValue) -> {
-			node.setPadding(YogaEdge.TOP, newValue.top());
-			node.setPadding(YogaEdge.RIGHT, newValue.right());
-			node.setPadding(YogaEdge.BOTTOM, newValue.bottom());
-			node.setPadding(YogaEdge.LEFT, newValue.left());
-		});
-		paddingTop.addListener((prop, oldValue, newValue) -> node.setPadding(YogaEdge.TOP, newValue));
-		paddingRight.addListener((prop, oldValue, newValue) -> node.setPadding(YogaEdge.RIGHT, newValue));
-		paddingBottom.addListener((prop, oldValue, newValue) -> node.setPadding(YogaEdge.BOTTOM, newValue));
-		paddingLeft.addListener((prop, oldValue, newValue) -> node.setPadding(YogaEdge.LEFT, newValue));
-
-		border.addListener((prop, oldValue, newValue) -> {
-			var style = node.getStyle();
-			style.setBorder(YogaEdge.TOP, newValue.top());
-			style.setBorder(YogaEdge.RIGHT, newValue.right());
-			style.setBorder(YogaEdge.BOTTOM, newValue.bottom());
-			style.setBorder(YogaEdge.LEFT, newValue.left());
-		});
-		borderTop.addListener((prop, oldValue, newValue) -> node.getStyle().setBorder(YogaEdge.TOP, newValue));
-		borderRight.addListener((prop, oldValue, newValue) -> node.getStyle().setBorder(YogaEdge.RIGHT, newValue));
-		borderBottom.addListener((prop, oldValue, newValue) -> node.getStyle().setBorder(YogaEdge.BOTTOM, newValue));
-		borderLeft.addListener((prop, oldValue, newValue) -> node.getStyle().setBorder(YogaEdge.LEFT, newValue));
-
-		gap.addListener((prop, oldValue, newValue) -> {
-			node.setGap(YogaGutter.ROW, newValue.x());
-			node.setGap(YogaGutter.COLUMN, newValue.y());
-		});
-		rowGap.addListener((prop, oldValue, newValue) -> node.setGap(YogaGutter.ROW, newValue));
-		columnGap.addListener((prop, oldValue, newValue) -> node.setGap(YogaGutter.COLUMN, newValue));
-
-		width.addListener((prop, oldValue, newValue) -> node.setWidth(newValue));
-		height.addListener((prop, oldValue, newValue) -> node.setHeight(newValue));
-		minWidth.addListener((prop, oldValue, newValue) -> node.setMinWidth(newValue));
-		minHeight.addListener((prop, oldValue, newValue) -> node.setMinHeight(newValue));
-		maxWidth.addListener((prop, oldValue, newValue) -> node.setMaxWidth(newValue));
-		maxHeight.addListener((prop, oldValue, newValue) -> node.setMaxHeight(newValue));
 		this.node.setStyle(initLayoutNode(node.getStyle(), attributes));
 	}
 

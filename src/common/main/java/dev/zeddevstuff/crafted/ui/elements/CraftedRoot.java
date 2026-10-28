@@ -28,7 +28,6 @@ public class CraftedRoot extends CraftedElement
 	public CraftedRoot(CraftedContext ctx, Map<String, String> attributes)
 	{
 		super(ctx, attributes);
-		//tryParseInto(title, attributes.get("title"), Parsers::tryParseText);
 		renderer.addListener((prop, oldValue, newValue) -> {
 			ctx.currentRenderer = newValue;
 			setRendererRecursive(newValue);

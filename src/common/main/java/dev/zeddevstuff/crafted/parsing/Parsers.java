@@ -4,6 +4,7 @@ import dev.zeddevstuff.crafted.platform.IText;
 import dev.zeddevstuff.crafted.types.Color;
 import dev.zeddevstuff.crafted.types.StyleLength2;
 import dev.zeddevstuff.crafted.types.StyleLength4;
+import dev.zeddevstuff.crafted.types.StyleSizeLength2;
 import org.appliedenergistics.yoga.*;
 import org.appliedenergistics.yoga.style.StyleLength;
 import org.appliedenergistics.yoga.style.StyleSizeLength;
@@ -165,6 +166,32 @@ public class Parsers
 				return StyleSizeLength.points(Integer.parseInt(value));
 		}
 		catch (NumberFormatException e)
+		{
+			return defaultValue;
+		}
+	}
+	public static StyleSizeLength2 parseStyleSizeLength2(String value, StyleSizeLength2 defaultValue)
+	{
+		if (value == null)
+			return defaultValue;
+		try
+		{
+			String[] parts = value.split("[, ]+");
+			if (parts.length == 1)
+			{
+				StyleSizeLength length = parseStyleSizeLength(parts[0], StyleSizeLength.ofAuto());
+				return new StyleSizeLength2(length, length);
+			}
+			else if (parts.length == 2)
+			{
+				return new StyleSizeLength2(parseStyleSizeLength(parts[0], StyleSizeLength.ofAuto()), parseStyleSizeLength(parts[1], StyleSizeLength.ofAuto()));
+			}
+			else
+			{
+				return defaultValue;
+			}
+		}
+		catch (Exception e)
 		{
 			return defaultValue;
 		}
