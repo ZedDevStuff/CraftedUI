@@ -9,10 +9,10 @@ import dev.zeddevstuff.crafted.platform.IFont;
 import dev.zeddevstuff.crafted.platform.IText;
 import dev.zeddevstuff.crafted.rendering.IRenders;
 import dev.zeddevstuff.crafted.types.Color;
-import dev.zeddevstuff.crafted.types.StyleSizeLength2;
 import dev.zeddevstuff.crafted.types.TextSettings;
 import dev.zeddevstuff.crafted.ui.CraftedContext;
 import dev.zeddevstuff.crafted.ui.CraftedElement;
+import org.appliedenergistics.yoga.YogaNodeType;
 import org.appliedenergistics.yoga.style.StyleSizeLength;
 
 import java.util.Map;
@@ -40,6 +40,7 @@ public class Text extends CraftedElement
 		super(ctx, attributes);
 		settings.set(ctx.crafted.defaultTextSettings);
 		font = registerProp(IFont.class, "font", settings.get()::font, (value) -> settings.set(settings.get().withFont(value)), ctx.crafted::getFontOrDefault);
+		node.setNodeType(YogaNodeType.TEXT);
 		text.addListener((prop, oldValue, newValue) -> {
 			var cFont = font.get();
 			if(cFont == null)
