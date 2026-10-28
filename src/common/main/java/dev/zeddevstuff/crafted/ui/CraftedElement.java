@@ -24,8 +24,8 @@ import java.util.function.Supplier;
 
 public abstract class CraftedElement
 {
-	private final CraftedContext ctx;
-	private final YogaNode node = new YogaNode();
+	protected final CraftedContext ctx;
+	protected final YogaNode node = new YogaNode();
 
 	protected CraftedElement parent;
 	public CraftedElement getParent() { return parent; }
@@ -248,6 +248,15 @@ public abstract class CraftedElement
 	 * Override this method to initialize the layout node for this element with non default values.
 	 */
 	protected YogaStyle initLayoutNode(YogaStyle style, Map<String, String> attributes) { return style; }
+	public boolean contains(float x, float y)
+	{
+		return x >= layout.x && x <= layout.x + layout.width && y >= layout.y && y <= layout.y + layout.height;
+	}
+
+	public CraftedElement findTopmostAt(float x, float y)
+	{
+		throw new UnsupportedOperationException("Not implemented yet");
+	}
 
 	public CraftedElement getElementById(String id)
 	{
