@@ -2,6 +2,7 @@ package dev.zeddevstuff.crafted.parsing;
 
 import org.xml.sax.SAXException;
 
+import javax.xml.XMLConstants;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
@@ -14,6 +15,18 @@ public class CraftedXmlParser
 	static
 	{
 		factory = DocumentBuilderFactory.newInstance();
+
+		try
+		{
+			factory.setFeature("http://apache.org/xml/features/disallow-doctype-decl", true);
+			factory.setFeature(XMLConstants.FEATURE_SECURE_PROCESSING, false);
+			factory.setExpandEntityReferences(false);
+			factory.setXIncludeAware(false);
+		}
+		catch (ParserConfigurationException e)
+		{
+			throw new RuntimeException(e);
+		}
 		try
 		{
 			builder = factory.newDocumentBuilder();
@@ -25,18 +38,13 @@ public class CraftedXmlParser
 	}
 	public static ParsedNode parse(String xml)
 	{
-		ParsedNode rootNode = new ParsedNode("Flux", null, new ParsedNode[]{});
 		try
 		{
 			var document = builder.parse(new java.io.ByteArrayInputStream(xml.getBytes()));
 			var rootElement = document.getDocumentElement();
 			return parsedNodeFromElement(rootElement);
 		}
-		catch (IOException e)
-		{
-			throw new RuntimeException(e);
-		}
-		catch (SAXException e)
+		catch (IOException | SAXException e)
 		{
 			throw new RuntimeException(e);
 		}

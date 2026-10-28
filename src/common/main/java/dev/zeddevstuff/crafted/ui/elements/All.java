@@ -8,5 +8,6 @@ public class All
 	{
 		CraftedRoot.register(crafted);
 		Box.register(crafted);
+		Text.register(crafted);
 	}
 }

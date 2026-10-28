@@ -33,10 +33,4 @@ public class CraftedRoot extends CraftedElement
 			setRendererRecursive(newValue);
 		});
 	}
-
-	@Override
-	protected YogaStyle initLayoutNode(YogaStyle style, Map<String, String> attributes)
-	{
-		return style;
-	}
 }

@@ -30,6 +30,7 @@ public class Entry
 			<Crafted title="Gallery" renderer="default">
 				<Box id="titlebar" width="100%" height="20" color="rgb(200, 200, 200)" />
 				<Box id="content" width="100%" height="stretch" color="rgb(255, 255, 255)" />
+				<Text fontScale="2">Hi!!!!!!!</Text>
 			</Crafted>
 			""");
 		var ctx = new CraftedContext(Crafted.defaultInstance());

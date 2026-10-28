@@ -25,7 +25,7 @@ public class Crafted
 	public final TextSettings defaultTextSettings;
 	public final ElementRegistry elements = new ElementRegistry();
 	public final RendererRegistry renderers = new RendererRegistry();
-
+	private final Map<String, IFont> fonts = new java.util.HashMap<>();
 
 	public Crafted(ILocalization localization, IFont defaultFont, IDispatcher dispatcher)
 	{
@@ -33,6 +33,7 @@ public class Crafted
 		this.defaultFont = defaultFont;
 		this.dispatcher = dispatcher;
 		this.defaultTextSettings = new TextSettings(defaultFont, 1.0f, -1);
+		registerFont("default", defaultFont);
 	}
 
 	public static Crafted defaultInstance()
@@ -45,5 +46,19 @@ public class Crafted
 	public CraftedElement createElement(CraftedContext ctx, String tag, Map<String, String> attributes)
 	{
 		return elements.createElement(ctx, tag, attributes);
+	}
+
+	public void registerFont(String name, IFont font)
+	{
+		fonts.put(name, font);
+	}
+	public IFont getFont(String name)
+	{
+		return fonts.getOrDefault(name, defaultFont);
+	}
+
+	public IFont getFontOrDefault(String name, IFont defaultFont)
+	{
+		return fonts.getOrDefault(name, defaultFont);
 	}
 }

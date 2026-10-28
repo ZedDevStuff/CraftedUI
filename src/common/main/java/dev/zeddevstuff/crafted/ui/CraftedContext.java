@@ -1,9 +1,7 @@
 package dev.zeddevstuff.crafted.ui;
 
 import dev.zeddevstuff.crafted.Crafted;
-import dev.zeddevstuff.crafted.rendering.IRenders;
-import dev.zeddevstuff.crafted.rendering.RendererRegistry;
-import dev.zeddevstuff.crafted.types.CraftedEventData;
+import dev.zeddevstuff.crafted.types.ICraftedCallback;
 
 import java.util.HashMap;
 import java.util.function.Consumer;
@@ -15,7 +13,7 @@ import java.util.function.Consumer;
 public class CraftedContext
 {
 	public final Crafted crafted;
-	private final HashMap<String, Consumer<CraftedEventData>> callbacks = new HashMap<>();
+	private final HashMap<String, CallbackEntry<?>> callbacks = new HashMap<>();
 	/**
 	 * The renderer to use for future elements created in this context.
 	 */
@@ -26,15 +24,22 @@ public class CraftedContext
 		this.crafted = crafted;
 	}
 
-	public void registerCallback(String name, Consumer<CraftedEventData> callback)
+	public <T extends ICraftedCallback> void registerCallback(Class<T> type, String name, Consumer<T> callback)
 	{
-		callbacks.put(name, callback);
+		callbacks.put(name, new CallbackEntry<>(type, callback));
 	}
-	public Consumer<CraftedEventData> getCallback(String name)
+	public boolean unregisterCallback(String name)
+	{
+		return callbacks.remove(name) != null;
+	}
+	@SuppressWarnings("unchecked")
+	public <T extends ICraftedCallback> Consumer<T> getCallback(Class<T> type, String name)
 	{
 		var result = callbacks.get(name);
-		if (result instanceof Consumer<CraftedEventData> consumer)
+		if (result.type() != type)
 			return null;
-		return result;
+		return (Consumer<T>) result.callback();
 	}
+
+	record CallbackEntry<T extends ICraftedCallback>(Class<?> type, Consumer<T> callback) {}
 }

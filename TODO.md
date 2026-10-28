@@ -1,0 +1,30 @@
+# Things to do
+
+- Core
+  - [x] Abstractions
+  - [x] CraftedElement
+  - [ ] Input (handling, propagation, focus, etc.)
+  - [ ] Event system
+  - [ ] Navigation
+  - [x] Rendering
+- UI
+  - [x] XML Parser
+  - [x] Schema generator
+  - [ ] Basic elements
+  - [x] Box
+  - [x] Text
+  - [ ] Image
+  - [ ] Button
+  - [ ] Input
+  - [ ] Scroll
+  - [ ] List
+  - [ ] Slider
+  - [ ] Progress bar
+  - [ ] Tabs
+  - [ ] Dropdown
+  - [ ] Tooltip
+  - [ ] Modal
+  - [ ] Menu
+  - [ ] Context menu
+- Extras
+  - [ ] Documentation

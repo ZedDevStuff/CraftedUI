@@ -19,6 +19,7 @@ import org.appliedenergistics.yoga.style.YogaStyle;
 import java.util.*;
 import java.util.function.BiFunction;
 import java.util.function.Consumer;
+import java.util.function.Predicate;
 import java.util.function.Supplier;
 
 public abstract class CraftedElement
@@ -244,17 +245,37 @@ public abstract class CraftedElement
 	}
 
 	/**
-	 * Use this method for initializing the layout node with the given attributes.
+	 * Override this method to initialize the layout node for this element with non default values.
 	 */
-	protected abstract YogaStyle initLayoutNode(YogaStyle style, Map<String, String> attributes);
+	protected YogaStyle initLayoutNode(YogaStyle style, Map<String, String> attributes) { return style; }
+
+	public CraftedElement getElementById(String id)
+	{
+		if(this.id.get().equals(id))
+			return this;
+		for(var child : children)
+		{
+			var result = child.getElementById(id);
+			if(result != null)
+				return result;
+		}
+		return null;
+	}
+	public CraftedElement[] findElements(Predicate<CraftedElement> predicate)
+	{
+		List<CraftedElement> results = new ArrayList<>();
+		if(predicate.test(this))
+			results.add(this);
+		for(var child : children)
+			results.addAll(Arrays.asList(child.findElements(predicate)));
+		return results.toArray(new CraftedElement[0]);
+	}
 
 	public void setParent(CraftedElement parent)
 	{
-		if(this.parent != null && this.parent.children.contains(this))
-		{
-			this.parent.children.remove(this);
-			this.parent.node.removeChild(this.node);
-		}
+		if(this.parent != null)
+			this.parent.removeChild(this);
+		parent.addChild(this);
 	}
 	public void addChild(CraftedElement child)
 	{
@@ -262,9 +283,21 @@ public abstract class CraftedElement
 			return;
 		if(children.contains(child))
 			return;
+		if(child.parent != null)
+			child.parent.removeChild(child);
 		children.add(child);
 		child.parent = this;
 		node.addChildAt(child.node, node.getChildCount());
+	}
+	public void addChildren(Collection<CraftedElement> children)
+	{
+		for(var child : children)
+			addChild(child);
+	}
+	public void addChildren(CraftedElement... children)
+	{
+		for(var child : children)
+			addChild(child);
 	}
 	public void removeChild(CraftedElement child)
 	{
@@ -275,6 +308,16 @@ public abstract class CraftedElement
 		children.remove(child);
 		child.parent = null;
 		node.removeChild(child.node);
+	}
+	public void removeChildren(Collection<CraftedElement> children)
+	{
+		for(var child : children)
+			removeChild(child);
+	}
+	public void removeChildren(CraftedElement... children)
+	{
+		for(var child : children)
+			removeChild(child);
 	}
 
 	public void setRenderer(String renderer)

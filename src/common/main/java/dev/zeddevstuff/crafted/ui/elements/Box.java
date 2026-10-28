@@ -30,13 +30,6 @@ public class Box extends CraftedElement
 	public Box(CraftedContext ctx, Map<String, String> attributes)
 	{
 		super(ctx, attributes);
-		//tryParseInto(color, attributes.get("color"), Parsers::tryParseColor);
-	}
-
-	@Override
-	protected YogaStyle initLayoutNode(YogaStyle style, Map<String, String> attributes)
-	{
-		return style;
 	}
 
 	public static class BoxRenderer implements IRenders<Box>
