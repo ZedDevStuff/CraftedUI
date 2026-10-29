@@ -11,6 +11,7 @@ import dev.zeddevstuff.crafted.types.EdgeInsets;
 import dev.zeddevstuff.crafted.types.StyleLength2;
 import dev.zeddevstuff.crafted.types.StyleLength4;
 import dev.zeddevstuff.crafted.types.StyleSizeLength2;
+import dev.zeddevstuff.crafted.utils.MathUtils;
 import org.appliedenergistics.yoga.*;
 import org.appliedenergistics.yoga.style.StyleLength;
 import org.appliedenergistics.yoga.style.StyleSizeLength;
@@ -418,20 +419,6 @@ public abstract class CraftedElement
 		public final EdgeInsets<Integer> padding;
 		public final EdgeInsets<Integer> border;
 
-		public LayoutResult(int width, int innerWidth, int height, int innerHeight, int x, int innerX, int y, int innerY, EdgeInsets<Integer> margin, EdgeInsets<Integer> padding, EdgeInsets<Integer> border)
-		{
-			this.width = width;
-			this.innerWidth = innerWidth;
-			this.height = height;
-			this.innerHeight = innerHeight;
-			this.x = x;
-			this.innerX = innerX;
-			this.y = y;
-			this.innerY = innerY;
-			this.margin = margin;
-			this.padding = padding;
-			this.border = border;
-		}
 		private LayoutResult(CraftedElement element)
 		{
 			this.x = (int)element.node.getLayoutX();
