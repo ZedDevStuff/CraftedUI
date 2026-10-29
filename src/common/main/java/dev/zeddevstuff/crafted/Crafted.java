@@ -3,6 +3,7 @@ package dev.zeddevstuff.crafted;
 import dev.zeddevstuff.crafted.platform.IDispatcher;
 import dev.zeddevstuff.crafted.platform.IFont;
 import dev.zeddevstuff.crafted.platform.ILocalization;
+import dev.zeddevstuff.crafted.platform.ITextureFactory;
 import dev.zeddevstuff.crafted.rendering.RendererRegistry;
 import dev.zeddevstuff.crafted.types.TextSettings;
 import dev.zeddevstuff.crafted.ui.CraftedContext;
@@ -22,16 +23,18 @@ public class Crafted
 	public final ILocalization localization;
 	public final IFont defaultFont;
 	public final IDispatcher dispatcher;
+	public final ITextureFactory textureFactory;
 	public final TextSettings defaultTextSettings;
 	public final ElementRegistry elements = new ElementRegistry();
 	public final RendererRegistry renderers = new RendererRegistry();
 	private final Map<String, IFont> fonts = new java.util.HashMap<>();
 
-	public Crafted(ILocalization localization, IFont defaultFont, IDispatcher dispatcher)
+	public Crafted(ILocalization localization, IFont defaultFont, IDispatcher dispatcher, ITextureFactory textureFactory)
 	{
 		this.localization = localization;
 		this.defaultFont = defaultFont;
 		this.dispatcher = dispatcher;
+		this.textureFactory = textureFactory;
 		this.defaultTextSettings = new TextSettings(defaultFont, 1.0f, -1);
 		registerFont("default", defaultFont);
 	}

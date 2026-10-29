@@ -55,13 +55,45 @@ public class CanvasImpl implements ICanvas
 	@Override
 	public void drawTexture(ITexture texture, Rect dest, Color tint)
 	{
-		graphics.blit(((MinecraftTexture) texture).resourceLocation, (int) dest.minX(), (int) dest.minY(), 0,  0, 0, (int) dest.width(), (int) dest.height(), texture.getWidth(), texture.getHeight());
+		if(texture instanceof MinecraftTexture mcTex)
+		{
+			// void blit(ResourceLocation atlasLocation, int x, int y, int uOffset, int vOffset, int uWidth, int vHeight)
+			// void blit(ResourceLocation atlasLocation, int x, int y, int blitOffset, float uOffset, float vOffset, int uWidth, int vHeight, int textureWidth, int textureHeight)
+			// void blit(ResourceLocation atlasLocation, int x, int y, int width, int height, float uOffset, float vOffset, int uWidth, int vHeight, int textureWidth, int textureHeight)
+			// void blit(ResourceLocation atlasLocation, int x, int y, float uOffset, float vOffset, int width, int height, int textureWidth, int textureHeight)
+			// void blit(ResourceLocation atlasLocation, int x1, int x2, int y1, int y2, int blitOffset, int uWidth, int vHeight, float uOffset, float vOffset, int textureWidth, int textureHeight)
+			// Sprites
+			// void blitSprite(ResourceLocation sprite, int x, int y, int width, int height)
+			// void blitSprite(ResourceLocation sprite, int x, int y, int blitOffset, int width, int height)
+			// void blitSprite(ResourceLocation sprite, int textureWidth, int textureHeight, int uPosition, int vPosition, int x, int y, int uWidth, int vHeight)
+			// void blitSprite(ResourceLocation sprite, int textureWidth, int textureHeight, int uPosition, int vPosition, int x, int y, int blitOffset, int uWidth, int vHeight)
+			if(mcTex.getKind() == ITexture.Kind.SIMPLE)
+				graphics.blit(mcTex.resourceLocation, (int) dest.minX(), (int) dest.minY(), 0, 0, (int) dest.width(), (int) dest.height(), texture.getWidth(), texture.getHeight());
+			else if(mcTex.getKind() == ITexture.Kind.SPRITE)
+				graphics.blitSprite(mcTex.resourceLocation, (int) dest.minX(), (int) dest.minY(), (int) dest.width(), (int) dest.height());
+		}
 	}
 
 	@Override
 	public void drawTexture(ITexture texture, Rect src, Rect dest, Color tint)
 	{
-		graphics.blit(((MinecraftTexture) texture).resourceLocation, (int) dest.minX(), (int) dest.minY(), 0, (float) src.minX(), (float) src.minY(), (int) src.width(), (int) src.height(), texture.getWidth(), texture.getHeight());
+		if(texture instanceof MinecraftTexture mcTex)
+		{
+			// void blit(ResourceLocation atlasLocation, int x, int y, int uOffset, int vOffset, int uWidth, int vHeight)
+			// void blit(ResourceLocation atlasLocation, int x, int y, int blitOffset, float uOffset, float vOffset, int uWidth, int vHeight, int textureWidth, int textureHeight)
+			// void blit(ResourceLocation atlasLocation, int x, int y, int width, int height, float uOffset, float vOffset, int uWidth, int vHeight, int textureWidth, int textureHeight)
+			// void blit(ResourceLocation atlasLocation, int x, int y, float uOffset, float vOffset, int width, int height, int textureWidth, int textureHeight)
+			// void blit(ResourceLocation atlasLocation, int x1, int x2, int y1, int y2, int blitOffset, int uWidth, int vHeight, float uOffset, float vOffset, int textureWidth, int textureHeight)
+			// Sprites
+			// void blitSprite(ResourceLocation sprite, int x, int y, int width, int height)
+			// void blitSprite(ResourceLocation sprite, int x, int y, int blitOffset, int width, int height)
+			// void blitSprite(ResourceLocation sprite, int textureWidth, int textureHeight, int uPosition, int vPosition, int x, int y, int uWidth, int vHeight)
+			// void blitSprite(ResourceLocation sprite, int textureWidth, int textureHeight, int uPosition, int vPosition, int x, int y, int blitOffset, int uWidth, int vHeight)
+			if(mcTex.getKind() == ITexture.Kind.SIMPLE)
+				graphics.blit(mcTex.resourceLocation, (int) dest.minX(), (int) dest.minY(), 0, (int) src.minX(), (int) src.minY(), (int) src.width(), (int) src.height(), texture.getWidth(), texture.getHeight());
+			else if(mcTex.getKind() == ITexture.Kind.SPRITE)
+				graphics.blitSprite(mcTex.resourceLocation, (int) src.width(), (int) src.height(), (int) src.minX(), (int) src.minY(), (int) dest.minX(), (int) dest.minY(), (int) dest.width(), (int) dest.height());
+		}
 	}
 
 	@Override

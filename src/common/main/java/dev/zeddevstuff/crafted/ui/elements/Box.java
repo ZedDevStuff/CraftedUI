@@ -25,7 +25,7 @@ public class Box extends CraftedElement
 	}
 
 	@Description("Background color of the box")
-	public final Prop<Color> color = registerProp("color", Color.TRANSPARENT, Parsers::parseColor);
+	public final Prop<Color> color = registerProp("color", Color.Transparent, Parsers::parseColor);
 
 	public Box(CraftedContext ctx, Map<String, String> attributes)
 	{
@@ -34,7 +34,6 @@ public class Box extends CraftedElement
 
 	public static class BoxRenderer implements IRenders<Box>
 	{
-
 		@Override
 		public void render(ICanvas canvas, Box element)
 		{

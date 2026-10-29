@@ -24,6 +24,8 @@ public class SchemaGenerator
 				continue;
 			var elementClass = element.getKey();
 			var elementAnnotation = elementClass.getAnnotation(DefineElement.class);
+			if(elementAnnotation == null)
+				continue;
 			XmlSchemaNode elementNode = elementNode(elementAnnotation, element.getKey());
 			root.addChild(elementNode);
 		}

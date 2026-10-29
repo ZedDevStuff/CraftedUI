@@ -7,6 +7,7 @@ import dev.zeddevstuff.crafted.parsing.CraftedXmlParser;
 import dev.zeddevstuff.crafted.platform.MainThreadDispatcher;
 import dev.zeddevstuff.crafted.platform.MinecraftFont;
 import dev.zeddevstuff.crafted.platform.MinecraftLocalization;
+import dev.zeddevstuff.crafted.platform.MinecraftTextureFactory;
 import dev.zeddevstuff.crafted.ui.CraftedContext;
 import dev.zeddevstuff.crafted.ui.elements.All;
 import dev.zeddevstuff.crafted.ui.elements.CraftedRoot;
@@ -21,7 +22,8 @@ public class Entry
 		Crafted.setDefaultInstance(new Crafted(
 			new MinecraftLocalization(),
 			new MinecraftFont("minecraft", Minecraft.getInstance().font),
-			new MainThreadDispatcher()
+			new MainThreadDispatcher(),
+			new MinecraftTextureFactory()
 		));
 		LogUtils.getLogger().info("CraftedUI initialized");
 		All.registerInto(Crafted.defaultInstance());
@@ -31,6 +33,7 @@ public class Entry
 				<Box id="titlebar" width="100%" height="20" color="rgb(200, 200, 200)" />
 				<Box id="content" width="100%" height="stretch" color="rgb(255, 255, 255)" />
 				<Text fontScale="2">Hi!!!!!!!</Text>
+				<Button>Click me</Button>
 			</Crafted>
 			""");
 		var ctx = new CraftedContext(Crafted.defaultInstance());

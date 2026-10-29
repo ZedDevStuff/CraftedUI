@@ -372,9 +372,6 @@ public abstract class CraftedElement
 	}
 	private void collectRenderCommands(List<RenderCommand> list)
 	{
-//		if (hidden())
-//			return;
-//		ensureRenderersRegistered();
 		if(renderer != null)
 			list.add(new RenderCommand(this, RenderCommand.Phase.RENDER));
 		var sortedChildren = children.stream().sorted(Comparator.comparingInt(a -> a.zIndex.get())).toArray(CraftedElement[]::new);

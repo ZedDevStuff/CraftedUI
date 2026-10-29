@@ -33,7 +33,7 @@ public class Text extends CraftedElement
 	public final ProxyProp<Float> fontScale = registerProp(Float.class, "fontScale", settings.get()::size, (value) -> settings.set(settings.get().withSize(value)), Parsers::parseFloat);
 	public final ProxyProp<Float> wrapWidth = registerProp(Float.class, "wrapWidth", settings.get()::wrapWidth, (value) -> settings.set(settings.get().withWrapWidth(value)), Parsers::parseFloat);
 
-	public final Prop<Color> color = registerProp("color", Color.WHITE, Parsers::parseColor);
+	public final Prop<Color> color = registerProp("color", Color.White, Parsers::parseColor);
 
 	public Text(CraftedContext ctx, Map<String, String> attributes)
 	{
