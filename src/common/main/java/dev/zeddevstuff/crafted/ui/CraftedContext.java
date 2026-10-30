@@ -1,6 +1,7 @@
 package dev.zeddevstuff.crafted.ui;
 
 import dev.zeddevstuff.crafted.Crafted;
+import dev.zeddevstuff.crafted.input.InputHandler;
 import dev.zeddevstuff.crafted.types.ICraftedCallback;
 
 import java.util.HashMap;
@@ -13,6 +14,7 @@ import java.util.function.Consumer;
 public class CraftedContext
 {
 	public final Crafted crafted;
+	public final InputHandler inputHandler = new InputHandler();
 	private final HashMap<String, CallbackEntry<?>> callbacks = new HashMap<>();
 	/**
 	 * The renderer to use for future elements created in this context.

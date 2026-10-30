@@ -11,7 +11,7 @@ public record TextSettings(IFont font, float size, float wrapWidth, boolean shad
 	public TextSettings withShadow(boolean shadow) { return new TextSettings(font, size, wrapWidth, shadow, shadowColor, shadowDirection); }
 	public TextSettings withShadowColor(Color shadowColor) { return new TextSettings(font, size, wrapWidth, shadow, shadowColor, shadowDirection); }
 	public TextSettings withShadowDirection(ShadowDirection direction) { return new TextSettings(font, size, wrapWidth, shadow, shadowColor, direction); }
-	
+
 	public boolean shouldWrap() { return wrapWidth > 0; }
 
 	public static final TextSettings DEFAULT = new TextSettings(null, 1.0f, -1, false, new Color(63,63,63), ShadowDirection.BOTTOM_RIGHT);

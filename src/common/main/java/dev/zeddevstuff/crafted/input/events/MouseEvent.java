@@ -31,21 +31,13 @@ public class MouseEvent extends UIEvent
 	{
 		return new MouseEvent(Type.SCROLL, target, x, y, null, scrollX, scrollY);
 	}
-	public static MouseEvent down(CraftedElement target, float x, float y, MouseButton button)
+	public static MouseEvent press(CraftedElement target, float x, float y, MouseButton button)
 	{
-		return new MouseEvent(Type.DOWN, target, x, y, button, 0, 0);
+		return new MouseEvent(Type.PRESS, target, x, y, button, 0, 0);
 	}
-	public static MouseEvent up(CraftedElement target, float x, float y, MouseButton button)
+	public static MouseEvent release(CraftedElement target, float x, float y, MouseButton button)
 	{
-		return new MouseEvent(Type.UP, target, x, y, button, 0, 0);
-	}
-	public static MouseEvent click(CraftedElement target, float x, float y, MouseButton button)
-	{
-		return new MouseEvent(Type.CLICK, target, x, y, button, 0, 0);
-	}
-	public static MouseEvent doubleClick(CraftedElement target, float x, float y, MouseButton button)
-	{
-		return new MouseEvent(Type.DOUBLE_CLICK, target, x, y, button, 0, 0);
+		return new MouseEvent(Type.RELEASE, target, x, y, button, 0, 0);
 	}
 	public static MouseEvent enter(CraftedElement target, float x, float y)
 	{
@@ -60,10 +52,8 @@ public class MouseEvent extends UIEvent
 	{
 		MOVE,
 		SCROLL,
-		DOWN,
-		UP,
-		CLICK,
-		DOUBLE_CLICK,
+		PRESS,
+		RELEASE,
 		ENTER,
 		EXIT
 	}

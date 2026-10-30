@@ -16,4 +16,12 @@ public enum MouseButton
 	{
 		this.code = code;
 	}
+
+	public static MouseButton fromCode(int code)
+	{
+		for(var button : values())
+			if(button.code == code)
+				return button;
+		return null;
+	}
 }

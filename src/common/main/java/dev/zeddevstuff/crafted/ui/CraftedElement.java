@@ -4,6 +4,8 @@ import dev.zeddevstuff.crafted.IProp;
 import dev.zeddevstuff.crafted.Prop;
 import dev.zeddevstuff.crafted.ProxyProp;
 import dev.zeddevstuff.crafted.annotations.Description;
+import dev.zeddevstuff.crafted.input.events.KeyboardEvent;
+import dev.zeddevstuff.crafted.input.events.MouseEvent;
 import dev.zeddevstuff.crafted.parsing.Parsers;
 import dev.zeddevstuff.crafted.platform.ICanvas;
 import dev.zeddevstuff.crafted.rendering.IRenders;
@@ -11,7 +13,6 @@ import dev.zeddevstuff.crafted.types.EdgeInsets;
 import dev.zeddevstuff.crafted.types.StyleLength2;
 import dev.zeddevstuff.crafted.types.StyleLength4;
 import dev.zeddevstuff.crafted.types.StyleSizeLength2;
-import dev.zeddevstuff.crafted.utils.MathUtils;
 import org.appliedenergistics.yoga.*;
 import org.appliedenergistics.yoga.style.StyleLength;
 import org.appliedenergistics.yoga.style.StyleSizeLength;
@@ -25,7 +26,7 @@ import java.util.function.Supplier;
 
 public abstract class CraftedElement
 {
-	protected final CraftedContext ctx;
+	public final CraftedContext ctx;
 	protected final YogaNode node = new YogaNode();
 
 	protected CraftedElement parent;
@@ -254,9 +255,23 @@ public abstract class CraftedElement
 		return x >= layout.x && x <= layout.x + layout.width && y >= layout.y && y <= layout.y + layout.height;
 	}
 
-	public CraftedElement findTopmostAt(float x, float y)
+	long findStart = 0;
+	long findEnd = 0;
+	public final CraftedElement findTopmostAt(float x, float y)
 	{
-		throw new UnsupportedOperationException("Not implemented yet");
+		findStart = System.nanoTime();
+		var result = findTopmostAtImpl(x, y);
+		findEnd = System.nanoTime();
+		System.out.println("findTopmostAt took " + (findEnd - findStart) + "ns (or " + (findEnd - findStart) / 1_000_000.0 + "ms)");
+		return result;
+	}
+	private CraftedElement findTopmostAtImpl(float x, float y)
+	{
+		var sortedChildren = children.stream()
+			.sorted(Comparator.comparingInt(a -> a.zIndex.get()))
+			.filter(child -> child.contains(x, y))
+			.toArray(CraftedElement[]::new);
+		return sortedChildren.length > 0 ? sortedChildren[sortedChildren.length - 1].findTopmostAt(x, y) : this;
 	}
 
 	public CraftedElement getElementById(String id)
@@ -389,6 +404,23 @@ public abstract class CraftedElement
 		if(renderer != null)
 			list.add(new RenderCommand(this, RenderCommand.Phase.AFTER_RENDER));
 	}
+
+	public boolean capturesKeyboardWhenFocused() { return false; }
+
+	public void onFocusGained() {}
+	public void onFocusLost() {}
+
+	public void onMouseEnter(MouseEvent event) {}
+	public void onMouseExit(MouseEvent event) {}
+	public void onMouseMove(MouseEvent event) {}
+	public void onMouseScroll(MouseEvent event) {}
+	public void onMousePress(MouseEvent event) {}
+	public void onMouseRelease(MouseEvent event) {}
+
+	public void onKeyPress(KeyboardEvent event) {}
+	public void onKeyRelease(KeyboardEvent event) {}
+	public void onCharTyped(KeyboardEvent event) {}
+
 
 	private record RenderCommand(CraftedElement element, Phase commandPhase)
 	{
