@@ -341,14 +341,22 @@ public abstract class CraftedElement
 			child.setRendererRecursive(renderer);
 	}
 
-	public void layoutTree(float width, float height)
+	public final void layoutTree(float width, float height)
 	{
 		node.calculateLayout(width, height);
 		layout = new LayoutResult(this);
 		for(var child : children)
 			child.layoutElement();
-
 	}
+	public final void refreshLayoutTree()
+	{
+		refreshLayout();
+		for(var child : children)
+			child.refreshLayoutTree();
+	}
+
+	protected void refreshLayout() {}
+
 	private void layoutElement()
 	{
 		if(parent == null && node.hasNewLayout())

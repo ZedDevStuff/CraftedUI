@@ -61,6 +61,19 @@ public class Parsers
 			return defaultValue;
 		}
 	}
+	public static Boolean parseBoolean(String value, Boolean defaultValue)
+	{
+		if (value == null)
+			return defaultValue;
+		try
+		{
+			return Boolean.parseBoolean(value);
+		}
+		catch (Exception e)
+		{
+			return defaultValue;
+		}
+	}
 	public static StyleLength parseStyleLength(String value, StyleLength defaultValue)
 	{
 		if (value == null)

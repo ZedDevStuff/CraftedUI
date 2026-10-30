@@ -5,6 +5,7 @@ import dev.zeddevstuff.crafted.Prop;
 import dev.zeddevstuff.crafted.ProxyProp;
 import dev.zeddevstuff.crafted.annotations.DefineElement;
 import dev.zeddevstuff.crafted.parsing.Parsers;
+import dev.zeddevstuff.crafted.platform.ICanvas;
 import dev.zeddevstuff.crafted.platform.IFont;
 import dev.zeddevstuff.crafted.platform.IText;
 import dev.zeddevstuff.crafted.rendering.IRenders;
@@ -28,10 +29,12 @@ public class Text extends CraftedElement
 
 	public final Prop<IText> text = registerProp(IText.class, "text", IText.literal("Text"), Parsers::parseText);
 
-	public final Prop<TextSettings> settings = new Prop<>(TextSettings.class, "settings", new TextSettings(null, 1.0f, -1));
+	public final Prop<TextSettings> settings = new Prop<>(TextSettings.class, "settings", TextSettings.DEFAULT);
 	public final ProxyProp<IFont> font;
 	public final ProxyProp<Float> fontScale = registerProp(Float.class, "fontScale", settings.get()::size, (value) -> settings.set(settings.get().withSize(value)), Parsers::parseFloat);
 	public final ProxyProp<Float> wrapWidth = registerProp(Float.class, "wrapWidth", settings.get()::wrapWidth, (value) -> settings.set(settings.get().withWrapWidth(value)), Parsers::parseFloat);
+	public final ProxyProp<Boolean> shadow = registerProp(Boolean.class, "shadow", settings.get()::shadow, (value) -> settings.set(settings.get().withShadow(value)), Parsers::parseBoolean);
+	public final ProxyProp<Color> shadowColor = registerProp(Color.class, "shadowColor", settings.get()::shadowColor, (value) -> settings.set(settings.get().withShadowColor(value)), Parsers::parseColor);
 
 	public final Prop<Color> color = registerProp("color", Color.White, Parsers::parseColor);
 
@@ -46,8 +49,8 @@ public class Text extends CraftedElement
 			if(cFont == null)
 				return;
 			var size = cFont.measureText(newValue, settings.get().size(), settings.get().wrapWidth());
-			this.width.set(StyleSizeLength.points(size[0]));
-			this.height.set(StyleSizeLength.points(size[1]));
+			this.width.set(StyleSizeLength.points(size[0] - 0));
+			this.height.set(StyleSizeLength.points(Math.max(size[1] - 0, 0)));
 		});
 		settings.addListener((prop, oldValue, newValue) -> {
 			var cFont = font.get();
@@ -59,16 +62,26 @@ public class Text extends CraftedElement
 		});
 	}
 
+	@Override
+	protected void refreshLayout()
+	{
+		var cFont = font.get();
+		if(cFont == null)
+			return;
+		var size = cFont.measureText(text.get(), settings.get().size(), settings.get().wrapWidth());
+		this.width.set(StyleSizeLength.points(size[0]));
+		this.height.set(StyleSizeLength.points(size[1]));
+	}
+
 	public static class TextRenderer implements IRenders<Text>
 	{
 		@Override
-		public void render(dev.zeddevstuff.crafted.platform.ICanvas canvas, Text element)
+		public void render(ICanvas canvas, Text element)
 		{
-			var layout = element.getLayout();
 			var fontScale = element.settings.get().size();
 			canvas.beginTransform();
 			canvas.scale(fontScale, fontScale);
-			canvas.drawText(element.text.get(), (int)(layout.x / fontScale), (int)(layout.y / fontScale),
+			canvas.drawText(element.text.get(), (int)(element.getLayout().x / fontScale), (int)(element.getLayout().y / fontScale),
 				element.settings.get(), element.color.get());
 			canvas.endTransform();
 		}

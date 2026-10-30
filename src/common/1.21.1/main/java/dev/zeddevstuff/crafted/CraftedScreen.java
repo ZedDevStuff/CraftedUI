@@ -20,6 +20,7 @@ public class CraftedScreen extends Screen
 	{
 		super(TextConverter.toMinecraftText(rootElement.title.get()));
 		this.rootElement = rootElement;
+		rootElement.refreshLayoutTree();
 	}
 	public CraftedScreen(CraftedContext ctx, Function<CraftedContext, CraftedRoot> rootElementFactory)
 	{

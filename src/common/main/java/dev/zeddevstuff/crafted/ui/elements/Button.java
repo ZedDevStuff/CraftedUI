@@ -30,6 +30,7 @@ public class Button extends CraftedElement
 		{
 			var text = new Text(ctx, Map.of());
 			text.text.set(Parsers.parseText(attributes.get("text"), IText.literal("???")));
+			text.settings.set(text.settings.get().withShadow(true));
 			addChild(text);
 		}
 	}

@@ -28,9 +28,21 @@ public class CanvasImpl implements ICanvas
 		if(settings.font() instanceof MinecraftFont font)
 		{
 			if(settings.shouldWrap())
+			{
+				if(settings.shadow())
+					graphics.drawWordWrap(font.font, Component.literal(text),
+						x + settings.shadowDirection().x, y + settings.shadowDirection().y,
+						(int) settings.wrapWidth(), settings.shadowColor().toArgbInt());
 				graphics.drawWordWrap(font.font, Component.literal(text), x, y, (int) settings.wrapWidth(), color.toArgbInt());
+			}
 			else
+			{
+				if(settings.shadow())
+					graphics.drawString(font.font, Component.literal(text),
+						x + settings.shadowDirection().x, y + settings.shadowDirection().y,
+						settings.shadowColor().toArgbInt(), false);
 				graphics.drawString(font.font, text, x, y, color.toArgbInt(), false);
+			}
 		}
 		else
 			throw new IllegalArgumentException("Unsupported font type: " + settings.font().getClass().getName());
@@ -43,10 +55,23 @@ public class CanvasImpl implements ICanvas
 			return;
 		if(settings.font() instanceof MinecraftFont font)
 		{
+
 			if(settings.shouldWrap())
+			{
+				if(settings.shadow())
+					graphics.drawWordWrap(font.font, Component.literal(text.get()),
+						x + settings.shadowDirection().x, y + settings.shadowDirection().y,
+						(int) settings.wrapWidth(), settings.shadowColor().toArgbInt());
 				graphics.drawWordWrap(font.font, Component.literal(text.get()), x, y, (int) settings.wrapWidth(), color.toArgbInt());
+			}
 			else
+			{
+				if(settings.shadow())
+					graphics.drawString(font.font, Component.literal(text.get()),
+						x + settings.shadowDirection().x, y + settings.shadowDirection().y,
+						settings.shadowColor().toArgbInt(), false);
 				graphics.drawString(font.font, Component.literal(text.get()), x, y, color.toArgbInt(), false);
+			}
 		}
 		else
 			throw new IllegalArgumentException("Unsupported font type: " + settings.font().getClass().getName());
