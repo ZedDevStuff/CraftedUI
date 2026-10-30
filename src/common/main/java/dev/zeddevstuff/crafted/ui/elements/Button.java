@@ -2,6 +2,7 @@ package dev.zeddevstuff.crafted.ui.elements;
 
 import dev.zeddevstuff.crafted.Crafted;
 import dev.zeddevstuff.crafted.annotations.DefineElement;
+import dev.zeddevstuff.crafted.input.events.MouseEvent;
 import dev.zeddevstuff.crafted.parsing.Parsers;
 import dev.zeddevstuff.crafted.platform.ICanvas;
 import dev.zeddevstuff.crafted.platform.IText;
@@ -34,6 +35,21 @@ public class Button extends CraftedElement
 			addChild(text);
 		}
 	}
+
+	@Override
+	public boolean receivesInputEvents() { return true; }
+
+//	@Override
+//	public void onMousePress(MouseEvent event)
+//	{
+//		System.out.println("Button pressed: " + ((Text)this.children.getFirst()).text);
+//	}
+//
+//	@Override
+//	public void onMouseRelease(MouseEvent event)
+//	{
+//		super.onMouseRelease(event);
+//	}
 
 	@Override
 	protected YogaStyle initLayoutNode(YogaStyle style, Map<String, String> attributes)

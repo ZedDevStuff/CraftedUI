@@ -42,4 +42,10 @@ public class ProxyProp<T> implements IProp<T>
 
 	@Override
 	public void setFromString(String str) { set(parser.apply(str, get())); }
+
+	@Override
+	public String toString()
+	{
+		return get() == null ? "null" : get().toString();
+	}
 }

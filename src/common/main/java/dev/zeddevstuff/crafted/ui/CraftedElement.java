@@ -4,8 +4,7 @@ import dev.zeddevstuff.crafted.IProp;
 import dev.zeddevstuff.crafted.Prop;
 import dev.zeddevstuff.crafted.ProxyProp;
 import dev.zeddevstuff.crafted.annotations.Description;
-import dev.zeddevstuff.crafted.input.events.KeyboardEvent;
-import dev.zeddevstuff.crafted.input.events.MouseEvent;
+import dev.zeddevstuff.crafted.input.events.*;
 import dev.zeddevstuff.crafted.parsing.Parsers;
 import dev.zeddevstuff.crafted.platform.ICanvas;
 import dev.zeddevstuff.crafted.rendering.IRenders;
@@ -18,6 +17,7 @@ import org.appliedenergistics.yoga.style.StyleLength;
 import org.appliedenergistics.yoga.style.StyleSizeLength;
 import org.appliedenergistics.yoga.style.YogaStyle;
 
+import javax.annotation.Nonnull;
 import java.util.*;
 import java.util.function.BiFunction;
 import java.util.function.Consumer;
@@ -32,6 +32,13 @@ public abstract class CraftedElement
 	protected CraftedElement parent;
 	public CraftedElement getParent() { return parent; }
 	protected final List<CraftedElement> children = new ArrayList<>();
+	private CraftedElement[] sortedChildrenCache = null;
+	private CraftedElement[] getSortedChildrenCache()
+	{
+		if(sortedChildrenCache == null)
+			sortedChildrenCache = children.stream().sorted(Comparator.<CraftedElement>comparingInt(a -> a.zIndex.get()).reversed()).toArray(CraftedElement[]::new);
+		return sortedChildrenCache;
+	}
 
 	private LayoutResult layout;
 	public LayoutResult getLayout() { return layout; }
@@ -50,12 +57,24 @@ public abstract class CraftedElement
 		props.put(prop.getName(), prop);
 		return prop;
 	}
+
+	@SuppressWarnings("unchecked")
+	protected <T, TProp extends IProp<T>> TProp registerProp(Class<T> type, String name, BiFunction<String, T, T> parser)
+	{
+		if(props.containsKey(name))
+			throw new IllegalArgumentException("Property with name '" + name + "' is already registered for this element.");
+		var prop = new Prop<>(type, name, null, parser);
+		props.put(name, prop);
+		return (TProp) prop;
+	}
+
 	/**
 	 * Registers a property for this element. <br>
-	 * This will allow the property to be set via attributes in the XML.
+	 * This will allow the property to be set via attributes in the XML. <br>
+	 * Note that this overload does not allow a null default value, as it cannot infer the type of the property from a null value.
 	 * @return The registered property.
 	 */
-	protected <T> Prop<T> registerProp(String name, T value, BiFunction<String, T, T> parser)
+	protected <T> Prop<T> registerProp(String name, @Nonnull T value, BiFunction<String, T, T> parser)
 	{
 		if(props.containsKey(name))
 			throw new IllegalArgumentException("Property with name '" + name + "' is already registered for this element.");
@@ -227,6 +246,20 @@ public abstract class CraftedElement
 	public final ProxyProp<StyleSizeLength> maxWidth = registerProp(StyleSizeLength.class, "maxWidth", () -> node.getStyle().getMaxDimension(YogaDimension.WIDTH), node::setMaxWidth, Parsers::parseStyleSizeLength);
 	public final ProxyProp<StyleSizeLength> maxHeight = registerProp(StyleSizeLength.class, "maxHeight", () -> node.getStyle().getMaxDimension(YogaDimension.HEIGHT), node::setMaxHeight, Parsers::parseStyleSizeLength);
 
+	public final Prop<IFocusEventHandler> onFocusGained = registerProp(IFocusEventHandler.class, "onFocusGained", this::getFocusCallback);
+	public final Prop<IFocusEventHandler> onFocusLost = registerProp(IFocusEventHandler.class, "onFocusLost", this::getFocusCallback);
+
+	public final Prop<IMouseEventHandler> onMouseMove = registerProp(IMouseEventHandler.class, "onMouseMove", this::getMouseCallback);
+	public final Prop<IMouseEventHandler> onMouseScroll = registerProp(IMouseEventHandler.class, "onMouseScroll", this::getMouseCallback);
+	public final Prop<IMouseEventHandler> onMouseEnter = registerProp(IMouseEventHandler.class, "onMouseEnter", this::getMouseCallback);
+	public final Prop<IMouseEventHandler> onMouseExit = registerProp(IMouseEventHandler.class, "onMouseExit", this::getMouseCallback);
+	public final Prop<IMouseEventHandler> onMousePress = registerProp(IMouseEventHandler.class, "onMousePress", this::getMouseCallback);
+	public final Prop<IMouseEventHandler> onMouseRelease = registerProp(IMouseEventHandler.class, "onMouseRelease", this::getMouseCallback);
+
+	public final Prop<IKeyEventHandler> onKeyPress = registerProp(IKeyEventHandler.class, "onKeyPress", this::getKeyCallback);
+	public final Prop<IKeyEventHandler> onKeyRelease = registerProp(IKeyEventHandler.class, "onKeyRelease", this::getKeyCallback);
+	public final Prop<IKeyEventHandler> onKeyType = registerProp(IKeyEventHandler.class, "onKeyType", this::getKeyCallback);
+
 	private IRenders<?> renderer;
 
 	public CraftedElement(CraftedContext ctx, Map<String, String> attributes)
@@ -234,6 +267,10 @@ public abstract class CraftedElement
 		this.ctx = ctx;
 		this.renderer = ctx.crafted.renderers.getRenderer(this.getClass(), attributes.getOrDefault("renderer", "default"));
 		this.node.setStyle(initLayoutNode(node.getStyle(), attributes));
+		zIndex.addListener((prop, oldValue, newValue) -> {
+			if(parent != null)
+				parent.udpateSortedChildrenCache();
+		});
 	}
 
 	void parseAttributes(Map<String, String> attributes)
@@ -246,32 +283,64 @@ public abstract class CraftedElement
 		}
 	}
 
+	IFocusEventHandler getFocusCallback(String name, IFocusEventHandler defaultValue)
+	{
+		return ctx.getCallback(IFocusEventHandler.class, name);
+	}
+	IMouseEventHandler getMouseCallback(String name, IMouseEventHandler defaultValue)
+	{
+		return ctx.getCallback(IMouseEventHandler.class, name);
+	}
+	IKeyEventHandler getKeyCallback(String name, IKeyEventHandler defaultValue)
+	{
+		return ctx.getCallback(IKeyEventHandler.class, name);
+	}
+
 	/**
 	 * Override this method to initialize the layout node for this element with non default values.
 	 */
 	protected YogaStyle initLayoutNode(YogaStyle style, Map<String, String> attributes) { return style; }
 	public boolean contains(float x, float y)
 	{
-		return x >= layout.x && x <= layout.x + layout.width && y >= layout.y && y <= layout.y + layout.height;
+		if(overflow.get() == YogaOverflow.HIDDEN)
+			return x >= layout.x && x <= layout.x + layout.width && y >= layout.y && y <= layout.y + layout.height;
+		else
+			// TODO: Figure out the best way to do this
+			return x >= layout.x && x <= layout.x + layout.width && y >= layout.y && y <= layout.y + layout.height;
 	}
 
-	long findStart = 0;
-	long findEnd = 0;
-	public final CraftedElement findTopmostAt(float x, float y)
+	// Thank you Wulferis
+	public CraftedElement findTopmostAt(float x, float y)
 	{
-		findStart = System.nanoTime();
-		var result = findTopmostAtImpl(x, y);
-		findEnd = System.nanoTime();
-		System.out.println("findTopmostAt took " + (findEnd - findStart) + "ns (or " + (findEnd - findStart) / 1_000_000.0 + "ms)");
-		return result;
+		if (!contains(x, y)) // Clip parent, so even the one calling this clips and doesnt get its clip/bounds ignored
+			return null;
+
+		// check each child, starting with the topmost one
+		// don't filter out children that don't receive input events themselves they may still contain children that do
+		for (var child : getSortedChildrenCache())
+		{
+			// recursively search the child's subtree for the topmost input target
+			// this will perform its own bounds check before searching deeper
+			var target = child.findTopmostAt(x, y);
+
+			// return immediately when a valid target is found
+			// since children are sorted by Z-index, this is the topmost valid target
+			if (target != null)
+				return target;
+		}
+
+		// no child contained a valid input target
+		// fall back to this element if it receives input events
+		// otherwise, return null so the caller can check another child
+		return receivesInputEvents() ? this : null;
 	}
-	private CraftedElement findTopmostAtImpl(float x, float y)
+	private void udpateSortedChildrenCache()
 	{
-		var sortedChildren = children.stream()
-			.sorted(Comparator.comparingInt(a -> a.zIndex.get()))
-			.filter(child -> child.contains(x, y))
+		sortedChildrenCache = children.stream()
+			.sorted(Comparator.<CraftedElement>comparingInt(a -> a.zIndex.get()).reversed())
 			.toArray(CraftedElement[]::new);
-		return sortedChildren.length > 0 ? sortedChildren[sortedChildren.length - 1].findTopmostAt(x, y) : this;
+		if(parent != null)
+			parent.udpateSortedChildrenCache();
 	}
 
 	public CraftedElement getElementById(String id)
@@ -405,21 +474,134 @@ public abstract class CraftedElement
 			list.add(new RenderCommand(this, RenderCommand.Phase.AFTER_RENDER));
 	}
 
+	/**
+	 * Override this method to indicate that this element should receive input events. <br>
+	 * By default, elements do not receive input events.
+	 */
+	public boolean receivesInputEvents() { return false; }
+
 	public boolean capturesKeyboardWhenFocused() { return false; }
 
-	public void onFocusGained() {}
-	public void onFocusLost() {}
+	public void handleFocusGained(FocusEvent event)
+	{
+		if(!receivesInputEvents())
+			return;
+		onFocusGained(event);
+		var callback = onFocusGained.get();
+		if(callback != null)
+			callback.onEvent(event);
+	}
+	public void onFocusGained(FocusEvent event) {}
 
+	public void handleFocusLost(FocusEvent event)
+	{
+		if(!receivesInputEvents())
+			return;
+		onFocusLost(event);
+		var callback = onFocusLost.get();
+		if(callback != null)
+			callback.onEvent(event);
+	}
+	public void onFocusLost(FocusEvent event) {}
+
+	public final void handleMouseEnter(MouseEvent event)
+	{
+		if(!receivesInputEvents())
+			return;
+		onMouseEnter(event);
+		var callback = onMouseEnter.get();
+		if(callback != null)
+			callback.onEvent(event);
+	}
 	public void onMouseEnter(MouseEvent event) {}
+
+	public final void handleMouseExit(MouseEvent event)
+	{
+		if(!receivesInputEvents())
+			return;
+		onMouseExit(event);
+		var callback = onMouseExit.get();
+		if(callback != null)
+			callback.onEvent(event);
+	}
 	public void onMouseExit(MouseEvent event) {}
+
+	public final void handleMouseMove(MouseEvent event)
+	{
+		if(!receivesInputEvents())
+			return;
+		onMouseMove(event);
+		var callback = onMouseMove.get();
+		if(callback != null)
+			callback.onEvent(event);
+	}
 	public void onMouseMove(MouseEvent event) {}
+
+	public final void handleMouseScroll(MouseEvent event)
+	{
+		if(!receivesInputEvents())
+			return;
+		onMouseScroll(event);
+		var callback = onMouseScroll.get();
+		if(callback != null)
+			callback.onEvent(event);
+	}
 	public void onMouseScroll(MouseEvent event) {}
+
+	public final void handleMousePress(MouseEvent event)
+	{
+		if(!receivesInputEvents())
+			return;
+		onMousePress(event);
+		var callback = onMousePress.get();
+		if(callback != null)
+			callback.onEvent(event);
+	}
 	public void onMousePress(MouseEvent event) {}
+
+	public final void handleMouseRelease(MouseEvent event)
+	{
+		if(!receivesInputEvents())
+			return;
+		onMouseRelease(event);
+		var callback = onMouseRelease.get();
+		if(callback != null)
+			callback.onEvent(event);
+	}
 	public void onMouseRelease(MouseEvent event) {}
 
-	public void onKeyPress(KeyboardEvent event) {}
-	public void onKeyRelease(KeyboardEvent event) {}
-	public void onCharTyped(KeyboardEvent event) {}
+	public final void handleKeyPress(KeyEvent event)
+	{
+		if(!receivesInputEvents())
+			return;
+		onKeyPress(event);
+		var callback = onKeyPress.get();
+		if(callback != null)
+			callback.onEvent(event);
+	}
+	public void onKeyPress(KeyEvent event) {}
+
+	public final void handleKeyRelease(KeyEvent event)
+	{
+		if(!receivesInputEvents())
+			return;
+		onKeyRelease(event);
+		var callback = onKeyRelease.get();
+		if(callback != null)
+			callback.onEvent(event);
+	}
+	public void onKeyRelease(KeyEvent event) {}
+
+	public final void handleCharTyped(KeyEvent event)
+	{
+		if(!receivesInputEvents())
+			return;
+		onCharTyped(event);
+		var callback = onKeyType.get();
+		if(callback != null)
+			callback.onEvent(event);
+	}
+	public void onCharTyped(KeyEvent event) {}
 
 
 	private record RenderCommand(CraftedElement element, Phase commandPhase)

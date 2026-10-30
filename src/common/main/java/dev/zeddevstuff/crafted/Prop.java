@@ -1,5 +1,6 @@
 package dev.zeddevstuff.crafted;
 
+import javax.annotation.Nonnull;
 import java.util.ArrayList;
 import java.util.Objects;
 import java.util.function.BiFunction;
@@ -19,7 +20,7 @@ public class Prop<T> implements IProp<T>
 	public T get() { return value; }
 	public void set(T newValue)
 	{
-		if(newValue == null || !type.isAssignableFrom(newValue.getClass()))
+		if(newValue != null && !type.isAssignableFrom(newValue.getClass()))
 			throw new IllegalArgumentException("Invalid value type for prop " + name + ": " + newValue);
 		if(Objects.equals(value, newValue))
 			return;
@@ -52,12 +53,12 @@ public class Prop<T> implements IProp<T>
 	}
 
 	@SuppressWarnings("unchecked")
-	public Prop(String name, T value)
+	public Prop(String name, @Nonnull T value)
 	{
 		this((Class<T>)value.getClass(), name, value);
 	}
 	@SuppressWarnings("unchecked")
-	public Prop(String name, T value, BiFunction<String, T, T> parser)
+	public Prop(String name, @Nonnull T value, BiFunction<String, T, T> parser)
 	{
 		this((Class<T>)value.getClass(), name, value, parser);
 	}
@@ -68,6 +69,12 @@ public class Prop<T> implements IProp<T>
 			listeners.add(listener);
 	}
 	public void removeListener(PropChangeListener<T> listener) { listeners.remove(listener); }
+
+	@Override
+	public String toString()
+	{
+		return value == null ? "null" : value.toString();
+	}
 
 	public interface PropChangeListener<T>
 	{

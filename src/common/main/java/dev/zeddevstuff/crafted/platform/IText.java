@@ -37,6 +37,9 @@ public interface IText
 
 		@Override
 		public String getRawText() { return text; }
+
+		@Override
+		public String toString() { return "Literal(\"" + text + "\")"; }
 	}
 	class Localized implements IText
 	{
@@ -52,5 +55,8 @@ public interface IText
 
 		@Override
 		public String getRawText() { return key; }
+
+		@Override
+		public String toString() { return "Localized(\"" + key + "\")"; }
 	}
 }

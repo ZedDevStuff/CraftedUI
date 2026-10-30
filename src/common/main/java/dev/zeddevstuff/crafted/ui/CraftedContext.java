@@ -2,7 +2,8 @@ package dev.zeddevstuff.crafted.ui;
 
 import dev.zeddevstuff.crafted.Crafted;
 import dev.zeddevstuff.crafted.input.InputHandler;
-import dev.zeddevstuff.crafted.types.ICraftedCallback;
+import dev.zeddevstuff.crafted.input.events.IUIEventHandler;
+import dev.zeddevstuff.crafted.input.events.UIEvent;
 
 import java.util.HashMap;
 import java.util.function.Consumer;
@@ -15,7 +16,7 @@ public class CraftedContext
 {
 	public final Crafted crafted;
 	public final InputHandler inputHandler = new InputHandler();
-	private final HashMap<String, CallbackEntry<?>> callbacks = new HashMap<>();
+	private final HashMap<String, IUIEventHandler> callbacks = new HashMap<>();
 	/**
 	 * The renderer to use for future elements created in this context.
 	 */
@@ -26,22 +27,24 @@ public class CraftedContext
 		this.crafted = crafted;
 	}
 
-	public <T extends ICraftedCallback> void registerCallback(Class<T> type, String name, Consumer<T> callback)
+	public <T extends IUIEventHandler> void registerCallback(String name, T callback)
 	{
-		callbacks.put(name, new CallbackEntry<>(type, callback));
+		callbacks.put(name, callback);
+	}
+	public <T extends IUIEventHandler> void registerCallback(Class<T> type, String name, T callback)
+	{
+		callbacks.put(name, callback);
 	}
 	public boolean unregisterCallback(String name)
 	{
 		return callbacks.remove(name) != null;
 	}
 	@SuppressWarnings("unchecked")
-	public <T extends ICraftedCallback> Consumer<T> getCallback(Class<T> type, String name)
+	public <T extends IUIEventHandler> T getCallback(Class<T> type, String name)
 	{
 		var result = callbacks.get(name);
-		if (result.type() != type)
+		if (result != null && !type.isAssignableFrom(result.getClass()))
 			return null;
-		return (Consumer<T>) result.callback();
+		return (T) result;
 	}
-
-	record CallbackEntry<T extends ICraftedCallback>(Class<?> type, Consumer<T> callback) {}
 }

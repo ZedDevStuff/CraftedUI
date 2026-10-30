@@ -3,8 +3,10 @@
 - Core
   - [x] Abstractions
   - [x] CraftedElement
-  - [ ] Input (handling, propagation, focus, etc.)
-  - [ ] Event system
+  - [ ] Input
+    - [x] Handling
+    - [ ] Focus and state
+    - [x] Markup callbacks (named only)
   - [ ] Navigation
   - [x] Rendering
 - UI
