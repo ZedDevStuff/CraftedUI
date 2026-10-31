@@ -39,8 +39,19 @@ public abstract class CraftedElement
 	private CraftedElement[] getSortedChildrenCache()
 	{
 		if(sortedChildrenCache == null)
-			sortedChildrenCache = children.stream().sorted(Comparator.<CraftedElement>comparingInt(a -> a.zIndex.get()).reversed()).toArray(CraftedElement[]::new);
+			sortedChildrenCache = children.stream()
+				.sorted(Comparator.<CraftedElement>comparingInt(a -> a.zIndex.get()).reversed())
+					.toArray(CraftedElement[]::new);
 		return sortedChildrenCache;
+	}
+	private CraftedElement[] renderSortedChildrenCache = null;
+	private CraftedElement[] getRenderSortedChildrenCache()
+	{
+		if(renderSortedChildrenCache == null)
+			renderSortedChildrenCache = children.stream()
+				.sorted(Comparator.<CraftedElement>comparingInt(a -> a.zIndex.get()))
+					.toArray(CraftedElement[]::new);
+		return renderSortedChildrenCache;
 	}
 
 	public final InteractionState state = new InteractionState(INTERNAL_KEY);
@@ -262,6 +273,8 @@ public abstract class CraftedElement
 	public final Prop<IMouseEventHandler> onMousePress = registerProp(IMouseEventHandler.class, "onMousePress", this::getMouseCallback);
 	public final Prop<IMouseEventHandler> onMouseRelease = registerProp(IMouseEventHandler.class, "onMouseRelease", this::getMouseCallback);
 
+	public final Prop<IClickEventHandler> onClick = registerProp(IClickEventHandler.class, "onClick", this::getClickCallback);
+
 	public final Prop<IKeyEventHandler> onKeyPress = registerProp(IKeyEventHandler.class, "onKeyPress", this::getKeyCallback);
 	public final Prop<IKeyEventHandler> onKeyRelease = registerProp(IKeyEventHandler.class, "onKeyRelease", this::getKeyCallback);
 	public final Prop<IKeyEventHandler> onKeyType = registerProp(IKeyEventHandler.class, "onKeyType", this::getKeyCallback);
@@ -275,7 +288,7 @@ public abstract class CraftedElement
 		this.node.setStyle(initLayoutNode(node.getStyle(), attributes));
 		zIndex.addListener((prop, oldValue, newValue) -> {
 			if(parent != null)
-				parent.udpateSortedChildrenCache();
+				parent.udpateSortedChildrenCaches();
 		});
 	}
 
@@ -296,6 +309,10 @@ public abstract class CraftedElement
 	IMouseEventHandler getMouseCallback(String name, IMouseEventHandler defaultValue)
 	{
 		return ctx.getCallback(IMouseEventHandler.class, name);
+	}
+	IClickEventHandler getClickCallback(String name, IClickEventHandler defaultValue)
+	{
+		return ctx.getCallback(IClickEventHandler.class, name);
 	}
 	IKeyEventHandler getKeyCallback(String name, IKeyEventHandler defaultValue)
 	{
@@ -340,13 +357,16 @@ public abstract class CraftedElement
 		// otherwise, return null so the caller can check another child
 		return receivesInputEvents() ? this : null;
 	}
-	private void udpateSortedChildrenCache()
+	private void udpateSortedChildrenCaches()
 	{
 		sortedChildrenCache = children.stream()
 			.sorted(Comparator.<CraftedElement>comparingInt(a -> a.zIndex.get()).reversed())
 			.toArray(CraftedElement[]::new);
+		renderSortedChildrenCache = children.stream()
+			.sorted(Comparator.<CraftedElement>comparingInt(a -> a.zIndex.get()))
+			.toArray(CraftedElement[]::new);
 		if(parent != null)
-			parent.udpateSortedChildrenCache();
+			parent.udpateSortedChildrenCaches();
 	}
 
 	public CraftedElement getElementById(String id)
@@ -473,8 +493,10 @@ public abstract class CraftedElement
 	{
 		if(renderer != null)
 			list.add(new RenderCommand(this, RenderCommand.Phase.RENDER));
-		var sortedChildren = children.stream().sorted(Comparator.comparingInt(a -> a.zIndex.get())).toArray(CraftedElement[]::new);
-		for(var child : sortedChildren)
+//		var sortedChildren = children.stream()
+//			.sorted(Comparator.comparingInt(a -> a.zIndex.get()))
+//			.toArray(CraftedElement[]::new);
+		for(var child : getRenderSortedChildrenCache())
 			child.collectRenderCommands(list);
 		if(renderer != null)
 			list.add(new RenderCommand(this, RenderCommand.Phase.AFTER_RENDER));
@@ -576,6 +598,17 @@ public abstract class CraftedElement
 			callback.onEvent(event);
 	}
 	public void onMouseRelease(MouseEvent event) {}
+
+	public final void handleClick(ClickEvent event)
+	{
+		if(!receivesInputEvents())
+			return;
+		onClick(event);
+		var callback = onClick.get();
+		if(callback != null)
+			callback.onEvent(event);
+	}
+	public void onClick(ClickEvent event) {}
 
 	public final void handleKeyPress(KeyEvent event)
 	{

@@ -2,6 +2,7 @@ package dev.zeddevstuff.crafted;
 
 import com.mojang.logging.LogUtils;
 import dev.zeddevstuff.crafted.input.ImportantKeys;
+import dev.zeddevstuff.crafted.input.events.IClickEventHandler;
 import dev.zeddevstuff.crafted.input.events.IMouseEventHandler;
 import dev.zeddevstuff.crafted.input.events.MouseEvent;
 import dev.zeddevstuff.crafted.parsing.DocumentBuilder;
@@ -40,7 +41,7 @@ public class Entry
 				<Box id="titlebar" width="100%" height="20" color="rgb(200, 200, 200)" />
 				<Box id="content" width="100%" height="stretch" color="rgb(255, 255, 255)" />
 				<Text fontScale="1">ijJ</Text>
-				<Button>Click me</Button>
+				<Button disabled="true">Click me</Button>
 				<Box>
 					<Box>
 						<Box>
@@ -71,7 +72,7 @@ public class Entry
 							<Box>
 							<Box>
 							<Box>
-							<Button onMousePress="onDeepClick">Insanely deeply nested button</Button>
+							<Button onClick="onDeepClick">Insanely deeply nested button</Button>
 							</Box>
 							</Box>
 							</Box>
@@ -105,7 +106,7 @@ public class Entry
 			</Crafted>
 			""");
 		var ctx = new CraftedContext(Crafted.defaultInstance());
-		ctx.registerCallback(IMouseEventHandler.class, "onDeepClick", event -> {
+		ctx.registerCallback(IClickEventHandler.class, "onDeepClick", event -> {
 			System.out.println("Deep click event received by context on element " + event.getTarget());
 		});
 		rootElement = (CraftedRoot)DocumentBuilder.buildTree(Crafted.defaultInstance(), ctx, parsed);

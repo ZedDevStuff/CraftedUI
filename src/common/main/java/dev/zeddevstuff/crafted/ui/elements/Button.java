@@ -83,7 +83,12 @@ public class Button extends CraftedElement
 		public void render(ICanvas canvas, Button element)
 		{
 			var layout = element.getLayout();
-			canvas.drawTexture(buttonTexture, Rect.posAndSize(layout.x, layout.y, layout.width, layout.height), Color.White);
+			if(element.state.isDisabled())
+				canvas.drawTexture(buttonDisabledTexture, Rect.posAndSize(layout.x, layout.y, layout.width, layout.height), Color.White);
+			else if(element.state.isHovered())
+				canvas.drawTexture(buttonHighlightedTexture, Rect.posAndSize(layout.x, layout.y, layout.width, layout.height), Color.White);
+			else
+				canvas.drawTexture(buttonTexture, Rect.posAndSize(layout.x, layout.y, layout.width, layout.height), Color.White);
 		}
 	}
 }
