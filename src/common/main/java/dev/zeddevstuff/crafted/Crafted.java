@@ -3,10 +3,8 @@ package dev.zeddevstuff.crafted;
 import dev.zeddevstuff.crafted.platform.IDispatcher;
 import dev.zeddevstuff.crafted.platform.IFont;
 import dev.zeddevstuff.crafted.platform.ILocalization;
-import dev.zeddevstuff.crafted.platform.ITextureFactory;
+import dev.zeddevstuff.crafted.platform.ITextureManager;
 import dev.zeddevstuff.crafted.rendering.RendererRegistry;
-import dev.zeddevstuff.crafted.types.Color;
-import dev.zeddevstuff.crafted.types.ShadowDirection;
 import dev.zeddevstuff.crafted.types.TextSettings;
 import dev.zeddevstuff.crafted.ui.CraftedContext;
 import dev.zeddevstuff.crafted.ui.CraftedElement;
@@ -25,18 +23,18 @@ public class Crafted
 	public final ILocalization localization;
 	public final IFont defaultFont;
 	public final IDispatcher dispatcher;
-	public final ITextureFactory textureFactory;
+	public final ITextureManager textures;
 	public final TextSettings defaultTextSettings;
 	public final ElementRegistry elements = new ElementRegistry();
 	public final RendererRegistry renderers = new RendererRegistry();
 	private final Map<String, IFont> fonts = new java.util.HashMap<>();
 
-	public Crafted(ILocalization localization, IFont defaultFont, IDispatcher dispatcher, ITextureFactory textureFactory)
+	public Crafted(ILocalization localization, IFont defaultFont, IDispatcher dispatcher, ITextureManager textures)
 	{
 		this.localization = localization;
 		this.defaultFont = defaultFont;
 		this.dispatcher = dispatcher;
-		this.textureFactory = textureFactory;
+		this.textures = textures;
 		this.defaultTextSettings = TextSettings.DEFAULT.withFont(defaultFont);
 		registerFont("default", defaultFont);
 	}

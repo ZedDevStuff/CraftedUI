@@ -11,5 +11,6 @@ public class All
 		Text.register(crafted);
 		Button.register(crafted);
 		Input.register(crafted);
+		Image.register(crafted);
 	}
 }

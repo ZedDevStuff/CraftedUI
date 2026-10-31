@@ -43,67 +43,8 @@ public class Entry
 				<Text fontScale="1">ijJ</Text>
 				<Button disabled="true">Click me</Button>
 				<Input width="200" height="20" placeholder="Search..." />
-				<Box>
-					<Box>
-						<Box>
-							<Box>
-							<Box>
-							<Box>
-							<Box>
-							<Box>
-							<Box>
-							<Box>
-							<Box>
-							<Box>
-							<Box>
-							<Box>
-							<Box>
-							<Box>
-							<Box>
-							<Box>
-							<Box>
-							<Box>
-							<Box>
-							<Box>
-							<Box>
-							<Box>
-							<Box>
-							<Box>
-							<Box>
-							<Box>
-							<Box>
-							<Box>
-							<Button onClick="onDeepClick">Insanely deeply nested button</Button>
-							</Box>
-							</Box>
-							</Box>
-							</Box>
-							</Box>
-							</Box>
-							</Box>
-							</Box>
-							</Box>
-							</Box>
-							</Box>
-							</Box>
-							</Box>
-							</Box>
-							</Box>
-							</Box>
-							</Box>
-							</Box>
-							</Box>
-							</Box>
-							</Box>
-							</Box>
-							</Box>
-							</Box>
-							</Box>
-							</Box>
-							</Box>
-						</Box>
-					</Box>
-				</Box>
+				<Image src="minecraft:textures/block/stone.png" width="64" height="64" />
+				<Button onClick="onDeepClick">Another button</Button>
 			</Crafted>
 			""");
 		var ctx = new CraftedContext(Crafted.defaultInstance());

@@ -93,7 +93,7 @@ public class CanvasImpl implements ICanvas
 			// void blitSprite(ResourceLocation sprite, int textureWidth, int textureHeight, int uPosition, int vPosition, int x, int y, int uWidth, int vHeight)
 			// void blitSprite(ResourceLocation sprite, int textureWidth, int textureHeight, int uPosition, int vPosition, int x, int y, int blitOffset, int uWidth, int vHeight)
 			if(mcTex.getKind() == ITexture.Kind.SIMPLE)
-				graphics.blit(mcTex.resourceLocation, (int) dest.minX(), (int) dest.minY(), 0, 0, (int) dest.width(), (int) dest.height(), texture.getWidth(), texture.getHeight());
+				graphics.blit(mcTex.resourceLocation, (int) dest.minX(), (int) dest.minY(), 0, 0, (int) dest.width(), (int) dest.height(), (int) dest.width(), (int) dest.height());
 			else if(mcTex.getKind() == ITexture.Kind.SPRITE)
 				graphics.blitSprite(mcTex.resourceLocation, (int) dest.minX(), (int) dest.minY(), (int) dest.width(), (int) dest.height());
 		}
@@ -114,7 +114,7 @@ public class CanvasImpl implements ICanvas
 			// void blitSprite(ResourceLocation sprite, int x, int y, int blitOffset, int width, int height)
 			// void blitSprite(ResourceLocation sprite, int textureWidth, int textureHeight, int uPosition, int vPosition, int x, int y, int uWidth, int vHeight)
 			// void blitSprite(ResourceLocation sprite, int textureWidth, int textureHeight, int uPosition, int vPosition, int x, int y, int blitOffset, int uWidth, int vHeight)
-			if(mcTex.getKind() == ITexture.Kind.SIMPLE)
+			if(mcTex.getKind() == ITexture.Kind.SIMPLE) // This is probably invalid
 				graphics.blit(mcTex.resourceLocation, (int) dest.minX(), (int) dest.minY(), 0, (int) src.minX(), (int) src.minY(), (int) src.width(), (int) src.height(), texture.getWidth(), texture.getHeight());
 			else if(mcTex.getKind() == ITexture.Kind.SPRITE)
 				graphics.blitSprite(mcTex.resourceLocation, (int) src.width(), (int) src.height(), (int) src.minX(), (int) src.minY(), (int) dest.minX(), (int) dest.minY(), (int) dest.width(), (int) dest.height());

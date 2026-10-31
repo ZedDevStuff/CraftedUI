@@ -46,6 +46,7 @@ cloche {
     }
 
     val common1211 = common("common:1.21.1") {
+        accessWideners.from("src/common/1.21.1/main/resources/crafted.accesswidener")
     }
     neoforge("neoforge:1.21.1") {
         loaderVersion = "21.1.219"
@@ -84,7 +85,6 @@ cloche {
 
         metadata {
             mixins = files("crafted.mixins.json")
-            components
         }
 
         runs {

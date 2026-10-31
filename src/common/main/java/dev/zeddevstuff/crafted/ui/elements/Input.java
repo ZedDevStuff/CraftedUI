@@ -7,7 +7,7 @@ import dev.zeddevstuff.crafted.input.events.KeyEvent;
 import dev.zeddevstuff.crafted.parsing.Parsers;
 import dev.zeddevstuff.crafted.platform.ICanvas;
 import dev.zeddevstuff.crafted.platform.IFont;
-import dev.zeddevstuff.crafted.platform.ITextureFactory;
+import dev.zeddevstuff.crafted.platform.ITextureManager;
 import dev.zeddevstuff.crafted.rendering.IRenders;
 import dev.zeddevstuff.crafted.types.Color;
 import dev.zeddevstuff.crafted.types.TextSettings;
@@ -36,6 +36,7 @@ public class Input extends CraftedElement
     public Input(CraftedContext ctx, Map<String, String> attributes)
     {
         super(ctx, attributes);
+        settings.set(ctx.crafted.defaultTextSettings);
         font = registerProp(IFont.class, "font", settings.get()::font, (value) -> settings.set(settings.get().withFont(value)), ctx.crafted::getFontOrDefault);
     }
 
@@ -74,13 +75,13 @@ public class Input extends CraftedElement
     public static void register(Crafted crafted)
     {
         crafted.elements.registerElement(Input.class, "Input", Input::new);
-        crafted.renderers.registerRenderer(Input.class, "default", new DefaultInputRenderer(crafted.textureFactory));
+        crafted.renderers.registerRenderer(Input.class, "default", new DefaultInputRenderer(crafted.textures));
     }
 
     public static class DefaultInputRenderer implements IRenders<Input>
     {
-        private static final Color borderColor = new Color(63, 63, 63);
-        public DefaultInputRenderer(ITextureFactory textureFactory)
+        private static final Color borderColor = new Color(160, 160, 160);
+        public DefaultInputRenderer(ITextureManager textures)
         {
             // Initialize any textures or resources needed for rendering the Input element
         }
@@ -88,21 +89,19 @@ public class Input extends CraftedElement
         @Override
         public void render(ICanvas canvas, Input element)
         {
+            if(element.font.get() == null)
+                return;
             var layout = element.getLayout();
-            // Render the input box background
             canvas.drawRect(layout.x, layout.y, layout.width, layout.height, element.state.isHovered() || element.state.isActive() || element.state.isFocused() ? Color.White : borderColor);
             canvas.drawRect(layout.x + 1, layout.y + 1, layout.width - 2, layout.height - 2, Color.Black);
-            //canvas.beginClip(layout.x + 2, layout.y + 2, layout.width - 4, layout.height - 4);
+            canvas.beginClip(layout.x + 2, layout.y + 2, layout.width - 4, layout.height - 4);
+            float textHeight = element.font.get().measureText(element.text.getText(), element.settings.get().size(), element.settings.get().wrapWidth())[1];
+            int textY = layout.y + (int)((layout.height - textHeight + 1) / 2);
             if(element.text.getText().isEmpty() && !element.state.isFocused())
-            {
-                canvas.drawText(element.placeholder.get(), layout.x + 4, layout.y + 4, element.settings.get(), element.placeholderColor.get());
-            }
+                canvas.drawText(element.placeholder.get(), layout.x + 4, textY, element.settings.get(), element.placeholderColor.get());
             else
-            {
-                canvas.drawText(element.text.getText(), layout.x + 4, layout.y + 4, element.settings.get(), element.textColor.get());
-            }
-            //canvas.endClip();
-            // Additional rendering logic for the input box (e.g., text cursor, text content) can be added here
+                canvas.drawText(element.text.getText(), layout.x + 4, textY, element.settings.get(), element.textColor.get());
+            canvas.endClip();
         }
     }
 }

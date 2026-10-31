@@ -1,6 +1,7 @@
 package dev.zeddevstuff.crafted.platform;
 
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.renderer.texture.SimpleTexture;
 import net.minecraft.resources.ResourceLocation;
 
 public class MinecraftTexture implements ITexture
@@ -8,21 +9,57 @@ public class MinecraftTexture implements ITexture
 	public final ResourceLocation resourceLocation;
 	private final Kind kind;
 	public Kind getKind() { return kind; }
-	private final int width;
-	public int getWidth() { return width; }
-	private final int height;
-	public int getHeight() { return height; }
+	private int width = -1;
+	public int getWidth()
+	{
+		if(width == -1)
+			fetchSize();
+		return width;
+	}
+	private int height = -1;
+	public int getHeight()
+	{
+		if(height == -1)
+			fetchSize();
+		return height;
+	}
 
 	public MinecraftTexture(ResourceLocation resourceLocation, Kind kind)
 	{
-		throw new UnsupportedOperationException("I don't remember how to fetch the actual size of the textures :(. Probably involves mixins or access wideners");
+		this.resourceLocation = resourceLocation;
+		this.kind = kind;
 	}
 
 	public MinecraftTexture(ResourceLocation resourceLocation, Kind kind, int width, int height)
 	{
-		this.resourceLocation = resourceLocation;
-		this.kind = kind;
+		this(resourceLocation, kind);
 		this.width = width;
 		this.height = height;
+	}
+
+	void fetchSize()
+	{
+		var texture = Minecraft.getInstance().getTextureManager().getTexture(resourceLocation);
+		try
+		{
+			// TODO: Add support for other texture types
+			if (texture instanceof SimpleTexture simpleTexture)
+			{
+				var manager = Minecraft.getInstance().getResourceManager();
+				var textureImage = simpleTexture.getTextureImage(manager);
+				var nativeImage = textureImage.getImage();
+				this.width = nativeImage.getWidth();
+				this.height = nativeImage.getHeight();
+			}
+			else
+			{
+				this.width = 0;
+				this.height = 0;
+			}
+		}
+		catch (Exception e)
+		{
+			throw new RuntimeException(e);
+		}
 	}
 }

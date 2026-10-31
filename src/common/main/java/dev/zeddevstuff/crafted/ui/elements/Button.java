@@ -2,12 +2,11 @@ package dev.zeddevstuff.crafted.ui.elements;
 
 import dev.zeddevstuff.crafted.Crafted;
 import dev.zeddevstuff.crafted.annotations.DefineElement;
-import dev.zeddevstuff.crafted.input.events.MouseEvent;
 import dev.zeddevstuff.crafted.parsing.Parsers;
 import dev.zeddevstuff.crafted.platform.ICanvas;
 import dev.zeddevstuff.crafted.platform.IText;
 import dev.zeddevstuff.crafted.platform.ITexture;
-import dev.zeddevstuff.crafted.platform.ITextureFactory;
+import dev.zeddevstuff.crafted.platform.ITextureManager;
 import dev.zeddevstuff.crafted.rendering.IRenders;
 import dev.zeddevstuff.crafted.types.Color;
 import dev.zeddevstuff.crafted.types.Rect;
@@ -54,18 +53,18 @@ public class Button extends CraftedElement
 	public static void register(Crafted crafted)
 	{
 		crafted.elements.registerElement(Button.class, "Button", Button::new);
-		crafted.renderers.registerRenderer(Button.class, "default", new DefaultButtonRenderer(crafted.textureFactory));
+		crafted.renderers.registerRenderer(Button.class, "default", new DefaultButtonRenderer(crafted.textures));
 	}
 
 	public static class DefaultButtonRenderer implements IRenders<Button>
 	{
 		private final ITexture buttonTexture, buttonDisabledTexture, buttonHighlightedTexture;
 
-		public DefaultButtonRenderer(ITextureFactory textureFactory)
+		public DefaultButtonRenderer(ITextureManager textures)
 		{
-			buttonTexture = textureFactory.getTexture("minecraft", "widget/button", ITexture.Kind.SPRITE, 200, 20);
-			buttonDisabledTexture = textureFactory.getTexture("minecraft", "widget/button_disabled", ITexture.Kind.SPRITE, 200, 20);
-			buttonHighlightedTexture = textureFactory.getTexture("minecraft", "widget/button_highlighted", ITexture.Kind.SPRITE, 200, 20);
+			buttonTexture = textures.get("minecraft", "widget/button", ITexture.Kind.SPRITE, 200, 20);
+			buttonDisabledTexture = textures.get("minecraft", "widget/button_disabled", ITexture.Kind.SPRITE, 200, 20);
+			buttonHighlightedTexture = textures.get("minecraft", "widget/button_highlighted", ITexture.Kind.SPRITE, 200, 20);
 		}
 		@Override
 		public void render(ICanvas canvas, Button element)

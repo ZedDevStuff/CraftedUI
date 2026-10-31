@@ -3,30 +3,32 @@
 - Core
   - [x] Abstractions
   - [x] CraftedElement
-  - [ ] Input
+  - [x] Input
     - [x] Handling
-    - [ ] Focus and state
+    - [x] Focus and state
     - [x] Markup callbacks (named only)
-  - [ ] Navigation
+  - [-] Navigation
+    - [x] Tab navigation
+    - [-] Arrow navigation
   - [x] Rendering
 - UI
   - [x] XML Parser
   - [x] Schema generator
-  - [ ] Basic elements
-  - [x] Box
-  - [x] Text
-  - [ ] Image
-  - [ ] Button
-  - [ ] Input
-  - [ ] Scroll
-  - [ ] List
-  - [ ] Slider
-  - [ ] Progress bar
-  - [ ] Tabs
-  - [ ] Dropdown
-  - [ ] Tooltip
-  - [ ] Modal
-  - [ ] Menu
-  - [ ] Context menu
+  - [-] Basic elements
+    - [x] Box
+    - [x] Text
+    - [x] Image
+    - [x] Button
+    - [x] Input
+    - [ ] Scroll
+    - [ ] List
+    - [ ] Slider
+    - [ ] Progress bar
+    - [ ] Tabs
+    - [ ] Dropdown
+    - [ ] Tooltip
+    - [ ] Modal
+    - [ ] Menu
+    - [ ] Context menu
 - Extras
   - [ ] Documentation

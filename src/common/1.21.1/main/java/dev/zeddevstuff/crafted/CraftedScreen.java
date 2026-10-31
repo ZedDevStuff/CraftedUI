@@ -1,5 +1,6 @@
 package dev.zeddevstuff.crafted;
 
+import dev.zeddevstuff.crafted.input.ImportantKeys;
 import dev.zeddevstuff.crafted.input.KeyModifiers;
 import dev.zeddevstuff.crafted.input.MouseButton;
 import dev.zeddevstuff.crafted.platform.CanvasImpl;
@@ -89,15 +90,27 @@ public class CraftedScreen extends Screen
 	@Override
 	public boolean keyPressed(int keyCode, int scanCode, int modifiers)
 	{
+		if(keyCode == ImportantKeys.ESCAPE)
+		{
+			if(context.inputHandler.getFocusedElement() != null)
+				context.inputHandler.setFocus(null);
+			else
+				onClose();
+		}
 		context.inputHandler.handleKeyPressed(keyCode, scanCode, KeyModifiers.fromFlags(modifiers));
 		return super.keyPressed(keyCode, scanCode, modifiers);
 	}
+
+
 	@Override
 	public boolean keyReleased(int keyCode, int scanCode, int modifiers)
 	{
 		context.inputHandler.handleKeyReleased(keyCode, scanCode, KeyModifiers.fromFlags(modifiers));
 		return super.keyReleased(keyCode, scanCode, modifiers);
 	}
+
+	@Override
+	public boolean shouldCloseOnEsc() { return false; }
 
 	// endregion Input Handling
 }
