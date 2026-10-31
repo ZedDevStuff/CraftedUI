@@ -626,7 +626,7 @@ public abstract class CraftedElement
 			AFTER_RENDER
 		}
 	}
-	public class LayoutResult
+	public static class LayoutResult
 	{
 		public final int width;
 		public final int innerWidth;
