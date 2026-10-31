@@ -136,7 +136,7 @@ public class InputHandler
 				break;
 		}
 		if (clicked)
-			target.handleClick(new ClickEvent(target, x, y, button)); // new event type
+			target.handleClick(new ClickEvent(target, ClickEvent.Source.MOUSE, x, y, button)); // new event type
 	}
 
 	public void handleCharTyped(char character, KeyModifiers modifiers)
@@ -149,7 +149,9 @@ public class InputHandler
 	{
 		if(rootElement == null)
 			return;
-		//throw new UnsupportedOperationException("Not implemented yet");
+		if (focusedElement == null) return;
+		if (keyCode == ImportantKeys.ENTER || keyCode == ImportantKeys.SPACE)
+			focusedElement.handleClick(new ClickEvent(focusedElement, ClickEvent.Source.KEYBOARD, 0, 0, null));
 	}
 	public void handleKeyReleased(int keyCode, int scanCode, KeyModifiers modifiers)
 	{
