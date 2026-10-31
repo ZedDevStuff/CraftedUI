@@ -27,6 +27,8 @@ public class ImportantKeys
 		SHIFT = isSdl ? 340 : 340;
 		CONTROL = isSdl ? 341 : 341;
 		ALT = isSdl ? 342 : 342;
+		HOME = isSdl ? 278 : 268;
+		END = isSdl ? 279 : 269;
 		A = isSdl ? 97 : 65;
 		C = isSdl ? 99 : 67;
 		V = isSdl ? 118 : 86;
@@ -45,6 +47,8 @@ public class ImportantKeys
 	public static int BACKSPACE;
 	public static int DELETE;
 	public static int INSERT;
+	public static int HOME;
+	public static int END;
 
 	public static int TAB;
 	public static int SHIFT;

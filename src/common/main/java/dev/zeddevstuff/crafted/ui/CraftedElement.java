@@ -355,7 +355,7 @@ public abstract class CraftedElement
 		// no child contained a valid input target
 		// fall back to this element if it receives input events
 		// otherwise, return null so the caller can check another child
-		return receivesInputEvents() ? this : null;
+		return receivesInputEvents() && !state.isDisabled() ? this : null;
 	}
 	private void udpateSortedChildrenCaches()
 	{

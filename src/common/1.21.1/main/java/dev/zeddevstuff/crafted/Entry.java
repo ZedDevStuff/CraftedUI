@@ -42,6 +42,7 @@ public class Entry
 				<Box id="content" width="100%" height="stretch" color="rgb(255, 255, 255)" />
 				<Text fontScale="1">ijJ</Text>
 				<Button disabled="true">Click me</Button>
+				<Input width="200" height="20" placeholder="Search..." />
 				<Box>
 					<Box>
 						<Box>

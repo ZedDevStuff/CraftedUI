@@ -10,5 +10,6 @@ public class All
 		Box.register(crafted);
 		Text.register(crafted);
 		Button.register(crafted);
+		Input.register(crafted);
 	}
 }

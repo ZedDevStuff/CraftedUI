@@ -1,8 +1,11 @@
 package dev.zeddevstuff.crafted.input;
 
 import dev.zeddevstuff.crafted.input.events.ClickEvent;
+import dev.zeddevstuff.crafted.input.events.FocusEvent;
+import dev.zeddevstuff.crafted.input.events.KeyEvent;
 import dev.zeddevstuff.crafted.input.events.MouseEvent;
 import dev.zeddevstuff.crafted.ui.CraftedElement;
+import net.minecraft.client.gui.navigation.FocusNavigationEvent;
 
 public class InputHandler
 {
@@ -16,6 +19,53 @@ public class InputHandler
 	public CraftedElement getFocusedElement() { return focusedElement; }
 	private MouseButton pressedButton;
 	public MouseButton getPressedButton() { return pressedButton; }
+
+	private CraftedElement[] focusableElements()
+	{
+		if (rootElement == null) return new CraftedElement[0];
+		return rootElement.findElements(e -> e.isFocusable() && !e.state.isDisabled());
+	}
+
+	public void setFocus(CraftedElement newFocus)
+	{
+		if (newFocus == focusedElement)
+			return;
+		if (newFocus != null && (!newFocus.isFocusable() || newFocus.state.isDisabled()))
+			return;
+
+		var previous = focusedElement;
+		if (previous != null)
+		{
+			previous.state.set(InteractionState.FOCUSED, false);
+			previous.handleFocusLost(FocusEvent.lost(previous, newFocus));
+		}
+		focusedElement = newFocus;
+		if (newFocus != null)
+		{
+			newFocus.state.set(InteractionState.FOCUSED, true);
+			newFocus.handleFocusGained(FocusEvent.gained(newFocus, previous));
+		}
+	}
+
+	private void moveFocus(boolean forward)
+	{
+		var elements = focusableElements();
+		if (elements.length == 0) { setFocus(null); return; }
+		if (focusedElement == null)
+		{
+			setFocus(forward ? elements[0] : elements[elements.length - 1]);
+			return;
+		}
+		int index = -1;
+		for (int i = 0; i < elements.length; i++)
+			if (elements[i] == focusedElement) { index = i; break; }
+		if (index == -1)
+		{
+			setFocus(forward ? elements[0] : elements[elements.length - 1]);
+			return;
+		}
+		setFocus(elements[(index + (forward ? 1 : elements.length - 1)) % elements.length]);
+	}
 
 	public void handleMouseMoved(float x, float y)
 	{
@@ -36,7 +86,6 @@ public class InputHandler
 				dispatchEnterExit(hoveredElement, MouseEvent.enter(hoveredElement, x, y));
 			}
 		}
-		// update armed: pressed && still over the press target
 		if (pressedElement != null)
 		{
 			boolean over = pressedElement.contains(x, y);
@@ -101,8 +150,7 @@ public class InputHandler
 			pressedButton = button;
 			target.state.set(InteractionState.PRESSED, true);
 			target.state.set(InteractionState.ARMED, true);
-			if (target.capturesKeyboardWhenFocused() || target.isFocusable())
-				focusedElement = target;
+			setFocus(target.isFocusable() ? target : null);
 			var event = MouseEvent.press(target, x, y, button);
 			var currentTarget = target;
 			while(!event.isPropagationStopped())
@@ -114,13 +162,19 @@ public class InputHandler
 					break;
 			}
 		}
+		else
+		{
+			pressedElement = null;
+			pressedButton = null;
+			setFocus(null);
+		}
 	}
 	public void handleMouseReleased(float x, float y, MouseButton button)
 	{
 		if(rootElement == null)
 			return;
 		if (pressedElement == null || button != pressedButton) return;
-		var target = pressedElement; // capture: release goes to the press target
+		var target = pressedElement;
 		boolean clicked = target.state.isArmed();
 		target.state.set(InteractionState.PRESSED, false);
 		target.state.set(InteractionState.ARMED, false);
@@ -136,27 +190,61 @@ public class InputHandler
 				break;
 		}
 		if (clicked)
-			target.handleClick(new ClickEvent(target, ClickEvent.Source.MOUSE, x, y, button)); // new event type
+			target.handleClick(new ClickEvent(target, ClickEvent.Source.MOUSE, x, y, button));
 	}
 
 	public void handleCharTyped(char character, KeyModifiers modifiers)
 	{
-		if(rootElement == null)
+		if (rootElement == null)
 			return;
-		//throw new UnsupportedOperationException("Not implemented yet");
+		if (focusedElement != null)
+		{
+			var event = KeyEvent.type(focusedElement, 0, 0, character, modifiers);
+			bubbleKey(event, KeyEvent.Type.TYPE);
+		}
 	}
 	public void handleKeyPressed(int keyCode, int scanCode, KeyModifiers modifiers)
 	{
-		if(rootElement == null)
+		if (rootElement == null)
 			return;
-		if (focusedElement == null) return;
-		if (keyCode == ImportantKeys.ENTER || keyCode == ImportantKeys.SPACE)
+		if (focusedElement != null)
+		{
+			var event = KeyEvent.press(focusedElement, keyCode, scanCode, (char) 0, modifiers);
+			bubbleKey(event, KeyEvent.Type.PRESS);
+			if (event.isConsumed())
+				return;
+		}
+
+		if (keyCode == ImportantKeys.TAB)
+			moveFocus(!modifiers.shift());
+		else if (focusedElement != null && (keyCode == ImportantKeys.ENTER || keyCode == ImportantKeys.SPACE))
 			focusedElement.handleClick(new ClickEvent(focusedElement, ClickEvent.Source.KEYBOARD, 0, 0, null));
+	}
+	private void bubbleKey(KeyEvent event, KeyEvent.Type type)
+	{
+		var currentTarget = focusedElement;
+		while (!event.isPropagationStopped())
+		{
+			event.setCurrentTarget(currentTarget);
+			if (type == KeyEvent.Type.PRESS)
+				currentTarget.handleKeyPress(event);
+			else if (type == KeyEvent.Type.RELEASE)
+				currentTarget.handleKeyRelease(event);
+			else if (type == KeyEvent.Type.TYPE)
+				currentTarget.handleCharTyped(event);
+			currentTarget = currentTarget.getParent();
+			if (currentTarget == null)
+				break;
+		}
 	}
 	public void handleKeyReleased(int keyCode, int scanCode, KeyModifiers modifiers)
 	{
 		if(rootElement == null)
 			return;
-		//throw new UnsupportedOperationException("Not implemented yet");
+		if(focusedElement != null)
+		{
+			var event = KeyEvent.release(focusedElement, keyCode, scanCode, (char) 0, modifiers);
+			bubbleKey(event, KeyEvent.Type.RELEASE);
+		}
 	}
 }

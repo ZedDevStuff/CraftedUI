@@ -9,6 +9,9 @@ public abstract class UIEvent
 	private CraftedElement currentTarget;
 	public CraftedElement getCurrentTarget() { return currentTarget; }
 	public void setCurrentTarget(CraftedElement currentTarget) { this.currentTarget = currentTarget; }
+	private boolean consumed;
+	public boolean isConsumed() { return consumed; }
+	public void consume() { consumed = true; }
 	private boolean propagationStopped;
 	public boolean isPropagationStopped() { return propagationStopped; }
 	public void stopPropagation() { propagationStopped = true; }

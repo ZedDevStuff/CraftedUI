@@ -41,18 +41,6 @@ public class Button extends CraftedElement
 	@Override
 	public boolean isFocusable() { return true; }
 
-//	@Override
-//	public void onMousePress(MouseEvent event)
-//	{
-//		System.out.println("Button pressed: " + ((Text)this.children.getFirst()).text);
-//	}
-//
-//	@Override
-//	public void onMouseRelease(MouseEvent event)
-//	{
-//		super.onMouseRelease(event);
-//	}
-
 	@Override
 	protected YogaStyle initLayoutNode(YogaStyle style, Map<String, String> attributes)
 	{
@@ -85,7 +73,7 @@ public class Button extends CraftedElement
 			var layout = element.getLayout();
 			if(element.state.isDisabled())
 				canvas.drawTexture(buttonDisabledTexture, Rect.posAndSize(layout.x, layout.y, layout.width, layout.height), Color.White);
-			else if(element.state.isHovered())
+			else if(element.state.isHovered() || element.state.isFocused())
 				canvas.drawTexture(buttonHighlightedTexture, Rect.posAndSize(layout.x, layout.y, layout.width, layout.height), Color.White);
 			else
 				canvas.drawTexture(buttonTexture, Rect.posAndSize(layout.x, layout.y, layout.width, layout.height), Color.White);
