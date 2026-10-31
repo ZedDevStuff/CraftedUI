@@ -4,6 +4,7 @@ import dev.zeddevstuff.crafted.IProp;
 import dev.zeddevstuff.crafted.Prop;
 import dev.zeddevstuff.crafted.ProxyProp;
 import dev.zeddevstuff.crafted.annotations.Description;
+import dev.zeddevstuff.crafted.input.InteractionState;
 import dev.zeddevstuff.crafted.input.events.*;
 import dev.zeddevstuff.crafted.parsing.Parsers;
 import dev.zeddevstuff.crafted.platform.ICanvas;
@@ -26,6 +27,8 @@ import java.util.function.Supplier;
 
 public abstract class CraftedElement
 {
+	// Just a hack. Don't think about it too much.
+	private final static Object INTERNAL_KEY = new Object();
 	public final CraftedContext ctx;
 	protected final YogaNode node = new YogaNode();
 
@@ -39,6 +42,8 @@ public abstract class CraftedElement
 			sortedChildrenCache = children.stream().sorted(Comparator.<CraftedElement>comparingInt(a -> a.zIndex.get()).reversed()).toArray(CraftedElement[]::new);
 		return sortedChildrenCache;
 	}
+
+	public final InteractionState state = new InteractionState(INTERNAL_KEY);
 
 	private LayoutResult layout;
 	public LayoutResult getLayout() { return layout; }
@@ -111,6 +116,7 @@ public abstract class CraftedElement
 	@Description("Unique identifier for this element")
 	public final Prop<String> id = registerProp("id", "", Parsers::parseString);
 	public final Prop<Integer> zIndex = registerProp("zIndex", 0, Parsers::parseInt);
+	public final ProxyProp<Boolean> disabled = registerProp(Boolean.class, "disabled", state::isDisabled, val -> state.set(INTERNAL_KEY, InteractionState.DISABLED, val), Parsers::parseBoolean);
 
 	public final ProxyProp<YogaDirection> direction = registerProp(YogaDirection.class, "direction", node::getLayoutDirection, node::setDirection, Parsers::parseYogaDirection);
 	public final ProxyProp<YogaFlexDirection> flexDirection = registerProp(YogaFlexDirection.class, "flexDirection", node::getFlexDirection, node::setFlexDirection, Parsers::parseYogaFlexDirection);
@@ -479,6 +485,7 @@ public abstract class CraftedElement
 	 * By default, elements do not receive input events.
 	 */
 	public boolean receivesInputEvents() { return false; }
+	public boolean isFocusable() { return false; }
 
 	public boolean capturesKeyboardWhenFocused() { return false; }
 

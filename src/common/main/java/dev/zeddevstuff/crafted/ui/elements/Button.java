@@ -38,6 +38,8 @@ public class Button extends CraftedElement
 
 	@Override
 	public boolean receivesInputEvents() { return true; }
+	@Override
+	public boolean isFocusable() { return true; }
 
 //	@Override
 //	public void onMousePress(MouseEvent event)

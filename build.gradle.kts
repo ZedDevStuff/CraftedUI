@@ -41,13 +41,11 @@ cloche {
         icon = "icon.png"
     }
 
-
     common {
 
     }
 
     val common1211 = common("common:1.21.1") {
-        //dependsOn(baseCommon)
     }
     neoforge("neoforge:1.21.1") {
         loaderVersion = "21.1.219"
