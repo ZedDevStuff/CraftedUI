@@ -1,0 +1,12 @@
+
+<Crafted renderer="default" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:noNamespaceSchemaLocation="CraftedUI.xsd">
+  
+         
+    <Box>
+        <Button id="button1" onClick="handleClick">Hi</Button>
+    </Box>
+    <Image src="minecraft:textures/block/stone.png" width="64" height="64" />
+    <Input placeholder="Search..." onKeyPress="doStuff" />
+    <Text>I have no idea</Text>
+</Crafted>

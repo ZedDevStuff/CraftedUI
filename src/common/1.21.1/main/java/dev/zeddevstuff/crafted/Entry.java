@@ -1,12 +1,9 @@
 package dev.zeddevstuff.crafted;
 
 import com.mojang.logging.LogUtils;
-import dev.zeddevstuff.crafted.input.ImportantKeys;
 import dev.zeddevstuff.crafted.input.events.IClickEventHandler;
-import dev.zeddevstuff.crafted.input.events.IMouseEventHandler;
-import dev.zeddevstuff.crafted.input.events.MouseEvent;
-import dev.zeddevstuff.crafted.parsing.DocumentBuilder;
 import dev.zeddevstuff.crafted.parsing.CraftedXmlParser;
+import dev.zeddevstuff.crafted.parsing.DocumentBuilder;
 import dev.zeddevstuff.crafted.platform.MainThreadDispatcher;
 import dev.zeddevstuff.crafted.platform.MinecraftFont;
 import dev.zeddevstuff.crafted.platform.MinecraftLocalization;

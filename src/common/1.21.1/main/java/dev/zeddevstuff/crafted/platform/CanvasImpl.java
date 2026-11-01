@@ -5,7 +5,8 @@ import dev.zeddevstuff.crafted.types.Rect;
 import dev.zeddevstuff.crafted.types.TextSettings;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.network.chat.Component;
-import org.joml.*;
+import org.joml.AxisAngle4f;
+import org.joml.Matrix4f;
 
 public class CanvasImpl implements ICanvas
 {

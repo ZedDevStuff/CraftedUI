@@ -1,7 +1,6 @@
 package dev.zeddevstuff.crafted.platform;
 
 import net.minecraft.network.chat.Component;
-import net.minecraft.network.chat.MutableComponent;
 
 public class TextConverter
 {

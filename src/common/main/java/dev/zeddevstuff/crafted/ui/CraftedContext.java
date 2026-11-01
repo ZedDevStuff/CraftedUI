@@ -3,10 +3,8 @@ package dev.zeddevstuff.crafted.ui;
 import dev.zeddevstuff.crafted.Crafted;
 import dev.zeddevstuff.crafted.input.InputHandler;
 import dev.zeddevstuff.crafted.input.events.IUIEventHandler;
-import dev.zeddevstuff.crafted.input.events.UIEvent;
 
 import java.util.HashMap;
-import java.util.function.Consumer;
 
 /**
  * Context class holding useful data and methods. <br>

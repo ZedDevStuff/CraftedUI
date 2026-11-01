@@ -7,12 +7,7 @@
 
 package org.appliedenergistics.yoga.algorithm;
 
-import org.appliedenergistics.yoga.YogaDirection;
-import org.appliedenergistics.yoga.YogaDisplay;
-import org.appliedenergistics.yoga.YogaFlexDirection;
-import org.appliedenergistics.yoga.YogaNode;
-import org.appliedenergistics.yoga.YogaPositionType;
-import org.appliedenergistics.yoga.YogaWrap;
+import org.appliedenergistics.yoga.*;
 import org.appliedenergistics.yoga.node.LayoutableChildren;
 import org.appliedenergistics.yoga.numeric.FloatOptional;
 

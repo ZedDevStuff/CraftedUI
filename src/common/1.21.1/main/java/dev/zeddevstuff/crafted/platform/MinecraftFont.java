@@ -1,6 +1,5 @@
 package dev.zeddevstuff.crafted.platform;
 
-import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
 import net.minecraft.network.chat.Style;
 

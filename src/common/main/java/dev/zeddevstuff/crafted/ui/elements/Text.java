@@ -4,6 +4,7 @@ import dev.zeddevstuff.crafted.Crafted;
 import dev.zeddevstuff.crafted.Prop;
 import dev.zeddevstuff.crafted.ProxyProp;
 import dev.zeddevstuff.crafted.annotations.DefineElement;
+import dev.zeddevstuff.crafted.annotations.Description;
 import dev.zeddevstuff.crafted.parsing.Parsers;
 import dev.zeddevstuff.crafted.platform.ICanvas;
 import dev.zeddevstuff.crafted.platform.IFont;
@@ -19,6 +20,7 @@ import org.appliedenergistics.yoga.style.StyleSizeLength;
 import java.util.Map;
 
 @DefineElement("Text")
+@Description("Displays text on the screen")
 public class Text extends CraftedElement
 {
 	static void register(Crafted crafted)

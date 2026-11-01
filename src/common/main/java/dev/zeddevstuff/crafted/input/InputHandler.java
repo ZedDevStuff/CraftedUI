@@ -5,7 +5,6 @@ import dev.zeddevstuff.crafted.input.events.FocusEvent;
 import dev.zeddevstuff.crafted.input.events.KeyEvent;
 import dev.zeddevstuff.crafted.input.events.MouseEvent;
 import dev.zeddevstuff.crafted.ui.CraftedElement;
-import net.minecraft.client.gui.navigation.FocusNavigationEvent;
 
 public class InputHandler
 {

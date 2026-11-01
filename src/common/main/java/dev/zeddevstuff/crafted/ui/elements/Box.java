@@ -10,12 +10,11 @@ import dev.zeddevstuff.crafted.rendering.IRenders;
 import dev.zeddevstuff.crafted.types.Color;
 import dev.zeddevstuff.crafted.ui.CraftedContext;
 import dev.zeddevstuff.crafted.ui.CraftedElement;
-import org.appliedenergistics.yoga.style.YogaStyle;
 
 import java.util.Map;
 
 @DefineElement(value = "Box")
-@Description("A basic box element, used for backgrounds and other simple UI elements.")
+@Description("A basic box element, used for backgrounds and other simple UI elements")
 public class Box extends CraftedElement
 {
 	public static void register(Crafted crafted)

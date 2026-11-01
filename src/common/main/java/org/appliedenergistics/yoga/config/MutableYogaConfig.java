@@ -7,11 +7,7 @@
 
 package org.appliedenergistics.yoga.config;
 
-import org.appliedenergistics.yoga.LogLevel;
-import org.appliedenergistics.yoga.YogaCloneNodeFunction;
-import org.appliedenergistics.yoga.YogaErrata;
-import org.appliedenergistics.yoga.YogaExperimentalFeature;
-import org.appliedenergistics.yoga.YogaNode;
+import org.appliedenergistics.yoga.*;
 
 import java.util.EnumSet;
 import java.util.Set;

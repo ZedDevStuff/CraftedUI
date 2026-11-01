@@ -13,11 +13,4 @@ import java.lang.annotation.Target;
 public @interface DefineElement
 {
 	String value() default "";
-	ContentType contentType() default ContentType.ANY;
-	public enum ContentType
-	{
-		NONE,
-		ANY,
-		TEXT
-	}
 }

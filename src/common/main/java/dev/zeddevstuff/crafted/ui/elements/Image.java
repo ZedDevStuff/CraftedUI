@@ -2,6 +2,8 @@ package dev.zeddevstuff.crafted.ui.elements;
 
 import dev.zeddevstuff.crafted.Crafted;
 import dev.zeddevstuff.crafted.Prop;
+import dev.zeddevstuff.crafted.annotations.DefineElement;
+import dev.zeddevstuff.crafted.annotations.Description;
 import dev.zeddevstuff.crafted.parsing.Parsers;
 import dev.zeddevstuff.crafted.platform.ICanvas;
 import dev.zeddevstuff.crafted.platform.ITexture;
@@ -13,6 +15,8 @@ import dev.zeddevstuff.crafted.ui.CraftedElement;
 
 import java.util.Map;
 
+@DefineElement("Image")
+@Description("Displays a texture or sprite on the screen")
 public class Image extends CraftedElement
 {
 	public final Prop<ITexture> src = registerProp(ITexture.class, "src", null, this::parseTexture);

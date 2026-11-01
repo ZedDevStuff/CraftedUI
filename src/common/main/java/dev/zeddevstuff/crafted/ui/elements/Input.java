@@ -3,6 +3,9 @@ package dev.zeddevstuff.crafted.ui.elements;
 import dev.zeddevstuff.crafted.Crafted;
 import dev.zeddevstuff.crafted.Prop;
 import dev.zeddevstuff.crafted.ProxyProp;
+import dev.zeddevstuff.crafted.annotations.DefineElement;
+import dev.zeddevstuff.crafted.annotations.Description;
+import dev.zeddevstuff.crafted.annotations.Ignore;
 import dev.zeddevstuff.crafted.input.events.KeyEvent;
 import dev.zeddevstuff.crafted.parsing.Parsers;
 import dev.zeddevstuff.crafted.platform.ICanvas;
@@ -19,8 +22,11 @@ import java.util.Map;
 
 import static dev.zeddevstuff.crafted.input.ImportantKeys.*;
 
+@DefineElement("Input")
+@Description("A text input field that allows users to enter and edit text.")
 public class Input extends CraftedElement
 {
+    @Ignore
     private final TextEditor text = new TextEditor("", false);
     public final ProxyProp<String> value = registerProp(String.class, "value", text::getText, text::setText, Parsers::parseString);
     public final Prop<String> placeholder = registerProp(String.class, "placeholder", "", Parsers::parseString);

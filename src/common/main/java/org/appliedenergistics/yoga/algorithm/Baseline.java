@@ -7,11 +7,7 @@
 
 package org.appliedenergistics.yoga.algorithm;
 
-import org.appliedenergistics.yoga.YogaAlign;
-import org.appliedenergistics.yoga.YogaDimension;
-import org.appliedenergistics.yoga.YogaNode;
-import org.appliedenergistics.yoga.YogaPhysicalEdge;
-import org.appliedenergistics.yoga.YogaPositionType;
+import org.appliedenergistics.yoga.*;
 import org.appliedenergistics.yoga.event.YogaEvent;
 import org.appliedenergistics.yoga.event.YogaEventType;
 

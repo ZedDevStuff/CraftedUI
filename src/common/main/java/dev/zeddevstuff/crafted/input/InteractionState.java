@@ -1,7 +1,5 @@
 package dev.zeddevstuff.crafted.input;
 
-import dev.zeddevstuff.crafted.ui.CraftedElement;
-
 // I'm honestly not sure if this is the best way.
 // Looked around a bit, also had Copilot look for options multiple times, and it came up with something like this most of the time,
 // so I guess I'll use it with my own spin (hopefully not butchering anything)

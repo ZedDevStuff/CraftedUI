@@ -8,19 +8,18 @@ import dev.zeddevstuff.crafted.parsing.Parsers;
 import dev.zeddevstuff.crafted.platform.IText;
 import dev.zeddevstuff.crafted.ui.CraftedContext;
 import dev.zeddevstuff.crafted.ui.CraftedElement;
-import org.appliedenergistics.yoga.style.YogaStyle;
 
 import java.util.Map;
 
 @DefineElement("Crafted")
-@Description("Root element of a Crafted document. All other elements must be children of this element.")
+@Description("Root element of a Crafted document. All other elements must be children of this element")
 public class CraftedRoot extends CraftedElement
 {
 	public static void register(Crafted crafted)
 	{
 		crafted.elements.registerElement(CraftedRoot.class, "Crafted", CraftedRoot::new);
 	}
-	@Description("Title of the document, used for window title and other purposes")
+	@Description("Title of the document, used for screen title and other purposes")
 	public final Prop<IText> title = registerProp(IText.class, "title", IText.literal("Crafted Document"), Parsers::parseText);
 	@Description("The renderer to use for elements in the tree")
 	public final Prop<String> renderer = registerProp("renderer", "default", Parsers::parseString);

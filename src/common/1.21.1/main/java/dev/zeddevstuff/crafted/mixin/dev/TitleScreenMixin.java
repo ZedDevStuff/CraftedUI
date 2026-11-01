@@ -2,9 +2,10 @@ package dev.zeddevstuff.crafted.mixin.dev;
 
 //import dev.zeddevstuff.crafted.screen.GlazeScreen;
 //import dev.zeddevstuff.crafted.ui.Gallery;
-import dev.zeddevstuff.crafted.Entry;
+
 import dev.zeddevstuff.crafted.CraftedScreen;
-	import net.minecraft.client.gui.components.Button;
+import dev.zeddevstuff.crafted.Entry;
+import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.gui.screens.TitleScreen;
 import net.minecraft.network.chat.Component;

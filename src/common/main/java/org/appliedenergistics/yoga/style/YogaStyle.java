@@ -7,19 +7,7 @@
 
 package org.appliedenergistics.yoga.style;
 
-import org.appliedenergistics.yoga.YogaAlign;
-import org.appliedenergistics.yoga.YogaBoxSizing;
-import org.appliedenergistics.yoga.YogaDimension;
-import org.appliedenergistics.yoga.YogaDirection;
-import org.appliedenergistics.yoga.YogaDisplay;
-import org.appliedenergistics.yoga.YogaEdge;
-import org.appliedenergistics.yoga.YogaFlexDirection;
-import org.appliedenergistics.yoga.YogaGutter;
-import org.appliedenergistics.yoga.YogaJustify;
-import org.appliedenergistics.yoga.YogaOverflow;
-import org.appliedenergistics.yoga.YogaPhysicalEdge;
-import org.appliedenergistics.yoga.YogaPositionType;
-import org.appliedenergistics.yoga.YogaWrap;
+import org.appliedenergistics.yoga.*;
 import org.appliedenergistics.yoga.algorithm.FlexDirectionUtil;
 import org.appliedenergistics.yoga.numeric.Comparison;
 import org.appliedenergistics.yoga.numeric.FloatOptional;
