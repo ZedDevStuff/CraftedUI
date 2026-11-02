@@ -18,12 +18,13 @@ import java.util.function.Function;
 
 public class CraftedScreen extends Screen
 {
-	protected final CanvasImpl canvas = new CanvasImpl();
+	protected final CanvasImpl canvas;
 	protected final CraftedContext context;
 	protected final CraftedRoot rootElement;
 	public CraftedScreen(CraftedRoot rootElement)
 	{
 		super(TextConverter.toMinecraftText(rootElement.title.get()));
+		this.canvas = new CanvasImpl(Minecraft.getInstance());
 		this.context = rootElement.ctx;
 		this.rootElement = rootElement;
 		context.inputHandler.setRootElement(rootElement);

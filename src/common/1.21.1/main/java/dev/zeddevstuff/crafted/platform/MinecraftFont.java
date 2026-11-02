@@ -1,5 +1,6 @@
 package dev.zeddevstuff.crafted.platform;
 
+import dev.zeddevstuff.crafted.types.Float2;
 import net.minecraft.client.gui.Font;
 import net.minecraft.network.chat.Style;
 
@@ -18,11 +19,11 @@ public class MinecraftFont implements IFont
 	public String getName() { return name; }
 
 	@Override
-	public float[] measureText(String text, float fontScale, float wrapWidth)
+	public Float2 measureText(String text, float fontScale, float wrapWidth)
 	{
 		if(wrapWidth <= 0)
 		{
-			return new float[] { (Math.max(0, font.width(text) - 1)) * fontScale, font.lineHeight * fontScale };
+			return new Float2(Math.max(0, font.width(text) - 1) * fontScale, font.lineHeight * fontScale);
 		}
 		else
 		{
@@ -30,7 +31,7 @@ public class MinecraftFont implements IFont
 			var maxWidth = 0;
 			for(var line : lines)
 				maxWidth = Math.max(maxWidth, Math.max(0, font.width(line) - 1));
-			return new float[] { maxWidth * fontScale, font.wordWrapHeight(text, (int)wrapWidth) };//lines.size() * font.lineHeight * fontScale };
+			return new Float2(maxWidth * fontScale, font.wordWrapHeight(text, (int)wrapWidth));
 		}
 	}
 }

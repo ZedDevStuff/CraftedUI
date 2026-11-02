@@ -34,4 +34,6 @@ public interface ICanvas
 	void beginClip(int x, int y, int width, int height);
 	boolean clipContains(int x, int y);
 	void endClip();
+
+	float deltaTime();
 }

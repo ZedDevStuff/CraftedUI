@@ -51,16 +51,16 @@ public class Text extends CraftedElement
 			if(cFont == null)
 				return;
 			var size = cFont.measureText(newValue, settings.get().size(), settings.get().wrapWidth());
-			this.width.set(StyleSizeLength.points(size[0] - 0));
-			this.height.set(StyleSizeLength.points(Math.max(size[1] - 0, 0)));
+			this.width.set(StyleSizeLength.points(size.width() - 0));
+			this.height.set(StyleSizeLength.points(Math.max(size.height() - 0, 0)));
 		});
 		settings.addListener((prop, oldValue, newValue) -> {
 			var cFont = font.get();
 			if(cFont == null)
 				return;
 			var size = cFont.measureText(text.get(), newValue.size(), newValue.wrapWidth());
-			this.width.set(StyleSizeLength.points(size[0]));
-			this.height.set(StyleSizeLength.points(size[1]));
+			this.width.set(StyleSizeLength.points(size.width()));
+			this.height.set(StyleSizeLength.points(size.height()));
 		});
 	}
 
@@ -71,8 +71,8 @@ public class Text extends CraftedElement
 		if(cFont == null)
 			return;
 		var size = cFont.measureText(text.get(), settings.get().size(), settings.get().wrapWidth());
-		this.width.set(StyleSizeLength.points(size[0]));
-		this.height.set(StyleSizeLength.points(size[1]));
+		this.width.set(StyleSizeLength.points(size.width()));
+		this.height.set(StyleSizeLength.points(size.height()));
 	}
 
 	public static class TextRenderer implements IRenders<Text>

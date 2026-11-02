@@ -3,6 +3,7 @@ package dev.zeddevstuff.crafted.platform;
 import dev.zeddevstuff.crafted.types.Color;
 import dev.zeddevstuff.crafted.types.Rect;
 import dev.zeddevstuff.crafted.types.TextSettings;
+import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.network.chat.Component;
 import org.joml.AxisAngle4f;
@@ -10,11 +11,18 @@ import org.joml.Matrix4f;
 
 public class CanvasImpl implements ICanvas
 {
+	private final Minecraft minecraft;
 	private GuiGraphics graphics;
 	public void setGraphics(GuiGraphics graphics)
 	{
 		this.graphics = graphics;
 	}
+
+	public CanvasImpl(Minecraft minecraft)
+	{
+		this.minecraft = minecraft;
+	}
+
 	@Override
 	public void drawRect(int x, int y, int width, int height, Color color)
 	{
@@ -148,5 +156,11 @@ public class CanvasImpl implements ICanvas
 	public void endClip()
 	{
 		graphics.disableScissor();
+	}
+
+	@Override
+	public float deltaTime()
+	{
+		return (float) 1 / minecraft.getFps();
 	}
 }

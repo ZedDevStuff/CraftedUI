@@ -1,5 +1,8 @@
 package dev.zeddevstuff.crafted.utils;
 
+import dev.zeddevstuff.crafted.platform.IFont;
+import dev.zeddevstuff.crafted.types.Float2;
+
 import java.util.Objects;
 
 public class TextEditor
@@ -23,6 +26,9 @@ public class TextEditor
             selectionEnd = text.length();
 
     }
+    private float cursorBlinkTimer;
+    private boolean cursorVisible;
+    public boolean isCursorVisible() { return cursorVisible; }
     private int cursorPosition;
     public int getCursorPosition() { return cursorPosition; }
     public void setCursorPosition(int position)
@@ -30,6 +36,8 @@ public class TextEditor
         if (position < 0 || position > text.length())
             throw new IllegalArgumentException("Cursor position out of bounds: " + position);
         this.cursorPosition = position;
+        cursorBlinkTimer = 0;
+        cursorVisible = true;
     }
 
     private int selectionStart;
@@ -59,10 +67,28 @@ public class TextEditor
         this.multiline = multiline;
     }
 
+    public boolean updateBlink(float deltaTime)
+    {
+        cursorBlinkTimer += deltaTime;
+        if (cursorBlinkTimer >= 0.5f)
+        {
+            cursorBlinkTimer = 0;
+            cursorVisible = !cursorVisible;
+        }
+        return cursorVisible;
+    }
+
+    public String getTextBeforeCursor()
+    {
+        return text.substring(0, cursorPosition);
+    }
+
     public void insert(String newText)
     {
         text = text.substring(0, cursorPosition) + newText + text.substring(cursorPosition);
         cursorPosition += newText.length();
+        cursorBlinkTimer = 0;
+        cursorVisible = true;
         dirty = true;
     }
     public void insert(char newChar)
@@ -75,7 +101,7 @@ public class TextEditor
         int start = Math.min(selectionStart, selectionEnd);
         int end = Math.max(selectionStart, selectionEnd);
         text = text.substring(0, start) + newText + text.substring(end);
-        cursorPosition = start + newText.length();
+        setCursorPosition(start + newText.length());
         selectionStart = selectionEnd = cursorPosition;
         dirty = true;
     }
@@ -96,7 +122,7 @@ public class TextEditor
         {
             selectionStart = selectionEnd = newPosition;
         }
-        cursorPosition = newPosition;
+        setCursorPosition(newPosition);
     }
     public void moveCursorToStart(boolean select)
     {
@@ -110,7 +136,7 @@ public class TextEditor
         {
             selectionStart = selectionEnd = 0;
         }
-        cursorPosition = 0;
+        setCursorPosition(0);
     }
     public void moveCursorToEnd(boolean select)
     {
@@ -124,7 +150,7 @@ public class TextEditor
         {
             selectionStart = selectionEnd = text.length();
         }
-        cursorPosition = text.length();
+        setCursorPosition(text.length());
     }
 
     public void delete(boolean backspace)
@@ -132,7 +158,7 @@ public class TextEditor
         if (backspace && cursorPosition > 0)
         {
             text = text.substring(0, cursorPosition - 1) + text.substring(cursorPosition);
-            cursorPosition--;
+            setCursorPosition(cursorPosition - 1);
         }
         else if (!backspace && cursorPosition < text.length())
         {

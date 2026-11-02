@@ -25,6 +25,28 @@ public class InputHandler
 		return rootElement.findElements(e -> e.isFocusable() && !e.state.isDisabled());
 	}
 
+	private CraftedElement directionalTarget(CraftedElement current, int dirX, int dirY)
+	{
+		if (current == null || current.getLayout() == null) return null;
+		var cur = current.getLayout();
+		float cx = cur.x + cur.width / 2f, cy = cur.y + cur.height / 2f;
+		CraftedElement best = null;
+		float bestScore = 0;
+		for (var candidate : focusableElements())
+		{
+			if (candidate == current) continue;
+			var l = candidate.getLayout();
+			if (l == null) continue;
+			float dx = (l.x + l.width / 2f) - cx;
+			float dy = (l.y + l.height / 2f) - cy;
+			float dot = dx * dirX + dy * dirY;
+			if (dot <= 0) continue;
+			float score = dot / (Math.abs(dx) + Math.abs(dy));
+			if (score > bestScore) { bestScore = score; best = candidate; }
+		}
+		return best;
+	}
+
 	public void setFocus(CraftedElement newFocus)
 	{
 		if (newFocus == focusedElement)
@@ -216,6 +238,14 @@ public class InputHandler
 
 		if (keyCode == ImportantKeys.TAB)
 			moveFocus(!modifiers.shift());
+		else if(keyCode == ImportantKeys.UP)
+			setFocus(directionalTarget(focusedElement, 0, -1));
+		else if(keyCode == ImportantKeys.DOWN)
+			setFocus(directionalTarget(focusedElement, 0, 1));
+		else if(keyCode == ImportantKeys.LEFT)
+			setFocus(directionalTarget(focusedElement, -1, 0));
+		else if(keyCode == ImportantKeys.RIGHT)
+			setFocus(directionalTarget(focusedElement, 1, 0));
 		else if (focusedElement != null && (keyCode == ImportantKeys.ENTER || keyCode == ImportantKeys.SPACE))
 			focusedElement.handleClick(new ClickEvent(focusedElement, ClickEvent.Source.KEYBOARD, 0, 0, null));
 	}

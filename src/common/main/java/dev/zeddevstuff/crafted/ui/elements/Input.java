@@ -10,9 +10,11 @@ import dev.zeddevstuff.crafted.input.events.*;
 import dev.zeddevstuff.crafted.parsing.Parsers;
 import dev.zeddevstuff.crafted.platform.ICanvas;
 import dev.zeddevstuff.crafted.platform.IFont;
+import dev.zeddevstuff.crafted.platform.ITexture;
 import dev.zeddevstuff.crafted.platform.ITextureManager;
 import dev.zeddevstuff.crafted.rendering.IRenders;
 import dev.zeddevstuff.crafted.types.Color;
+import dev.zeddevstuff.crafted.types.Rect;
 import dev.zeddevstuff.crafted.types.TextSettings;
 import dev.zeddevstuff.crafted.ui.CraftedContext;
 import dev.zeddevstuff.crafted.ui.CraftedElement;
@@ -37,25 +39,31 @@ public class Input extends CraftedElement
     }
 
     public final ProxyProp<String> value = registerProp(String.class, "value", text::getText, text::setText, Parsers::parseString);
-    public final Prop<Boolean> allowNavigationWithTab = registerProp(Boolean.class, "allowNavigationWithTab", true, Parsers::parseBoolean);
+    public final Prop<Boolean> allowTabNavigation = registerProp(Boolean.class, "allowTabNavigation", true, Parsers::parseBoolean);
+    public final Prop<Boolean> allowArrowNavigation = registerProp(Boolean.class, "allowArrowNavigation", true, Parsers::parseBoolean);
     public final Prop<String> placeholder = registerProp(String.class, "placeholder", "", Parsers::parseString);
 
     public final Prop<Color> textColor = registerProp("textColor", Color.White, Parsers::parseColor);
     public final Prop<Color> placeholderColor = registerProp("placeholderColor", Color.Gray, Parsers::parseColor);
 
     public final Prop<TextSettings> settings = new Prop<>(TextSettings.class, "settings", TextSettings.DEFAULT);
+    private TextSettings placeholderSettings;
     public final ProxyProp<IFont> font;
     public final ProxyProp<Float> fontScale = registerProp(Float.class, "fontScale", settings.get()::size, (value) -> settings.set(settings.get().withSize(value)), Parsers::parseFloat);
     public final ProxyProp<Float> wrapWidth = registerProp(Float.class, "wrapWidth", settings.get()::wrapWidth, (value) -> settings.set(settings.get().withWrapWidth(value)), Parsers::parseFloat);
     public final ProxyProp<Boolean> shadow = registerProp(Boolean.class, "shadow", settings.get()::shadow, (value) -> settings.set(settings.get().withShadow(value)), Parsers::parseBoolean);
     public final ProxyProp<Color> shadowColor = registerProp(Color.class, "shadowColor", settings.get()::shadowColor, (value) -> settings.set(settings.get().withShadowColor(value)), Parsers::parseColor);
 
+    private float xOffset = 0;
 
 
     public Input(CraftedContext ctx, Map<String, String> attributes)
     {
         super(ctx, attributes);
-        settings.set(ctx.crafted.defaultTextSettings);
+        settings.addListener((prop, oldValue, newValue) -> {
+            placeholderSettings = newValue.withShadow(false);
+        });
+        settings.set(ctx.crafted.defaultTextSettings.withShadow(true));
         font = registerProp(IFont.class, "font", settings.get()::font, (value) -> settings.set(settings.get().withFont(value)), ctx.crafted::getFontOrDefault);
     }
 
@@ -69,10 +77,8 @@ public class Input extends CraftedElement
     @Override
     public void onKeyPress(KeyEvent event)
     {
-        boolean shouldConsume = true;
-        if(event.keyCode == TAB && allowNavigationWithTab.get())
-            shouldConsume = false;
-        if(event.keyCode == TAB && shouldConsume)
+        boolean shouldConsume = event.keyCode != TAB || !allowTabNavigation.get();
+		if(event.keyCode == TAB && shouldConsume)
             text.insert("    ");
         else if(event.keyCode == ENTER && !event.modifiers.shift())
             ctx.inputHandler.setFocus(null);
@@ -124,9 +130,11 @@ public class Input extends CraftedElement
     public static class DefaultInputRenderer implements IRenders<Input>
     {
         private static final Color borderColor = new Color(160, 160, 160);
+        private final ITexture textfieldTexture, textfieldHighlightedTexture;
         public DefaultInputRenderer(ITextureManager textures)
         {
-            // Initialize any textures or resources needed for rendering the Input element
+            textfieldTexture = textures.get("minecraft", "widget/text_field");
+            textfieldHighlightedTexture = textures.get("minecraft", "widget/text_field_highlighted");
         }
 
         @Override
@@ -134,16 +142,37 @@ public class Input extends CraftedElement
         {
             if(element.font.get() == null)
                 return;
+            // TODO: Make this support text scaling properly.
             var layout = element.getLayout();
-            canvas.drawRect(layout.x, layout.y, layout.width, layout.height, element.state.isHovered() || element.state.isActive() || element.state.isFocused() ? Color.White : borderColor);
-            canvas.drawRect(layout.x + 1, layout.y + 1, layout.width - 2, layout.height - 2, Color.Black);
+            if(element.state.isHovered() || element.state.isActive() || element.state.isFocused())
+                canvas.drawTexture(textfieldHighlightedTexture, Rect.posAndSize(layout.x, layout.y, layout.width, layout.height));
+            else
+                canvas.drawTexture(textfieldTexture, Rect.posAndSize(layout.x, layout.y, layout.width, layout.height));
             canvas.beginClip(layout.x + 2, layout.y + 2, layout.width - 4, layout.height - 4);
-            float textHeight = element.font.get().measureText(element.text.getText(), element.settings.get().size(), element.settings.get().wrapWidth())[1];
+            float textHeight = element.font.get().measureText(element.text.getText(), element.settings.get().size(), element.settings.get().wrapWidth()).height();
             int textY = layout.y + (int)((layout.height - textHeight + 1) / 2);
             if(element.text.getText().isEmpty() && !element.state.isFocused())
-                canvas.drawText(element.placeholder.get(), layout.x + 4, textY, element.settings.get(), element.placeholderColor.get());
+                canvas.drawText(element.placeholder.get(), layout.x + 4, textY, element.placeholderSettings, element.placeholderColor.get());
             else
+            {
+                canvas.beginTransform();
+                if(element.xOffset != 0)
+                    canvas.translate(-element.xOffset, 0);
                 canvas.drawText(element.text.getText(), layout.x + 4, textY, element.settings.get(), element.textColor.get());
+            }
+            if(element.text.updateBlink(canvas.deltaTime()) && element.state.isFocused())
+            {
+                String textBeforeCursor = element.text.getTextBeforeCursor();
+                boolean insideText = element.text.getCursorPosition() < element.text.getText().length();
+                int cursorX = textBeforeCursor.isEmpty() ? layout.x + 4 : layout.x + 4 + (insideText ? 1 : 2) + (int)element.font.get()
+                    .measureText(textBeforeCursor, element.settings.get().size(), element.settings.get().wrapWidth()).width();
+                int cursorY = insideText ? textY : textY + (int)textHeight - 1;
+                int cursorHeight = insideText ? (int)textHeight : 1;
+                int cursorWidth = insideText ? 1 : 5;
+                canvas.drawRect(cursorX, cursorY, cursorWidth, cursorHeight, element.textColor.get());
+            }
+            if(element.xOffset != 0)
+                canvas.endTransform();
             canvas.endClip();
         }
     }
