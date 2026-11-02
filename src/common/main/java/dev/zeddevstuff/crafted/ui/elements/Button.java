@@ -3,6 +3,9 @@ package dev.zeddevstuff.crafted.ui.elements;
 import dev.zeddevstuff.crafted.Crafted;
 import dev.zeddevstuff.crafted.annotations.DefineElement;
 import dev.zeddevstuff.crafted.annotations.Description;
+import dev.zeddevstuff.crafted.input.MouseButton;
+import dev.zeddevstuff.crafted.input.events.ClickEvent;
+import dev.zeddevstuff.crafted.input.events.MouseEvent;
 import dev.zeddevstuff.crafted.parsing.Parsers;
 import dev.zeddevstuff.crafted.platform.ICanvas;
 import dev.zeddevstuff.crafted.platform.IText;
@@ -16,6 +19,7 @@ import dev.zeddevstuff.crafted.ui.CraftedElement;
 import org.appliedenergistics.yoga.YogaAlign;
 import org.appliedenergistics.yoga.YogaDimension;
 import org.appliedenergistics.yoga.YogaJustify;
+import org.appliedenergistics.yoga.style.StyleLength;
 import org.appliedenergistics.yoga.style.StyleSizeLength;
 import org.appliedenergistics.yoga.style.YogaStyle;
 
@@ -52,10 +56,31 @@ public class Button extends CraftedElement
 		return style;
 	}
 
+	@Override
+	public void onMousePress(MouseEvent event)
+	{
+		if(event.button == MouseButton.LEFT && renderer.get() instanceof CraftedButtonRenderer)
+		{
+			marginTop.set(StyleLength.points(3));
+			height.set(StyleSizeLength.points(height.get().value().getValue() - 3));
+		}
+	}
+
+	@Override
+	public void onMouseRelease(MouseEvent event)
+	{
+		if(event.button == MouseButton.LEFT && renderer.get() instanceof CraftedButtonRenderer)
+		{
+			marginTop.set(StyleLength.points(0));
+			height.set(StyleSizeLength.points(height.get().value().getValue() + 3));
+		}
+	}
+
 	public static void register(Crafted crafted)
 	{
 		crafted.elements.registerElement(Button.class, "Button", Button::new);
 		crafted.renderers.registerRenderer(Button.class, "default", new DefaultButtonRenderer(crafted.textures));
+		crafted.renderers.registerRenderer(Button.class, "crafted", new CraftedButtonRenderer());
 	}
 
 	public static class DefaultButtonRenderer implements IRenders<Button>
@@ -78,6 +103,29 @@ public class Button extends CraftedElement
 				canvas.drawTexture(buttonHighlightedTexture, Rect.posAndSize(layout.x, layout.y, layout.width, layout.height));
 			else
 				canvas.drawTexture(buttonTexture, Rect.posAndSize(layout.x, layout.y, layout.width, layout.height));
+		}
+	}
+
+	public static class CraftedButtonRenderer implements IRenders<Button>
+	{
+		@Override
+		public void render(ICanvas canvas, Button element)
+		{
+			var layout = element.getLayout();
+			// 1. Border
+			// 2. Top (background)
+			// 3. Elevation (darker background)
+			// 4. Text
+			Color borderColor = element.state.isDisabled() ? Color.Gray : Color.Black;
+			Color backgroundColor = element.state.isDisabled() ? Color.LightGray : Color.Gray;
+			int y = layout.y;
+			int height = layout.height;
+			int elevationY = y + height - 4;
+			int elevationHeight = 3;
+			canvas.drawRect(layout.x, y, layout.width, height, borderColor);
+			canvas.drawRect(layout.x + 1, y + 1, layout.width - 2, height - 2, Color.White);
+			if(!element.state.isActive())
+				canvas.drawRect(layout.x + 1, elevationY, layout.width - 2, elevationHeight, Color.DarkGray);
 		}
 	}
 }

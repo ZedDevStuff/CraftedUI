@@ -5,7 +5,9 @@ import dev.zeddevstuff.crafted.Prop;
 import dev.zeddevstuff.crafted.annotations.DefineElement;
 import dev.zeddevstuff.crafted.annotations.Description;
 import dev.zeddevstuff.crafted.parsing.Parsers;
+import dev.zeddevstuff.crafted.platform.ICanvas;
 import dev.zeddevstuff.crafted.platform.IText;
+import dev.zeddevstuff.crafted.rendering.IRenders;
 import dev.zeddevstuff.crafted.ui.CraftedContext;
 import dev.zeddevstuff.crafted.ui.CraftedElement;
 

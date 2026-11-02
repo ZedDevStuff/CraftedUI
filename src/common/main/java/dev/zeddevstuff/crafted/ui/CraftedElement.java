@@ -13,6 +13,7 @@ import dev.zeddevstuff.crafted.types.EdgeInsets;
 import dev.zeddevstuff.crafted.types.StyleLength2;
 import dev.zeddevstuff.crafted.types.StyleLength4;
 import dev.zeddevstuff.crafted.types.StyleSizeLength2;
+import dev.zeddevstuff.crafted.ui.elements.CraftedRoot;
 import org.appliedenergistics.yoga.*;
 import org.appliedenergistics.yoga.style.StyleLength;
 import org.appliedenergistics.yoga.style.StyleSizeLength;
@@ -279,12 +280,16 @@ public abstract class CraftedElement
 	public final Prop<IKeyEventHandler> onKeyRelease = registerProp(IKeyEventHandler.class, "onKeyRelease", this::getKeyCallback);
 	public final Prop<IKeyEventHandler> onKeyType = registerProp(IKeyEventHandler.class, "onKeyType", this::getKeyCallback);
 
-	private IRenders<?> renderer;
+	@Description("The renderer to use for this element.")
+	public final Prop<IRenders<?>> renderer;
 
 	public CraftedElement(CraftedContext ctx, Map<String, String> attributes)
 	{
 		this.ctx = ctx;
-		this.renderer = ctx.crafted.renderers.getRenderer(this.getClass(), attributes.getOrDefault("renderer", "default"));
+		if(!(this instanceof CraftedRoot))
+			this.renderer = registerProp("renderer", ctx.crafted.renderers.getRendererOrDefault(this.getClass(), attributes.getOrDefault("renderer", "default")), this::getRenderer);
+		else
+			this.renderer = null;
 		this.node.setStyle(initLayoutNode(node.getStyle(), attributes));
 		zIndex.addListener((prop, oldValue, newValue) -> {
 			if(parent != null)
@@ -317,6 +322,10 @@ public abstract class CraftedElement
 	IKeyEventHandler getKeyCallback(String name, IKeyEventHandler defaultValue)
 	{
 		return ctx.getCallback(IKeyEventHandler.class, name);
+	}
+	IRenders<?> getRenderer(String name, IRenders<?> defaultValue)
+	{
+		return ctx.crafted.renderers.getRendererOrDefault(this.getClass(), name);
 	}
 
 	/**
@@ -442,7 +451,8 @@ public abstract class CraftedElement
 
 	public void setRenderer(String renderer)
 	{
-		this.renderer = ctx.crafted.renderers.getRendererOrDefault(this.getClass(), renderer);
+		if(this.renderer != null)
+			this.renderer.set(ctx.crafted.renderers.getRendererOrDefault(this.getClass(), renderer));
 	}
 	public void setRendererRecursive(String renderer)
 	{
@@ -487,7 +497,7 @@ public abstract class CraftedElement
 		List<RenderCommand> renderCommands = new ArrayList<>();
 		collectRenderCommands(renderCommands);
 		for(var cmd : renderCommands)
-			cmd.Execute(canvas);
+			cmd.execute(canvas);
 	}
 	private void collectRenderCommands(List<RenderCommand> list)
 	{
@@ -644,16 +654,15 @@ public abstract class CraftedElement
 
 	private record RenderCommand(CraftedElement element, Phase commandPhase)
 	{
-
-		public void Execute(ICanvas canvas)
+		public void execute(ICanvas canvas)
 		{
 			switch (commandPhase)
 			{
 				case Phase.RENDER:
-					element.renderer.forceRender(canvas, element);
+					element.renderer.get().forceRender(canvas, element);
 					break;
 				case Phase.AFTER_RENDER:
-					element.renderer.forceAfterRender(canvas, element);
+					element.renderer.get().forceAfterRender(canvas, element);
 					break;
 			}
 		}
