@@ -2,6 +2,7 @@ package dev.zeddevstuff.crafted.mixin;
 
 import dev.zeddevstuff.crafted.Constants;
 import org.objectweb.asm.tree.ClassNode;
+import org.slf4j.Logger;
 import org.spongepowered.asm.mixin.extensibility.IMixinConfigPlugin;
 import org.spongepowered.asm.mixin.extensibility.IMixinInfo;
 
@@ -10,10 +11,12 @@ import java.util.Set;
 
 public class MixinManager implements IMixinConfigPlugin
 {
+	Logger logger = org.slf4j.LoggerFactory.getLogger("CraftedUI");
 	@Override
 	public void onLoad(String mixinPackage)
 	{
-		System.out.println("[Crafted] Dev mode is enabled, adding gallery button to title screen.");
+		if(Constants.DEV_MODE)
+			logger.info("Dev mode is enabled, adding gallery button to title screen.");
 	}
 
 	@Override

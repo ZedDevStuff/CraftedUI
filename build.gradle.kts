@@ -46,7 +46,7 @@ cloche {
     }
 
     val common1211 = common("common:1.21.1") {
-        accessWideners.from("src/common/1.21.1/main/resources/crafted.accesswidener")
+        accessWideners.from("src/common/1.21.1/main/crafted_ui.accesswidener")
     }
     neoforge("neoforge:1.21.1") {
         loaderVersion = "21.1.219"
@@ -58,6 +58,9 @@ cloche {
 
         dependencies {
             fabricApi("0.116.8")
+        }
+        metadata {
+            dependency("fabric-api", "0.116.8")
         }
 
         dependsOn(common1211)
@@ -84,7 +87,7 @@ cloche {
         }
 
         metadata {
-            mixins = files("crafted.mixins.json")
+            mixins = files("crafted_ui.mixins.json")
         }
 
         runs {
