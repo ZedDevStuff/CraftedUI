@@ -8,38 +8,29 @@ import net.minecraft.resources.ResourceLocation;
 public class MinecraftTexture implements ITexture
 {
 	public final ResourceLocation resourceLocation;
-	private final Kind kind;
+	private Kind kind;
 	public Kind getKind() { return kind; }
 	private int width = -1;
-	public int getWidth()
-	{
-		if(width == -1)
-			fetchSize();
-		return width;
-	}
+	public int getWidth() { return width; }
 	private int height = -1;
-	public int getHeight()
-	{
-		if(height == -1)
-			fetchSize();
-		return height;
-	}
+	public int getHeight() { return height; }
 
-	public MinecraftTexture(ResourceLocation resourceLocation, Kind kind)
+	public MinecraftTexture(ResourceLocation resourceLocation)
 	{
 		this.resourceLocation = resourceLocation;
-		this.kind = kind;
+		fetchData();
 	}
 
-	public MinecraftTexture(ResourceLocation resourceLocation, Kind kind, int width, int height)
+	void fetchData()
 	{
-		this(resourceLocation, kind);
-		this.width = width;
-		this.height = height;
-	}
-
-	void fetchSize()
-	{
+		var actualLocation = resourceLocation.toString().replace(":widget/", ":textures/gui/sprites/widget/");
+		if(actualLocation.contains(":textures/gui/sprites/widget"))
+			kind = ITexture.Kind.SPRITE;
+		else
+			kind = ITexture.Kind.SIMPLE;
+		if(!actualLocation.endsWith(".png"))
+			actualLocation += ".png";
+		var resourceLocation = ResourceLocation.parse(actualLocation);
 		var texture = Minecraft.getInstance().getTextureManager().getTexture(resourceLocation);
 		try
 		{

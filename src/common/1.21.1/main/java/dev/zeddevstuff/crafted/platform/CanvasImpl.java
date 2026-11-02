@@ -84,7 +84,7 @@ public class CanvasImpl implements ICanvas
 		if(texture instanceof MinecraftTexture mcTex)
 		{
 			if(mcTex.getKind() == ITexture.Kind.SIMPLE)
-				graphics.blit(mcTex.resourceLocation, (int) dest.minX(), (int) dest.minY(), 0, 0, (int) dest.width(), (int) dest.height(), (int) dest.width(), (int) dest.height());
+				graphics.blit(mcTex.resourceLocation, (int) dest.minX(), (int) dest.minY(), 0f, 0f, (int) dest.width(), (int) dest.height(), (int) dest.width(), (int) dest.height());
 			else if(mcTex.getKind() == ITexture.Kind.SPRITE)
 				graphics.blitSprite(mcTex.resourceLocation, (int) dest.minX(), (int) dest.minY(), (int) dest.width(), (int) dest.height());
 		}
@@ -95,18 +95,14 @@ public class CanvasImpl implements ICanvas
 	{
 		if(texture instanceof MinecraftTexture mcTex)
 		{
-			// void blit(ResourceLocation atlasLocation, int x, int y, int uOffset, int vOffset, int uWidth, int vHeight)
-			// void blit(ResourceLocation atlasLocation, int x, int y, int blitOffset, float uOffset, float vOffset, int uWidth, int vHeight, int textureWidth, int textureHeight)
-			// void blit(ResourceLocation atlasLocation, int x, int y, int width, int height, float uOffset, float vOffset, int uWidth, int vHeight, int textureWidth, int textureHeight)
-			// void blit(ResourceLocation atlasLocation, int x, int y, float uOffset, float vOffset, int width, int height, int textureWidth, int textureHeight)
-			// void blit(ResourceLocation atlasLocation, int x1, int x2, int y1, int y2, int blitOffset, int uWidth, int vHeight, float uOffset, float vOffset, int textureWidth, int textureHeight)
-			// Sprites
+			// TODO: Improve this mess
 			// void blitSprite(ResourceLocation sprite, int x, int y, int width, int height)
 			// void blitSprite(ResourceLocation sprite, int x, int y, int blitOffset, int width, int height)
 			// void blitSprite(ResourceLocation sprite, int textureWidth, int textureHeight, int uPosition, int vPosition, int x, int y, int uWidth, int vHeight)
 			// void blitSprite(ResourceLocation sprite, int textureWidth, int textureHeight, int uPosition, int vPosition, int x, int y, int blitOffset, int uWidth, int vHeight)
-			if(mcTex.getKind() == ITexture.Kind.SIMPLE) // This is probably invalid
-				graphics.blit(mcTex.resourceLocation, (int) dest.minX(), (int) dest.minY(), 0, (int) src.minX(), (int) src.minY(), (int) src.width(), (int) src.height(), texture.getWidth(), texture.getHeight());
+			if(mcTex.getKind() == ITexture.Kind.SIMPLE)
+				// It sorta works? I really hate programming without documentation
+				graphics.blit(mcTex.resourceLocation, (int) dest.minX(), (int) dest.minY(), src.uOffset(texture.getWidth()), src.vOffset(texture.getHeight()), (int) dest.width(), (int) dest.height(), (int) (dest.width() * src.uScale(16)), (int) (dest.height() * src.vScale(16)));
 			else if(mcTex.getKind() == ITexture.Kind.SPRITE)
 				graphics.blitSprite(mcTex.resourceLocation, (int) src.width(), (int) src.height(), (int) src.minX(), (int) src.minY(), (int) dest.minX(), (int) dest.minY(), (int) dest.width(), (int) dest.height());
 		}
@@ -143,13 +139,11 @@ public class CanvasImpl implements ICanvas
 	{
 		graphics.enableScissor(x, y, x + width, y + height);
 	}
-
 	@Override
 	public boolean clipContains(int x, int y)
 	{
 		return graphics.containsPointInScissor(x, y);
 	}
-
 	@Override
 	public void endClip()
 	{

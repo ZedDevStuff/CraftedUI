@@ -64,9 +64,9 @@ public class Button extends CraftedElement
 
 		public DefaultButtonRenderer(ITextureManager textures)
 		{
-			buttonTexture = textures.get("minecraft", "widget/button", ITexture.Kind.SPRITE, 200, 20);
-			buttonDisabledTexture = textures.get("minecraft", "widget/button_disabled", ITexture.Kind.SPRITE, 200, 20);
-			buttonHighlightedTexture = textures.get("minecraft", "widget/button_highlighted", ITexture.Kind.SPRITE, 200, 20);
+			buttonTexture = textures.get("minecraft", "widget/button");
+			buttonDisabledTexture = textures.get("minecraft", "widget/button_disabled");
+			buttonHighlightedTexture = textures.get("minecraft", "widget/button_highlighted");
 		}
 		@Override
 		public void render(ICanvas canvas, Button element)

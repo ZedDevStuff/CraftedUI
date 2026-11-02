@@ -4,7 +4,9 @@ import dev.zeddevstuff.crafted.input.ImportantKeys;
 import dev.zeddevstuff.crafted.input.KeyModifiers;
 import dev.zeddevstuff.crafted.input.MouseButton;
 import dev.zeddevstuff.crafted.platform.CanvasImpl;
+import dev.zeddevstuff.crafted.platform.ITexture;
 import dev.zeddevstuff.crafted.platform.TextConverter;
+import dev.zeddevstuff.crafted.types.Rect;
 import dev.zeddevstuff.crafted.ui.CraftedContext;
 import dev.zeddevstuff.crafted.ui.elements.CraftedRoot;
 import net.minecraft.client.Minecraft;
@@ -31,7 +33,7 @@ public class CraftedScreen extends Screen
 	{
 		this(rootElementFactory.apply(ctx));
 	}
-
+	ITexture testTexture;
 	@Override
 	public void render(GuiGraphics guiGraphics, int i, int i1, float v)
 	{

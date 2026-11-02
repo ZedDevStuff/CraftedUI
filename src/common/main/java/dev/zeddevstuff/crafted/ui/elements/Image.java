@@ -4,11 +4,9 @@ import dev.zeddevstuff.crafted.Crafted;
 import dev.zeddevstuff.crafted.Prop;
 import dev.zeddevstuff.crafted.annotations.DefineElement;
 import dev.zeddevstuff.crafted.annotations.Description;
-import dev.zeddevstuff.crafted.parsing.Parsers;
 import dev.zeddevstuff.crafted.platform.ICanvas;
 import dev.zeddevstuff.crafted.platform.ITexture;
 import dev.zeddevstuff.crafted.rendering.IRenders;
-import dev.zeddevstuff.crafted.types.Color;
 import dev.zeddevstuff.crafted.types.Rect;
 import dev.zeddevstuff.crafted.ui.CraftedContext;
 import dev.zeddevstuff.crafted.ui.CraftedElement;
@@ -28,16 +26,7 @@ public class Image extends CraftedElement
 
 	private ITexture parseTexture(String s, ITexture iTexture)
 	{
-		var split = s.split(":", 2);
-		if(split.length == 1)
-			return ctx.crafted.textures.get(s, ITexture.Kind.SIMPLE);
-		else
-		{
-			if(split[0].equals("sprite"))
-				return ctx.crafted.textures.get(split[1], ITexture.Kind.SPRITE);
-			else
-				return ctx.crafted.textures.get(split[1], ITexture.Kind.SIMPLE);
-		}
+		return ctx.crafted.textures.get(s);
 	}
 
 	public static void register(Crafted crafted)

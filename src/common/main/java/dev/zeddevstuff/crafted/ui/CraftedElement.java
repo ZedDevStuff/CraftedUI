@@ -56,7 +56,7 @@ public abstract class CraftedElement
 
 	public final InteractionState state = new InteractionState(INTERNAL_KEY);
 
-	private LayoutResult layout;
+	private LayoutResult layout = new LayoutResult();
 	public LayoutResult getLayout() { return layout; }
 
 	protected final HashMap<String, IProp<?>> props = new HashMap<>();
@@ -680,6 +680,21 @@ public abstract class CraftedElement
 		public final EdgeInsets<Integer> margin;
 		public final EdgeInsets<Integer> padding;
 		public final EdgeInsets<Integer> border;
+
+		private LayoutResult()
+		{
+			this.x = 0;
+			this.y = 0;
+			this.width = 0;
+			this.height = 0;
+			this.margin = new EdgeInsets<>(0, 0, 0, 0);
+			this.padding = new EdgeInsets<>(0, 0, 0, 0);
+			this.border = new EdgeInsets<>(0, 0, 0, 0);
+			this.innerX = x + margin.left() + padding.left() + border.left();
+			this.innerY = y + margin.top() + padding.top() + border.top();
+			this.innerWidth = width - margin.left() - margin.right() - padding.left() -padding.right() - border.left() - border.right();
+			this.innerHeight = height - margin.top() - margin.bottom() - padding.top() - padding.bottom() - border.top() - border.bottom();
+		}
 
 		private LayoutResult(CraftedElement element)
 		{
