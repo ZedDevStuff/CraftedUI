@@ -27,7 +27,8 @@ public class Entry
 			new MinecraftLocalization(),
 			new MinecraftFont("minecraft", Minecraft.getInstance().font),
 			new MainThreadDispatcher(),
-			new MinecraftTextureManager()
+			new MinecraftTextureManager(),
+			new Clipboard()
 		));
 		LogUtils.getLogger().info("CraftedUI initialized");
 		All.registerInto(Crafted.defaultInstance());

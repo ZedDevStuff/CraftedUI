@@ -1,9 +1,6 @@
 package dev.zeddevstuff.crafted;
 
-import dev.zeddevstuff.crafted.platform.IDispatcher;
-import dev.zeddevstuff.crafted.platform.IFont;
-import dev.zeddevstuff.crafted.platform.ILocalization;
-import dev.zeddevstuff.crafted.platform.ITextureManager;
+import dev.zeddevstuff.crafted.platform.*;
 import dev.zeddevstuff.crafted.rendering.RendererRegistry;
 import dev.zeddevstuff.crafted.types.TextSettings;
 import dev.zeddevstuff.crafted.ui.CraftedContext;
@@ -24,17 +21,19 @@ public class Crafted
 	public final IFont defaultFont;
 	public final IDispatcher dispatcher;
 	public final ITextureManager textures;
+	public final IClipboard clipboard;
 	public final TextSettings defaultTextSettings;
 	public final ElementRegistry elements = new ElementRegistry();
 	public final RendererRegistry renderers = new RendererRegistry();
 	private final Map<String, IFont> fonts = new java.util.HashMap<>();
 
-	public Crafted(ILocalization localization, IFont defaultFont, IDispatcher dispatcher, ITextureManager textures)
+	public Crafted(ILocalization localization, IFont defaultFont, IDispatcher dispatcher, ITextureManager textures, IClipboard clipboard)
 	{
 		this.localization = localization;
 		this.defaultFont = defaultFont;
 		this.dispatcher = dispatcher;
 		this.textures = textures;
+		this.clipboard = clipboard;
 		this.defaultTextSettings = TextSettings.DEFAULT.withFont(defaultFont);
 		registerFont("default", defaultFont);
 	}

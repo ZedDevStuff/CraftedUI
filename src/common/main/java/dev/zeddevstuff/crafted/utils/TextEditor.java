@@ -56,6 +56,29 @@ public class TextEditor
             throw new IllegalArgumentException("Selection end position out of bounds: " + position);
         this.selectionEnd = position;
     }
+    public void clearSelection()
+    {
+        selectionStart = selectionEnd = cursorPosition;
+    }
+
+    public boolean hasSelection()
+    {
+        return selectionStart != selectionEnd;
+    }
+
+    public String getSelectedText()
+    {
+        int start = Math.min(selectionStart, selectionEnd);
+        int end = Math.max(selectionStart, selectionEnd);
+        return text.substring(start, end);
+    }
+
+    public void selectAll()
+    {
+        selectionStart = 0;
+        selectionEnd = text.length();
+        setCursorPosition(text.length());
+    }
 
     private boolean multiline;
     public boolean isMultiline() { return multiline; }
@@ -85,6 +108,11 @@ public class TextEditor
 
     public void insert(String newText)
     {
+        if (hasSelection())
+        {
+            replaceSelection(newText);
+            return;
+        }
         text = text.substring(0, cursorPosition) + newText + text.substring(cursorPosition);
         cursorPosition += newText.length();
         cursorBlinkTimer = 0;
@@ -153,17 +181,52 @@ public class TextEditor
         setCursorPosition(text.length());
     }
 
+    public void moveCursorToPoint(IFont font, Float2 position, float scale)
+    {
+        int newPosition = getCursorPositionAtX(font, position.x(), scale);
+        setCursorPosition(newPosition);
+        clearSelection();
+    }
+    public void extendSelectionToPoint(IFont font, Float2 position, float scale)
+    {
+        int newPosition = getCursorPositionAtX(font, position.x(), scale);
+        setCursorPosition(newPosition);
+        selectionEnd = newPosition;
+    }
+
+    private int getCursorPositionAtX(IFont font, float x, float scale)
+    {
+        if (x <= 0 || text.isEmpty())
+            return 0;
+
+        float previousWidth = 0;
+        for (int position = 1; position <= text.length(); position++)
+        {
+            float currentWidth = font.measureText(text.substring(0, position), scale, -1).width();
+            if (x < (previousWidth + currentWidth) / 2)
+                return position - 1;
+            previousWidth = currentWidth;
+        }
+        return text.length();
+    }
+
     public void delete(boolean backspace)
     {
+        if (hasSelection())
+        {
+            replaceSelection("");
+            return;
+        }
         if (backspace && cursorPosition > 0)
         {
             text = text.substring(0, cursorPosition - 1) + text.substring(cursorPosition);
             setCursorPosition(cursorPosition - 1);
+            dirty = true;
         }
         else if (!backspace && cursorPosition < text.length())
         {
             text = text.substring(0, cursorPosition) + text.substring(cursorPosition + 1);
+            dirty = true;
         }
-        dirty = true;
     }
 }

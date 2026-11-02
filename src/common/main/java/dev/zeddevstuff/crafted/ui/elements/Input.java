@@ -6,6 +6,7 @@ import dev.zeddevstuff.crafted.ProxyProp;
 import dev.zeddevstuff.crafted.annotations.DefineElement;
 import dev.zeddevstuff.crafted.annotations.Description;
 import dev.zeddevstuff.crafted.annotations.Ignore;
+import dev.zeddevstuff.crafted.input.MouseButton;
 import dev.zeddevstuff.crafted.input.events.*;
 import dev.zeddevstuff.crafted.parsing.Parsers;
 import dev.zeddevstuff.crafted.platform.ICanvas;
@@ -14,6 +15,7 @@ import dev.zeddevstuff.crafted.platform.ITexture;
 import dev.zeddevstuff.crafted.platform.ITextureManager;
 import dev.zeddevstuff.crafted.rendering.IRenders;
 import dev.zeddevstuff.crafted.types.Color;
+import dev.zeddevstuff.crafted.types.Float2;
 import dev.zeddevstuff.crafted.types.Rect;
 import dev.zeddevstuff.crafted.types.TextSettings;
 import dev.zeddevstuff.crafted.ui.CraftedContext;
@@ -45,6 +47,7 @@ public class Input extends CraftedElement
 
     public final Prop<Color> textColor = registerProp("textColor", Color.White, Parsers::parseColor);
     public final Prop<Color> placeholderColor = registerProp("placeholderColor", Color.Gray, Parsers::parseColor);
+    public final Prop<Color> selectionColor = registerProp("selectionColor", Color.CornflowerBlue, Parsers::parseColor);
 
     public final Prop<TextSettings> settings = new Prop<>(TextSettings.class, "settings", TextSettings.DEFAULT);
     private TextSettings placeholderSettings;
@@ -70,13 +73,39 @@ public class Input extends CraftedElement
     @Override
     public void onCharTyped(KeyEvent event)
     {
-        event.consume();
         text.insert(event.character);
+        event.consume();
     }
 
     @Override
     public void onKeyPress(KeyEvent event)
     {
+        // TODO: Find a way to not be locked to QWERTY layouts
+        if(event.modifiers.control())
+        {
+            if(event.keyCode == A)
+                text.selectAll();
+            else if(event.keyCode == C)
+            {
+                if(text.hasSelection())
+                    ctx.crafted.clipboard.set(text.getSelectedText());
+            }
+            else if(event.keyCode == X)
+            {
+                if(text.hasSelection())
+                {
+                    ctx.crafted.clipboard.set(text.getSelectedText());
+                    text.delete(false);
+                }
+            }
+            else if(event.keyCode == V)
+                text.insert(ctx.crafted.clipboard.get());
+            else
+                return;
+            event.consume();
+            return;
+        }
+
         boolean shouldConsume = event.keyCode != TAB || !allowTabNavigation.get();
 		if(event.keyCode == TAB && shouldConsume)
             text.insert("    ");
@@ -98,6 +127,47 @@ public class Input extends CraftedElement
             event.consume();
     }
 
+    private boolean canStartDrag = false;
+    private boolean isDragging = false;
+    @Override
+    public void onMousePress(MouseEvent event)
+    {
+        if(event.button == MouseButton.LEFT)
+        {
+            canStartDrag = true;
+            text.moveCursorToPoint(font.get(), new Float2(event.x - 4 + xOffset, event.y), fontScale.get());
+            text.setSelectionStart(text.getCursorPosition());
+            event.consume();
+        }
+    }
+
+    @Override
+    public void onMouseRelease(MouseEvent event)
+    {
+        if(event.button == MouseButton.LEFT)
+        {
+            if(isDragging)
+                isDragging = false;
+            canStartDrag = false;
+            event.consume();
+        }
+    }
+
+    @Override
+    public void onMouseMove(MouseEvent event)
+    {
+        if(canStartDrag)
+        {
+            isDragging = true;
+            canStartDrag = false;
+        }
+        if(isDragging)
+        {
+            text.extendSelectionToPoint(font.get(), new Float2(event.x - 4 + xOffset, event.y), fontScale.get());
+            event.consume();
+        }
+    }
+
     @Override
     public void onFocusLost(FocusEvent event)
     {
@@ -106,6 +176,7 @@ public class Input extends CraftedElement
 
     protected void onSubmit(UIEvent event)
     {
+        text.clearSelection();
         if(!text.isDirty())
             return;
         var handler = onSubmit.get();
@@ -142,37 +213,59 @@ public class Input extends CraftedElement
         {
             if(element.font.get() == null)
                 return;
-            // TODO: Make this support text scaling properly.
             var layout = element.getLayout();
             if(element.state.isHovered() || element.state.isActive() || element.state.isFocused())
                 canvas.drawTexture(textfieldHighlightedTexture, Rect.posAndSize(layout.x, layout.y, layout.width, layout.height));
             else
                 canvas.drawTexture(textfieldTexture, Rect.posAndSize(layout.x, layout.y, layout.width, layout.height));
             canvas.beginClip(layout.x + 2, layout.y + 2, layout.width - 4, layout.height - 4);
-            float textHeight = element.font.get().measureText(element.text.getText(), element.settings.get().size(), element.settings.get().wrapWidth()).height();
+            var textSettings = element.settings.get().withNoWrap();
+            String text = element.text.getText();
+            int textLeft = layout.x + 4;
+            int textRight = layout.x + layout.width - 4;
+            float textWidth = element.font.get().measureText(text, textSettings.size(), -1).width();
+            float caretWidth = element.font.get().measureText(
+                element.text.getTextBeforeCursor(), textSettings.size(), -1).width();
+            float caretX = textLeft + caretWidth;
+            int visibleWidth = Math.max(0, textRight - textLeft);
+            if(caretX - element.xOffset > textRight)
+                element.xOffset = caretX - textRight;
+            else if(caretX - element.xOffset < textLeft)
+                element.xOffset = caretX - textLeft;
+            element.xOffset = Math.max(0, Math.min(element.xOffset, Math.max(0, textWidth - visibleWidth)));
+
+            float textHeight = element.font.get().measureText(text, textSettings.size(), -1).height();
             int textY = layout.y + (int)((layout.height - textHeight + 1) / 2);
-            if(element.text.getText().isEmpty() && !element.state.isFocused())
+            if(text.isEmpty() && !element.state.isFocused())
                 canvas.drawText(element.placeholder.get(), layout.x + 4, textY, element.placeholderSettings, element.placeholderColor.get());
             else
             {
                 canvas.beginTransform();
-                if(element.xOffset != 0)
-                    canvas.translate(-element.xOffset, 0);
-                canvas.drawText(element.text.getText(), layout.x + 4, textY, element.settings.get(), element.textColor.get());
-            }
-            if(element.text.updateBlink(canvas.deltaTime()) && element.state.isFocused())
-            {
-                String textBeforeCursor = element.text.getTextBeforeCursor();
-                boolean insideText = element.text.getCursorPosition() < element.text.getText().length();
-                int cursorX = textBeforeCursor.isEmpty() ? layout.x + 4 : layout.x + 4 + (insideText ? 1 : 2) + (int)element.font.get()
-                    .measureText(textBeforeCursor, element.settings.get().size(), element.settings.get().wrapWidth()).width();
-                int cursorY = insideText ? textY : textY + (int)textHeight - 1;
-                int cursorHeight = insideText ? (int)textHeight : 1;
-                int cursorWidth = insideText ? 1 : 5;
-                canvas.drawRect(cursorX, cursorY, cursorWidth, cursorHeight, element.textColor.get());
-            }
-            if(element.xOffset != 0)
+                canvas.translate(-element.xOffset, 0);
+
+                int selectionStart = Math.min(element.text.getSelectionStart(), element.text.getSelectionEnd());
+                int selectionEnd = Math.max(element.text.getSelectionStart(), element.text.getSelectionEnd());
+                if(selectionStart != selectionEnd)
+                {
+                    float selectionX = textLeft + element.font.get()
+                        .measureText(text.substring(0, selectionStart), textSettings.size(), -1).width();
+                    float selectionEndX = textLeft + element.font.get()
+                        .measureText(text.substring(0, selectionEnd), textSettings.size(), -1).width();
+                    canvas.drawRect((int)selectionX, textY, (int)(selectionEndX - selectionX), (int)textHeight, element.selectionColor.get());
+                }
+
+                canvas.drawText(text, textLeft, textY, textSettings, element.textColor.get());
+                if(element.text.updateBlink(canvas.deltaTime()) && element.state.isFocused())
+                {
+                    boolean insideText = element.text.getCursorPosition() < text.length();
+                    int cursorX = (int)caretX;
+                    int cursorY = insideText ? textY : textY + (int)textHeight - 1;
+                    int cursorHeight = insideText ? (int)textHeight : 1;
+                    int cursorWidth = insideText ? 1 : 5;
+                    canvas.drawRect(cursorX, cursorY, cursorWidth, cursorHeight, element.textColor.get());
+                }
                 canvas.endTransform();
+            }
             canvas.endClip();
         }
     }

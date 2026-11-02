@@ -722,5 +722,14 @@ public abstract class CraftedElement
 			this.innerWidth = width - margin.left() - margin.right() - padding.left() -padding.right() - border.left() - border.right();
 			this.innerHeight = height - margin.top() - margin.bottom() - padding.top() - padding.bottom() - border.top() - border.bottom();
 		}
+
+		public boolean contains(float x, float y)
+		{
+			return x >= this.x && x <= this.x + this.width && y >= this.y && y <= this.y + this.height;
+		}
+		public boolean containsInner(float x, float y)
+		{
+			return x >= this.innerX && x <= this.innerX + this.innerWidth && y >= this.innerY && y <= this.innerY + this.innerHeight;
+		}
 	}
 }
