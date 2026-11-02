@@ -9,7 +9,7 @@ plugins {
 }
 
 group = "dev.zeddevstuff"
-version = "1.0-SNAPSHOT"
+version = "1.0.0-PROTOTYPE"
 
 repositories {
     mavenCentral()
@@ -21,28 +21,21 @@ repositories {
         mavenFabric()
         mavenForge()
     }
-    maven("https://maven.twelveiterations.com/repository/maven-public/") {
-        name = "Twelve Iterations"
-        content {
-            includeGroup("net.blay09.mods")
-        }
-    }
 }
 
 cloche {
     metadata {
         modId = "crafted_ui"
         name = rootProject.name
-        description = "Simpler UI for Minecraft"
+        description = "A simple declarative UI framework for Minecraft"
         license = "MIT"
         author("ZedDevStuff")
-        url = "https://modrinth.com/mod/crafted"
+        url = "https://modrinth.com/mod/crafted_ui"
         issues = "https://github.com/ZedDevStuff/CraftedUI/issues"
         icon = "icon.png"
     }
 
     common {
-
     }
 
     val common1211 = common("common:1.21.1") {
@@ -71,11 +64,6 @@ cloche {
 
         metadata {
             entrypoint("client", "dev.zeddevstuff.crafted.CraftedFabric")
-        }
-    }
-
-    commonTargets.configureEach {
-        dependencies {
         }
     }
 
