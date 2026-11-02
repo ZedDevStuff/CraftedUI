@@ -10,6 +10,7 @@ import dev.zeddevstuff.crafted.rendering.IRenders;
 import dev.zeddevstuff.crafted.types.Color;
 import dev.zeddevstuff.crafted.ui.CraftedContext;
 import dev.zeddevstuff.crafted.ui.CraftedElement;
+import org.appliedenergistics.yoga.YogaOverflow;
 
 import java.util.Map;
 
@@ -37,7 +38,16 @@ public class Box extends CraftedElement
 		public void render(ICanvas canvas, Box element)
 		{
 			var layout = element.getLayout();
+			if(element.overflow.get() != YogaOverflow.VISIBLE)
+				canvas.beginClip(layout.x, layout.y, layout.width, layout.height);
 			canvas.drawRect(layout.x, layout.y, layout.width, layout.height, element.color.get());
+		}
+
+		@Override
+		public void afterRender(ICanvas canvas, Box element)
+		{
+			if(element.overflow.get() != YogaOverflow.VISIBLE)
+				canvas.endClip();
 		}
 	}
 }

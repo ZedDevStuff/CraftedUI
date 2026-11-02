@@ -1,12 +1,10 @@
-
 <Crafted renderer="default" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:noNamespaceSchemaLocation="CraftedUI.xsd">
-  
-         
-    <Box>
-        <Button id="button1" onClick="handleClick">Hi</Button>
-    </Box>
+    <Box id="titlebar" width="100%" height="20" color="rgb(200, 200, 200)" />
+    <Box id="content" width="100%" height="stretch" color="rgb(255, 255, 255)" />
+    <Text fontScale="1">ijJ</Text>
+    <Button disabled="true">Click me</Button>
+    <Input width="200" height="20" placeholder="Search..." />
     <Image src="minecraft:textures/block/stone.png" width="64" height="64" />
-    <Input placeholder="Search..." onKeyPress="doStuff" />
-    <Text>I have no idea</Text>
+    <Button onClick="onDeepClick">Another button</Button>
 </Crafted>

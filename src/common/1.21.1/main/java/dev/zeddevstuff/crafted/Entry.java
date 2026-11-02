@@ -4,26 +4,28 @@ import com.mojang.logging.LogUtils;
 import dev.zeddevstuff.crafted.input.events.IClickEventHandler;
 import dev.zeddevstuff.crafted.parsing.CraftedXmlParser;
 import dev.zeddevstuff.crafted.parsing.DocumentBuilder;
-import dev.zeddevstuff.crafted.platform.MainThreadDispatcher;
-import dev.zeddevstuff.crafted.platform.MinecraftFont;
-import dev.zeddevstuff.crafted.platform.MinecraftLocalization;
-import dev.zeddevstuff.crafted.platform.MinecraftTextureFactory;
+import dev.zeddevstuff.crafted.platform.*;
 import dev.zeddevstuff.crafted.ui.CraftedContext;
 import dev.zeddevstuff.crafted.ui.elements.All;
 import dev.zeddevstuff.crafted.ui.elements.CraftedRoot;
 import dev.zeddevstuff.crafted.utils.SchemaGenerator;
 import net.minecraft.client.Minecraft;
 
+import java.nio.file.Path;
+
 public class Entry
 {
 	public static CraftedRoot rootElement;
-	static void init()
+	private static IPreloader loader;
+	static void init(Path resources)
 	{
+		loader = new Preloader(resources);
+		loader.load();
 		Crafted.setDefaultInstance(new Crafted(
 			new MinecraftLocalization(),
 			new MinecraftFont("minecraft", Minecraft.getInstance().font),
 			new MainThreadDispatcher(),
-			new MinecraftTextureFactory()
+			new MinecraftTextureManager()
 		));
 		LogUtils.getLogger().info("CraftedUI initialized");
 		All.registerInto(Crafted.defaultInstance());
@@ -48,7 +50,6 @@ public class Entry
 		ctx.registerCallback(IClickEventHandler.class, "onDeepClick", event -> {
 			System.out.println("Deep click event received by context on element " + event.getTarget());
 		});
-		rootElement = (CraftedRoot)DocumentBuilder.buildTree(Crafted.defaultInstance(), ctx, parsed);
-
+		rootElement = (CraftedRoot)DocumentBuilder.buildTree(Crafted.defaultInstance(), ctx, loader.getDocument("Gallery"));
 	}
 }

@@ -2,7 +2,7 @@ package dev.zeddevstuff.crafted.platform;
 
 import net.minecraft.resources.ResourceLocation;
 
-public class MinecraftTextureFactory implements ITextureManager
+public class MinecraftTextureManager implements ITextureManager
 {
 	@Override
 	public ITexture get(String path, ITexture.Kind kind, int width, int height)

@@ -1,6 +1,7 @@
 package dev.zeddevstuff.crafted.platform;
 
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.renderer.texture.DynamicTexture;
 import net.minecraft.client.renderer.texture.SimpleTexture;
 import net.minecraft.resources.ResourceLocation;
 
@@ -42,8 +43,19 @@ public class MinecraftTexture implements ITexture
 		var texture = Minecraft.getInstance().getTextureManager().getTexture(resourceLocation);
 		try
 		{
-			// TODO: Add support for other texture types
-			if (texture instanceof SimpleTexture simpleTexture)
+			if (texture instanceof DynamicTexture dynamicTexture)
+			{
+				var nativeImage = dynamicTexture.getPixels();
+				if(nativeImage != null)
+				{
+					this.width = nativeImage.getWidth();
+					this.height = nativeImage.getHeight();
+					return;
+				}
+				this.width = 0;
+				this.height = 0;
+			}
+			else if (texture instanceof SimpleTexture simpleTexture)
 			{
 				var manager = Minecraft.getInstance().getResourceManager();
 				var textureImage = simpleTexture.getTextureImage(manager);

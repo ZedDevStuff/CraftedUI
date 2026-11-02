@@ -36,6 +36,10 @@ public class CraftedXmlParser
 			throw new RuntimeException(e);
 		}
 	}
+
+	/**
+	 * @throws RuntimeException if the XML is invalid or cannot be parsed
+	 */
 	public static ParsedNode parse(String xml)
 	{
 		try
@@ -58,6 +62,8 @@ public class CraftedXmlParser
 		for (int i = 0; i < attrMap.getLength(); i++)
 		{
 			var attr = attrMap.item(i);
+			if(attr.getNodeName().startsWith("xmlns") || attr.getNodeName().startsWith("xsi") || attr.getNodeName().contains(":"))
+				continue;
 			attributes.put(attr.getNodeName(), attr.getNodeValue());
 		}
 		var textContent = getTextContent(element);

@@ -14,6 +14,9 @@
 - UI
   - [x] XML Parser
   - [x] Schema generator
+  - [-] File Loader
+    - [ ] Load from file
+    - [x] Load from jar resources
   - [-] Basic elements
     - [x] Box
     - [x] Text
