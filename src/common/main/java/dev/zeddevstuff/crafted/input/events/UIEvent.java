@@ -6,8 +6,14 @@ public abstract class UIEvent
 {
 	private final CraftedElement target;
 	public CraftedElement getTarget() { return target; }
+	public <T extends CraftedElement> T getTargetAs(Class<T> type) { return type.cast(target); }
+	@SuppressWarnings("unchecked")
+	public <T extends CraftedElement> T getTargetAs() { return (T) target; }
 	private CraftedElement currentTarget;
 	public CraftedElement getCurrentTarget() { return currentTarget; }
+	public <T extends CraftedElement> T getCurrentTargetAs(Class<T> type) { return type.cast(currentTarget); }
+	@SuppressWarnings("unchecked")
+	public <T extends CraftedElement> T getCurrentTargetAs() { return (T) currentTarget; }
 	public void setCurrentTarget(CraftedElement currentTarget) { this.currentTarget = currentTarget; }
 	private boolean consumed;
 	public boolean isConsumed() { return consumed; }

@@ -4,7 +4,7 @@
     <Box id="content" width="100%" height="stretch" color="rgb(255, 255, 255)" />
     <Text fontScale="1">ijJ</Text>
     <Button disabled="true">Click me</Button>
-    <Input width="200" height="20" placeholder="Search..." />
+    <Input onSubmit="testSubmit" width="200" height="20" placeholder="Search..." />
     <Image src="minecraft:textures/block/stone.png" width="64" height="64" />
     <Button onClick="onDeepClick">Another button</Button>
 </Crafted>

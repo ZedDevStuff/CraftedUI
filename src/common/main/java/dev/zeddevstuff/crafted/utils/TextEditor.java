@@ -1,10 +1,28 @@
 package dev.zeddevstuff.crafted.utils;
 
+import java.util.Objects;
+
 public class TextEditor
 {
+    private boolean dirty = false;
+    public boolean isDirty() { return dirty; }
+    public void clearDirty() { dirty = false; }
+
     private String text;
     public String getText() { return text; }
-    public void setText(String text) { this.text = text; }
+    public void setText(String text)
+    {
+        if(!Objects.equals(this.text, text))
+            dirty = true;
+        this.text = text;
+        if(cursorPosition > text.length())
+            cursorPosition = text.length();
+        if(selectionStart > text.length())
+            selectionStart = text.length();
+        if(selectionEnd > text.length())
+            selectionEnd = text.length();
+
+    }
     private int cursorPosition;
     public int getCursorPosition() { return cursorPosition; }
     public void setCursorPosition(int position)
@@ -45,6 +63,7 @@ public class TextEditor
     {
         text = text.substring(0, cursorPosition) + newText + text.substring(cursorPosition);
         cursorPosition += newText.length();
+        dirty = true;
     }
     public void insert(char newChar)
     {
@@ -58,6 +77,7 @@ public class TextEditor
         text = text.substring(0, start) + newText + text.substring(end);
         cursorPosition = start + newText.length();
         selectionStart = selectionEnd = cursorPosition;
+        dirty = true;
     }
 
     // TODO: Support control for word-wise movement.
@@ -118,5 +138,6 @@ public class TextEditor
         {
             text = text.substring(0, cursorPosition) + text.substring(cursorPosition + 1);
         }
+        dirty = true;
     }
 }

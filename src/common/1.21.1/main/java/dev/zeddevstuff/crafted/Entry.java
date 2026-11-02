@@ -2,12 +2,14 @@ package dev.zeddevstuff.crafted;
 
 import com.mojang.logging.LogUtils;
 import dev.zeddevstuff.crafted.input.events.IClickEventHandler;
+import dev.zeddevstuff.crafted.input.events.ISubmitEventHandler;
 import dev.zeddevstuff.crafted.parsing.CraftedXmlParser;
 import dev.zeddevstuff.crafted.parsing.DocumentBuilder;
 import dev.zeddevstuff.crafted.platform.*;
 import dev.zeddevstuff.crafted.ui.CraftedContext;
 import dev.zeddevstuff.crafted.ui.elements.All;
 import dev.zeddevstuff.crafted.ui.elements.CraftedRoot;
+import dev.zeddevstuff.crafted.ui.elements.Input;
 import dev.zeddevstuff.crafted.utils.SchemaGenerator;
 import net.minecraft.client.Minecraft;
 
@@ -35,20 +37,12 @@ public class Entry
 
 			System.out.println(schema);
 		}
-		var parsed = CraftedXmlParser.parse("""
-			<Crafted title="Gallery" renderer="default">
-				<Box id="titlebar" width="100%" height="20" color="rgb(200, 200, 200)" />
-				<Box id="content" width="100%" height="stretch" color="rgb(255, 255, 255)" />
-				<Text fontScale="1">ijJ</Text>
-				<Button disabled="true">Click me</Button>
-				<Input width="200" height="20" placeholder="Search..." />
-				<Image src="minecraft:textures/block/stone.png" width="64" height="64" />
-				<Button onClick="onDeepClick">Another button</Button>
-			</Crafted>
-			""");
 		var ctx = new CraftedContext(Crafted.defaultInstance());
 		ctx.registerCallback(IClickEventHandler.class, "onDeepClick", event -> {
-			System.out.println("Deep click event received by context on element " + event.getTarget());
+			System.out.println("Button " + event.getTarget().id.get() + " clicked");
+		});
+		ctx.registerCallback(ISubmitEventHandler.class, "testSubmit", event -> {
+			System.out.println("Submitted value: " + event.getTargetAs(Input.class).value.get());
 		});
 		rootElement = (CraftedRoot)DocumentBuilder.buildTree(Crafted.defaultInstance(), ctx, loader.getDocument("Gallery"));
 	}

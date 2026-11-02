@@ -6,7 +6,7 @@ import dev.zeddevstuff.crafted.ProxyProp;
 import dev.zeddevstuff.crafted.annotations.DefineElement;
 import dev.zeddevstuff.crafted.annotations.Description;
 import dev.zeddevstuff.crafted.annotations.Ignore;
-import dev.zeddevstuff.crafted.input.events.KeyEvent;
+import dev.zeddevstuff.crafted.input.events.*;
 import dev.zeddevstuff.crafted.parsing.Parsers;
 import dev.zeddevstuff.crafted.platform.ICanvas;
 import dev.zeddevstuff.crafted.platform.IFont;
@@ -28,16 +28,29 @@ public class Input extends CraftedElement
 {
     @Ignore
     private final TextEditor text = new TextEditor("", false);
+
+    public final Prop<ISubmitEventHandler> onSubmit = registerProp(ISubmitEventHandler.class, "onSubmit", null, this::parseSubmitEventHandler);
+
+    private ISubmitEventHandler parseSubmitEventHandler(String s, ISubmitEventHandler iSubmitEventHandler)
+    {
+        return ctx.getCallback(ISubmitEventHandler.class, s);
+    }
+
     public final ProxyProp<String> value = registerProp(String.class, "value", text::getText, text::setText, Parsers::parseString);
+    public final Prop<Boolean> allowNavigationWithTab = registerProp(Boolean.class, "allowNavigationWithTab", true, Parsers::parseBoolean);
     public final Prop<String> placeholder = registerProp(String.class, "placeholder", "", Parsers::parseString);
+
     public final Prop<Color> textColor = registerProp("textColor", Color.White, Parsers::parseColor);
     public final Prop<Color> placeholderColor = registerProp("placeholderColor", Color.Gray, Parsers::parseColor);
+
     public final Prop<TextSettings> settings = new Prop<>(TextSettings.class, "settings", TextSettings.DEFAULT);
     public final ProxyProp<IFont> font;
     public final ProxyProp<Float> fontScale = registerProp(Float.class, "fontScale", settings.get()::size, (value) -> settings.set(settings.get().withSize(value)), Parsers::parseFloat);
     public final ProxyProp<Float> wrapWidth = registerProp(Float.class, "wrapWidth", settings.get()::wrapWidth, (value) -> settings.set(settings.get().withWrapWidth(value)), Parsers::parseFloat);
     public final ProxyProp<Boolean> shadow = registerProp(Boolean.class, "shadow", settings.get()::shadow, (value) -> settings.set(settings.get().withShadow(value)), Parsers::parseBoolean);
     public final ProxyProp<Color> shadowColor = registerProp(Color.class, "shadowColor", settings.get()::shadowColor, (value) -> settings.set(settings.get().withShadowColor(value)), Parsers::parseColor);
+
+
 
     public Input(CraftedContext ctx, Map<String, String> attributes)
     {
@@ -56,8 +69,14 @@ public class Input extends CraftedElement
     @Override
     public void onKeyPress(KeyEvent event)
     {
-        event.consume();
-        if(event.keyCode == BACKSPACE)
+        boolean shouldConsume = true;
+        if(event.keyCode == TAB && allowNavigationWithTab.get())
+            shouldConsume = false;
+        if(event.keyCode == TAB && shouldConsume)
+            text.insert("    ");
+        else if(event.keyCode == ENTER && !event.modifiers.shift())
+            ctx.inputHandler.setFocus(null);
+        else if(event.keyCode == BACKSPACE)
             text.delete(true);
         else if(event.keyCode == DELETE)
             text.delete(false);
@@ -69,12 +88,30 @@ public class Input extends CraftedElement
             text.moveCursorToStart(event.modifiers.shift());
         else if(event.keyCode == END)
             text.moveCursorToEnd(event.modifiers.shift());
+        if(shouldConsume)
+            event.consume();
+    }
+
+    @Override
+    public void onFocusLost(FocusEvent event)
+    {
+        onSubmit(event);
+    }
+
+    protected void onSubmit(UIEvent event)
+    {
+        if(!text.isDirty())
+            return;
+        var handler = onSubmit.get();
+        if(handler != null)
+            handler.onEvent(new SubmitEvent(this, event));
+        if(!(event instanceof FocusEvent))
+            ctx.inputHandler.setFocus(null);
+        text.clearDirty();
     }
 
     @Override
     public boolean receivesInputEvents() { return true; }
-    @Override
-    public boolean capturesKeyboardWhenFocused() { return true; }
     @Override
     public boolean isFocusable() { return true; }
 

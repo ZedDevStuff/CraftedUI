@@ -509,8 +509,6 @@ public abstract class CraftedElement
 	public boolean receivesInputEvents() { return false; }
 	public boolean isFocusable() { return false; }
 
-	public boolean capturesKeyboardWhenFocused() { return false; }
-
 	public void handleFocusGained(FocusEvent event)
 	{
 		if(!receivesInputEvents())
