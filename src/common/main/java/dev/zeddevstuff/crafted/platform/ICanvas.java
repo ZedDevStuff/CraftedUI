@@ -14,8 +14,8 @@ public interface ICanvas
 	void drawText(String text, int x, int y, TextSettings settings, Color color);
 	void drawText(IText text, int x, int y, TextSettings settings, Color color);
 
-	void drawTexture(ITexture texture, Rect dest, Color tint);
-	void drawTexture(ITexture texture, Rect src, Rect dest, Color tint);
+	void drawTexture(ITexture texture, Rect dest);
+	void drawTexture(ITexture texture, Rect src, Rect dest);
 
 	/**
 	 * Begins a transformation block. All subsequent drawing operations will be transformed by the current transformation matrix.

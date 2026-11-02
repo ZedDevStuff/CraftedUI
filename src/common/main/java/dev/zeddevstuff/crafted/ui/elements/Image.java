@@ -20,7 +20,6 @@ import java.util.Map;
 public class Image extends CraftedElement
 {
 	public final Prop<ITexture> src = registerProp(ITexture.class, "src", null, this::parseTexture);
-	public final Prop<Color> tint = registerProp("tint", Color.White, Parsers::parseColor);
 
 	public Image(CraftedContext ctx, Map<String, String> attributes)
 	{
@@ -55,7 +54,7 @@ public class Image extends CraftedElement
 			if(element.src.get() == null)
 				return;
 			var layout = element.getLayout();
-			canvas.drawTexture(element.src.get(), Rect.posAndSize(layout.x, layout.y, layout.width, layout.height), Color.White);
+			canvas.drawTexture(element.src.get(), Rect.posAndSize(layout.x, layout.y, layout.width, layout.height));
 		}
 	}
 }

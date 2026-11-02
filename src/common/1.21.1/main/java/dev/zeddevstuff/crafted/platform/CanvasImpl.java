@@ -79,20 +79,10 @@ public class CanvasImpl implements ICanvas
 	}
 
 	@Override
-	public void drawTexture(ITexture texture, Rect dest, Color tint)
+	public void drawTexture(ITexture texture, Rect dest)
 	{
 		if(texture instanceof MinecraftTexture mcTex)
 		{
-			// void blit(ResourceLocation atlasLocation, int x, int y, int uOffset, int vOffset, int uWidth, int vHeight)
-			// void blit(ResourceLocation atlasLocation, int x, int y, int blitOffset, float uOffset, float vOffset, int uWidth, int vHeight, int textureWidth, int textureHeight)
-			// void blit(ResourceLocation atlasLocation, int x, int y, int width, int height, float uOffset, float vOffset, int uWidth, int vHeight, int textureWidth, int textureHeight)
-			// void blit(ResourceLocation atlasLocation, int x, int y, float uOffset, float vOffset, int width, int height, int textureWidth, int textureHeight)
-			// void blit(ResourceLocation atlasLocation, int x1, int x2, int y1, int y2, int blitOffset, int uWidth, int vHeight, float uOffset, float vOffset, int textureWidth, int textureHeight)
-			// Sprites
-			// void blitSprite(ResourceLocation sprite, int x, int y, int width, int height)
-			// void blitSprite(ResourceLocation sprite, int x, int y, int blitOffset, int width, int height)
-			// void blitSprite(ResourceLocation sprite, int textureWidth, int textureHeight, int uPosition, int vPosition, int x, int y, int uWidth, int vHeight)
-			// void blitSprite(ResourceLocation sprite, int textureWidth, int textureHeight, int uPosition, int vPosition, int x, int y, int blitOffset, int uWidth, int vHeight)
 			if(mcTex.getKind() == ITexture.Kind.SIMPLE)
 				graphics.blit(mcTex.resourceLocation, (int) dest.minX(), (int) dest.minY(), 0, 0, (int) dest.width(), (int) dest.height(), (int) dest.width(), (int) dest.height());
 			else if(mcTex.getKind() == ITexture.Kind.SPRITE)
@@ -101,7 +91,7 @@ public class CanvasImpl implements ICanvas
 	}
 
 	@Override
-	public void drawTexture(ITexture texture, Rect src, Rect dest, Color tint)
+	public void drawTexture(ITexture texture, Rect src, Rect dest)
 	{
 		if(texture instanceof MinecraftTexture mcTex)
 		{
