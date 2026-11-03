@@ -4,7 +4,9 @@ import dev.zeddevstuff.crafted.Crafted;
 import dev.zeddevstuff.crafted.Prop;
 import dev.zeddevstuff.crafted.annotations.DefineElement;
 import dev.zeddevstuff.crafted.annotations.Description;
+import dev.zeddevstuff.crafted.input.ImportantKeys;
 import dev.zeddevstuff.crafted.input.MouseButton;
+import dev.zeddevstuff.crafted.input.events.KeyEvent;
 import dev.zeddevstuff.crafted.input.events.MouseEvent;
 import dev.zeddevstuff.crafted.parsing.Parsers;
 import dev.zeddevstuff.crafted.platform.ICanvas;
@@ -61,18 +63,43 @@ public class Button extends CraftedElement
 	@Override
 	public void onMousePress(MouseEvent event)
 	{
-		if(event.button == MouseButton.LEFT && renderer.get() instanceof CraftedButtonRenderer)
+		if(event.button == MouseButton.LEFT)
+			applyLayoutChanges();
+	}
+
+	@Override
+	public void onMouseRelease(MouseEvent event)
+	{
+		if(event.button == MouseButton.LEFT)
+			revertLayoutChanges();
+	}
+
+	@Override
+	public void onKeyPress(KeyEvent event)
+	{
+		if(event.keyCode == ImportantKeys.SPACE || event.keyCode == ImportantKeys.ENTER)
+			applyLayoutChanges();
+	}
+
+	@Override
+	public void onKeyRelease(KeyEvent event)
+	{
+		if(event.keyCode == ImportantKeys.SPACE || event.keyCode == ImportantKeys.ENTER)
+			revertLayoutChanges();
+	}
+
+	private void applyLayoutChanges()
+	{
+		if(renderer.get() instanceof CraftedButtonRenderer)
 		{
 			marginTop.set(StyleLength.points(3));
 			paddingBottom.set(StyleLength.points(3));
 			height.set(StyleSizeLength.points(height.get().value().getValue() - 3));
 		}
 	}
-
-	@Override
-	public void onMouseRelease(MouseEvent event)
+	private void revertLayoutChanges()
 	{
-		if(event.button == MouseButton.LEFT && renderer.get() instanceof CraftedButtonRenderer)
+		if(renderer.get() instanceof CraftedButtonRenderer)
 		{
 			marginTop.set(StyleLength.points(0));
 			paddingBottom.set(StyleLength.points(0));
@@ -119,35 +146,50 @@ public class Button extends CraftedElement
 			Color borderColor, backgroundColor, elevationColor;
 			switch (element.style.get())
 			{
-				case "primary" -> {
-					borderColor = element.state.isDisabled() ? theme.disabled() : theme.onPrimary();
-					backgroundColor = theme.primary();
-					elevationColor = ColorUtils.adjustLightness(theme.primary(), -0.15f);
-				}
 				case "secondary" -> {
-					borderColor = element.state.isDisabled() ? theme.disabled() : theme.onSecondary();
+					borderColor = element.state.isDisabled()
+						? theme.disabled()
+						: (element.state.isFocused() || element.state.isHovered())
+							? ColorUtils.bestContrast(theme.onSecondary(), Color.White, Color.Black)
+							: theme.onSecondary();
 					backgroundColor = theme.secondary();
 					elevationColor = ColorUtils.adjustLightness(theme.secondary(), -0.15f);
 				}
 				case "error" -> {
-					borderColor = element.state.isDisabled() ? theme.disabled() : theme.onError();
+					borderColor = element.state.isDisabled()
+						? theme.disabled()
+						: (element.state.isFocused() || element.state.isHovered())
+							? ColorUtils.bestContrast(theme.onError(), Color.White, Color.Black)
+							: theme.onError();
 					backgroundColor = theme.error();
 					elevationColor = ColorUtils.adjustLightness(theme.error(), -0.15f);
 				}
 				case "warning" -> {
-					borderColor = element.state.isDisabled() ? theme.disabled() : theme.onWarning();
+					borderColor = element.state.isDisabled()
+						? theme.disabled()
+						: (element.state.isFocused() || element.state.isHovered())
+							? ColorUtils.bestContrast(theme.onWarning(), Color.White, Color.Black)
+							: theme.onWarning();
 					backgroundColor = theme.warning();
 					elevationColor = ColorUtils.adjustLightness(theme.warning(), -0.15f);
 				}
 				case "success" -> {
-					borderColor = element.state.isDisabled() ? theme.disabled() : theme.onSuccess();
+					borderColor = element.state.isDisabled()
+						? theme.disabled()
+						: (element.state.isFocused() || element.state.isHovered())
+							? ColorUtils.bestContrast(theme.onSuccess(), Color.White, Color.Black)
+							: theme.onSuccess();
 					backgroundColor = theme.success();
 					elevationColor = ColorUtils.adjustLightness(theme.success(), -0.15f);
 				}
 				default -> {
-					borderColor = Color.Black;
-					backgroundColor = Color.White;
-					elevationColor = Color.Gray;
+					borderColor = element.state.isDisabled()
+						? theme.disabled()
+						: (element.state.isFocused() || element.state.isHovered())
+						? ColorUtils.bestContrast(theme.onPrimary(), Color.White, Color.Black)
+						: theme.onPrimary();
+					backgroundColor = theme.primary();
+					elevationColor = ColorUtils.adjustLightness(theme.primary(), -0.15f);
 				}
 			}
 			var layout = element.getLayout();

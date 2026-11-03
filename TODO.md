@@ -23,6 +23,7 @@
     - [x] Image
     - [x] Button
     - [x] Input
+    - [x] Checkbox
     - [ ] Text Area (Basically just a multi-line input)
     - [ ] Scroll
     - [ ] List

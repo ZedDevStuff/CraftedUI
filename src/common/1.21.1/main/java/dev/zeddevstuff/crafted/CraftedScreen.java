@@ -3,6 +3,9 @@ package dev.zeddevstuff.crafted;
 import dev.zeddevstuff.crafted.input.ImportantKeys;
 import dev.zeddevstuff.crafted.input.KeyModifiers;
 import dev.zeddevstuff.crafted.input.MouseButton;
+import dev.zeddevstuff.crafted.parsing.CraftedXmlParser;
+import dev.zeddevstuff.crafted.parsing.DocumentBuilder;
+import dev.zeddevstuff.crafted.parsing.ParsedNode;
 import dev.zeddevstuff.crafted.platform.CanvasImpl;
 import dev.zeddevstuff.crafted.platform.ITexture;
 import dev.zeddevstuff.crafted.platform.TextConverter;
@@ -33,6 +36,14 @@ public class CraftedScreen extends Screen
 	public CraftedScreen(CraftedContext ctx, Function<CraftedContext, CraftedRoot> rootElementFactory)
 	{
 		this(rootElementFactory.apply(ctx));
+	}
+	public CraftedScreen(CraftedContext ctx, ParsedNode rootElementNode)
+	{
+		this(ctx, (context) -> (CraftedRoot) DocumentBuilder.buildTree(ctx, rootElementNode));
+	}
+	public CraftedScreen(CraftedContext ctx, String xml)
+	{
+		this(ctx, CraftedXmlParser.parse(xml));
 	}
 	ITexture testTexture;
 	@Override

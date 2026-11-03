@@ -74,6 +74,24 @@ public class Parsers
 			return defaultValue;
 		}
 	}
+	public static Boolean parseBooleanIndeterminate(String value, Boolean defaultValue)
+	{
+		if (value == null)
+			return defaultValue;
+		try
+		{
+			if(value.equalsIgnoreCase("true"))
+				return true;
+			else if(value.equalsIgnoreCase("false"))
+				return false;
+			else
+				return null;
+		}
+		catch (Exception e)
+		{
+			return defaultValue;
+		}
+	}
 	public static StyleLength parseStyleLength(String value, StyleLength defaultValue)
 	{
 		if (value == null)

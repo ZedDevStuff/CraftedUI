@@ -29,22 +29,44 @@ public class InputHandler
 	{
 		if (current == null || current.getLayout() == null) return null;
 		var cur = current.getLayout();
-		float cx = cur.x + cur.width / 2f, cy = cur.y + cur.height / 2f;
-		CraftedElement best = null;
-		float bestScore = 0;
+		boolean horizontal = dirX != 0;
+		float currentStart = horizontal ? cur.y : cur.x;
+		float currentEnd = horizontal ? cur.y + cur.height : cur.x + cur.width;
+		float currentCenter = horizontal ? cur.x + cur.width / 2f : cur.y + cur.height / 2f;
+		CraftedElement alignedBest = null;
+		float alignedDistance = Float.POSITIVE_INFINITY;
+		float alignedOffset = Float.POSITIVE_INFINITY;
+		CraftedElement fallbackBest = null;
+		float fallbackScore = Float.POSITIVE_INFINITY;
 		for (var candidate : focusableElements())
 		{
 			if (candidate == current) continue;
 			var l = candidate.getLayout();
 			if (l == null) continue;
-			float dx = (l.x + l.width / 2f) - cx;
-			float dy = (l.y + l.height / 2f) - cy;
-			float dot = dx * dirX + dy * dirY;
-			if (dot <= 0) continue;
-			float score = dot / (Math.abs(dx) + Math.abs(dy));
-			if (score > bestScore) { bestScore = score; best = candidate; }
+			float candidateStart = horizontal ? l.y : l.x;
+			float candidateEnd = horizontal ? l.y + l.height : l.x + l.width;
+			float candidateCenter = horizontal ? l.x + l.width / 2f : l.y + l.height / 2f;
+			float primaryDistance = (candidateCenter - currentCenter) * (horizontal ? dirX : dirY);
+			if (primaryDistance <= 0) continue;
+
+			float offset = Math.abs((candidateStart + candidateEnd) / 2f - (currentStart + currentEnd) / 2f);
+			boolean aligned = candidateEnd >= currentStart && candidateStart <= currentEnd;
+			if (aligned && (primaryDistance < alignedDistance
+				|| (primaryDistance == alignedDistance && offset < alignedOffset)))
+			{
+				alignedBest = candidate;
+				alignedDistance = primaryDistance;
+				alignedOffset = offset;
+			}
+
+			float score = primaryDistance + offset;
+			if (score < fallbackScore)
+			{
+				fallbackBest = candidate;
+				fallbackScore = score;
+			}
 		}
-		return best;
+		return alignedBest != null ? alignedBest : fallbackBest;
 	}
 
 	public void setFocus(CraftedElement newFocus)

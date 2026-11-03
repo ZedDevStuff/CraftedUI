@@ -22,6 +22,10 @@ public class CraftedContext
 	 */
 	public String currentRenderer = "default";
 
+	public CraftedContext()
+	{
+		this(Crafted.defaultInstance());
+	}
 	public CraftedContext(Crafted crafted)
 	{
 		this.crafted = crafted;

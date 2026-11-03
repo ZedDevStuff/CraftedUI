@@ -10,6 +10,7 @@ public class All
 		Box.register(crafted);
 		Text.register(crafted);
 		Button.register(crafted);
+		Checkbox.register(crafted);
 		Input.register(crafted);
 		Image.register(crafted);
 	}
