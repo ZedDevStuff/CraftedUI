@@ -4,7 +4,6 @@ import dev.zeddevstuff.crafted.Crafted;
 import dev.zeddevstuff.crafted.Prop;
 import dev.zeddevstuff.crafted.annotations.DefineElement;
 import dev.zeddevstuff.crafted.annotations.Description;
-import dev.zeddevstuff.crafted.parsing.Parsers;
 import dev.zeddevstuff.crafted.platform.ICanvas;
 import dev.zeddevstuff.crafted.rendering.IRenders;
 import dev.zeddevstuff.crafted.types.Color;
@@ -25,7 +24,7 @@ public class Box extends CraftedElement
 	}
 
 	@Description("Background color of the box")
-	public final Prop<Color> color = registerProp("color", Color.Transparent, Parsers::parseColor);
+	public final Prop<Color> color = registerProp("color", Color.Transparent, this::parseColor);
 
 	public Box(CraftedContext ctx, Map<String, String> attributes)
 	{

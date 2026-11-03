@@ -1,7 +1,5 @@
 package dev.zeddevstuff.crafted.types;
 
-import dev.zeddevstuff.crafted.utils.MathUtils;
-
 public record Color(int r, int g, int b, int a)
 {
 	public Color(int r, int g, int b)
@@ -19,11 +17,11 @@ public record Color(int r, int g, int b, int a)
 	
 	public Color(float r, float g, float b)
 	{
-		this((int)(MathUtils.clamp(r, 0.0f, 1.0f) * 255.0f), (int)(MathUtils.clamp(g, 0.0f, 1.0f) * 255.0f), (int)(MathUtils.clamp(b, 0.0f, 1.0f) * 255.0f), 1f);
+		this((int)(Math.clamp(r, 0.0f, 1.0f) * 255.0f), (int)(Math.clamp(g, 0.0f, 1.0f) * 255.0f), (int)(Math.clamp(b, 0.0f, 1.0f) * 255.0f), 1f);
 	}
 	public Color(float r, float g, float b, float a)
 	{
-		this((int)(MathUtils.clamp(r, 0.0f, 1.0f) * 255.0f), (int)(MathUtils.clamp(g, 0.0f, 1.0f) * 255.0f), (int)(MathUtils.clamp(b, 0.0f, 1.0f) * 255.0f), (int)(MathUtils.clamp(a, 0.0f, 1.0f) * 255.0f));
+		this((int)(Math.clamp(r, 0.0f, 1.0f) * 255.0f), (int)(Math.clamp(g, 0.0f, 1.0f) * 255.0f), (int)(Math.clamp(b, 0.0f, 1.0f) * 255.0f), (int)(Math.clamp(a, 0.0f, 1.0f) * 255.0f));
 	}
 
 	public Color withAlpha(int alpha)

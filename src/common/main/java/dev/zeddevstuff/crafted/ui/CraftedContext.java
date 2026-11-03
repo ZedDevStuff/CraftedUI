@@ -3,6 +3,7 @@ package dev.zeddevstuff.crafted.ui;
 import dev.zeddevstuff.crafted.Crafted;
 import dev.zeddevstuff.crafted.input.InputHandler;
 import dev.zeddevstuff.crafted.input.events.IUIEventHandler;
+import dev.zeddevstuff.crafted.types.ColorTheme;
 
 import java.util.HashMap;
 
@@ -15,6 +16,7 @@ public class CraftedContext
 	public final Crafted crafted;
 	public final InputHandler inputHandler = new InputHandler();
 	private final HashMap<String, IUIEventHandler> callbacks = new HashMap<>();
+	public ColorTheme theme = ColorTheme.BLUE;
 	/**
 	 * The renderer to use for future elements created in this context.
 	 */

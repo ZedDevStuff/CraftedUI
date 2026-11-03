@@ -45,9 +45,9 @@ public class Input extends CraftedElement
     public final Prop<Boolean> allowArrowNavigation = registerProp(Boolean.class, "allowArrowNavigation", true, Parsers::parseBoolean);
     public final Prop<String> placeholder = registerProp(String.class, "placeholder", "", Parsers::parseString);
 
-    public final Prop<Color> textColor = registerProp("textColor", Color.White, Parsers::parseColor);
-    public final Prop<Color> placeholderColor = registerProp("placeholderColor", Color.Gray, Parsers::parseColor);
-    public final Prop<Color> selectionColor = registerProp("selectionColor", Color.CornflowerBlue, Parsers::parseColor);
+    public final Prop<Color> textColor = registerProp("textColor", Color.White, this::parseColor);
+    public final Prop<Color> placeholderColor = registerProp("placeholderColor", Color.Gray, this::parseColor);
+    public final Prop<Color> selectionColor = registerProp("selectionColor", Color.CornflowerBlue, this::parseColor);
 
     public final Prop<TextSettings> settings = new Prop<>(TextSettings.class, "settings", TextSettings.DEFAULT);
     private TextSettings placeholderSettings;
@@ -55,7 +55,7 @@ public class Input extends CraftedElement
     public final ProxyProp<Float> fontScale = registerProp(Float.class, "fontScale", settings.get()::size, (value) -> settings.set(settings.get().withSize(value)), Parsers::parseFloat);
     public final ProxyProp<Float> wrapWidth = registerProp(Float.class, "wrapWidth", settings.get()::wrapWidth, (value) -> settings.set(settings.get().withWrapWidth(value)), Parsers::parseFloat);
     public final ProxyProp<Boolean> shadow = registerProp(Boolean.class, "shadow", settings.get()::shadow, (value) -> settings.set(settings.get().withShadow(value)), Parsers::parseBoolean);
-    public final ProxyProp<Color> shadowColor = registerProp(Color.class, "shadowColor", settings.get()::shadowColor, (value) -> settings.set(settings.get().withShadowColor(value)), Parsers::parseColor);
+    public final ProxyProp<Color> shadowColor = registerProp(Color.class, "shadowColor", settings.get()::shadowColor, (value) -> settings.set(settings.get().withShadowColor(value)), this::parseColor);
 
     private float xOffset = 0;
 
@@ -106,10 +106,18 @@ public class Input extends CraftedElement
             return;
         }
 
+        if(event.keyCode == UP || event.keyCode == DOWN)
+        {
+            if(!allowArrowNavigation.get())
+                return;
+            event.consume();
+            return;
+        }
+
         boolean shouldConsume = event.keyCode != TAB || !allowTabNavigation.get();
 		if(event.keyCode == TAB && shouldConsume)
             text.insert("    ");
-        else if(event.keyCode == ENTER && !event.modifiers.shift())
+        if(event.keyCode == ENTER && !event.modifiers.shift())
             ctx.inputHandler.setFocus(null);
         else if(event.keyCode == BACKSPACE)
             text.delete(true);
@@ -232,7 +240,7 @@ public class Input extends CraftedElement
                 element.xOffset = caretX - textRight;
             else if(caretX - element.xOffset < textLeft)
                 element.xOffset = caretX - textLeft;
-            element.xOffset = Math.max(0, Math.min(element.xOffset, Math.max(0, textWidth - visibleWidth)));
+            element.xOffset = Math.clamp(element.xOffset, 0, Math.max(0, textWidth - visibleWidth));
 
             float textHeight = element.font.get().measureText(text, textSettings.size(), -1).height();
             int textY = layout.y + (int)((layout.height - textHeight + 1) / 2);

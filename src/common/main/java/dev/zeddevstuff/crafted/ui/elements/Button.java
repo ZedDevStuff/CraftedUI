@@ -1,10 +1,10 @@
 package dev.zeddevstuff.crafted.ui.elements;
 
 import dev.zeddevstuff.crafted.Crafted;
+import dev.zeddevstuff.crafted.Prop;
 import dev.zeddevstuff.crafted.annotations.DefineElement;
 import dev.zeddevstuff.crafted.annotations.Description;
 import dev.zeddevstuff.crafted.input.MouseButton;
-import dev.zeddevstuff.crafted.input.events.ClickEvent;
 import dev.zeddevstuff.crafted.input.events.MouseEvent;
 import dev.zeddevstuff.crafted.parsing.Parsers;
 import dev.zeddevstuff.crafted.platform.ICanvas;
@@ -13,9 +13,11 @@ import dev.zeddevstuff.crafted.platform.ITexture;
 import dev.zeddevstuff.crafted.platform.ITextureManager;
 import dev.zeddevstuff.crafted.rendering.IRenders;
 import dev.zeddevstuff.crafted.types.Color;
+import dev.zeddevstuff.crafted.types.ColorTheme;
 import dev.zeddevstuff.crafted.types.Rect;
 import dev.zeddevstuff.crafted.ui.CraftedContext;
 import dev.zeddevstuff.crafted.ui.CraftedElement;
+import dev.zeddevstuff.crafted.utils.ColorUtils;
 import org.appliedenergistics.yoga.YogaAlign;
 import org.appliedenergistics.yoga.YogaDimension;
 import org.appliedenergistics.yoga.YogaJustify;
@@ -62,6 +64,7 @@ public class Button extends CraftedElement
 		if(event.button == MouseButton.LEFT && renderer.get() instanceof CraftedButtonRenderer)
 		{
 			marginTop.set(StyleLength.points(3));
+			paddingBottom.set(StyleLength.points(3));
 			height.set(StyleSizeLength.points(height.get().value().getValue() - 3));
 		}
 	}
@@ -72,6 +75,7 @@ public class Button extends CraftedElement
 		if(event.button == MouseButton.LEFT && renderer.get() instanceof CraftedButtonRenderer)
 		{
 			marginTop.set(StyleLength.points(0));
+			paddingBottom.set(StyleLength.points(0));
 			height.set(StyleSizeLength.points(height.get().value().getValue() + 3));
 		}
 	}
@@ -111,21 +115,50 @@ public class Button extends CraftedElement
 		@Override
 		public void render(ICanvas canvas, Button element)
 		{
+			var theme = element.ctx.theme;
+			Color borderColor, backgroundColor, elevationColor;
+			switch (element.style.get())
+			{
+				case "primary" -> {
+					borderColor = element.state.isDisabled() ? theme.disabled() : theme.onPrimary();
+					backgroundColor = theme.primary();
+					elevationColor = ColorUtils.adjustLightness(theme.primary(), -0.15f);
+				}
+				case "secondary" -> {
+					borderColor = element.state.isDisabled() ? theme.disabled() : theme.onSecondary();
+					backgroundColor = theme.secondary();
+					elevationColor = ColorUtils.adjustLightness(theme.secondary(), -0.15f);
+				}
+				case "error" -> {
+					borderColor = element.state.isDisabled() ? theme.disabled() : theme.onError();
+					backgroundColor = theme.error();
+					elevationColor = ColorUtils.adjustLightness(theme.error(), -0.15f);
+				}
+				case "warning" -> {
+					borderColor = element.state.isDisabled() ? theme.disabled() : theme.onWarning();
+					backgroundColor = theme.warning();
+					elevationColor = ColorUtils.adjustLightness(theme.warning(), -0.15f);
+				}
+				case "success" -> {
+					borderColor = element.state.isDisabled() ? theme.disabled() : theme.onSuccess();
+					backgroundColor = theme.success();
+					elevationColor = ColorUtils.adjustLightness(theme.success(), -0.15f);
+				}
+				default -> {
+					borderColor = Color.Black;
+					backgroundColor = Color.White;
+					elevationColor = Color.Gray;
+				}
+			}
 			var layout = element.getLayout();
-			// 1. Border
-			// 2. Top (background)
-			// 3. Elevation (darker background)
-			// 4. Text
-			Color borderColor = element.state.isDisabled() ? Color.Gray : Color.Black;
-			Color backgroundColor = element.state.isDisabled() ? Color.LightGray : Color.Gray;
 			int y = layout.y;
 			int height = layout.height;
 			int elevationY = y + height - 4;
 			int elevationHeight = 3;
 			canvas.drawRect(layout.x, y, layout.width, height, borderColor);
-			canvas.drawRect(layout.x + 1, y + 1, layout.width - 2, height - 2, Color.White);
+			canvas.drawRect(layout.x + 1, y + 1, layout.width - 2, height - 2, backgroundColor);
 			if(!element.state.isActive())
-				canvas.drawRect(layout.x + 1, elevationY, layout.width - 2, elevationHeight, Color.DarkGray);
+				canvas.drawRect(layout.x + 1, elevationY, layout.width - 2, elevationHeight, elevationColor);
 		}
 	}
 }

@@ -9,10 +9,7 @@ import dev.zeddevstuff.crafted.input.events.*;
 import dev.zeddevstuff.crafted.parsing.Parsers;
 import dev.zeddevstuff.crafted.platform.ICanvas;
 import dev.zeddevstuff.crafted.rendering.IRenders;
-import dev.zeddevstuff.crafted.types.EdgeInsets;
-import dev.zeddevstuff.crafted.types.StyleLength2;
-import dev.zeddevstuff.crafted.types.StyleLength4;
-import dev.zeddevstuff.crafted.types.StyleSizeLength2;
+import dev.zeddevstuff.crafted.types.*;
 import dev.zeddevstuff.crafted.ui.elements.CraftedRoot;
 import org.appliedenergistics.yoga.*;
 import org.appliedenergistics.yoga.style.StyleLength;
@@ -127,6 +124,8 @@ public abstract class CraftedElement
 	}
 	@Description("Unique identifier for this element")
 	public final Prop<String> id = registerProp("id", "", Parsers::parseString);
+	@Description("Used by some renderers to determine how to render this element")
+	public final Prop<String> style = registerProp("style", "", Parsers::parseString);
 	public final Prop<Integer> zIndex = registerProp("zIndex", 0, Parsers::parseInt);
 	public final ProxyProp<Boolean> disabled = registerProp(Boolean.class, "disabled", state::isDisabled, val -> state.set(INTERNAL_KEY, InteractionState.DISABLED, val), Parsers::parseBoolean);
 
@@ -327,6 +326,13 @@ public abstract class CraftedElement
 	{
 		return ctx.crafted.renderers.getRendererOrDefault(this.getClass(), name);
 	}
+	protected Color parseColor(String s, Color defaultValue)
+	{
+		var color = ctx.theme.getColorByName(s);
+		if(color != null)
+			return color;
+		return Parsers.parseColor(s, defaultValue);
+	}
 
 	/**
 	 * Override this method to initialize the layout node for this element with non default values.
@@ -482,11 +488,13 @@ public abstract class CraftedElement
 		if(parent == null && node.hasNewLayout())
 		{
 			layout = new LayoutResult(this);
+			node.calculateLayout(layout.innerWidth, layout.innerHeight);
 			node.markLayoutSeen();
 		}
 		else if(node.hasNewLayout())
 		{
 			layout = new LayoutResult(this, parent.layout);
+			node.calculateLayout(layout.innerWidth, layout.innerHeight);
 			node.markLayoutSeen();
 		}
 		for(var child : children)
@@ -503,9 +511,6 @@ public abstract class CraftedElement
 	{
 		if(renderer != null)
 			list.add(new RenderCommand(this, RenderCommand.Phase.RENDER));
-//		var sortedChildren = children.stream()
-//			.sorted(Comparator.comparingInt(a -> a.zIndex.get()))
-//			.toArray(CraftedElement[]::new);
 		for(var child : getRenderSortedChildrenCache())
 			child.collectRenderCommands(list);
 		if(renderer != null)
@@ -709,9 +714,9 @@ public abstract class CraftedElement
 			this.y = (int)element.node.getLayoutY();
 			this.width = (int)element.node.getLayoutWidth();
 			this.height = (int)element.node.getLayoutHeight();
-			this.margin = new EdgeInsets<>((int)element.node.getLayoutMargin(YogaEdge.TOP), (int)element.node.getLayoutMargin(YogaEdge.RIGHT), (int)element.node.getLayoutMargin(YogaEdge.BOTTOM), (int)element.node.getLayoutMargin(YogaEdge.LEFT));
-			this.padding = new EdgeInsets<>((int)element.node.getLayoutPadding(YogaEdge.TOP), (int)element.node.getLayoutPadding(YogaEdge.RIGHT), (int)element.node.getLayoutPadding(YogaEdge.BOTTOM), (int)element.node.getLayoutPadding(YogaEdge.LEFT));
-			this.border = new EdgeInsets<>((int)element.node.getLayoutBorder(YogaEdge.TOP), (int)element.node.getLayoutBorder(YogaEdge.RIGHT), (int)element.node.getLayoutBorder(YogaEdge.BOTTOM), (int)element.node.getLayoutBorder(YogaEdge.LEFT));
+			this.margin = new EdgeInsets<>((int)element.node.getLayoutMargin(YogaEdge.LEFT), (int)element.node.getLayoutMargin(YogaEdge.TOP), (int)element.node.getLayoutMargin(YogaEdge.RIGHT), (int)element.node.getLayoutMargin(YogaEdge.BOTTOM));
+			this.padding = new EdgeInsets<>((int)element.node.getLayoutPadding(YogaEdge.LEFT), (int)element.node.getLayoutPadding(YogaEdge.TOP), (int)element.node.getLayoutPadding(YogaEdge.RIGHT), (int)element.node.getLayoutPadding(YogaEdge.BOTTOM));
+			this.border = new EdgeInsets<>((int)element.node.getLayoutBorder(YogaEdge.LEFT), (int)element.node.getLayoutBorder(YogaEdge.TOP), (int)element.node.getLayoutBorder(YogaEdge.RIGHT), (int)element.node.getLayoutBorder(YogaEdge.BOTTOM));
 			this.innerX = x + margin.left() + padding.left() + border.left();
 			this.innerY = y + margin.top() + padding.top() + border.top();
 			this.innerWidth = width - margin.left() - margin.right() - padding.left() -padding.right() - border.left() - border.right();
@@ -723,9 +728,9 @@ public abstract class CraftedElement
 			this.y = container.innerY + (int)element.node.getLayoutY();
 			this.width = (int)element.node.getLayoutWidth();
 			this.height = (int)element.node.getLayoutHeight();
-			this.margin = new EdgeInsets<>((int)element.node.getLayoutMargin(YogaEdge.TOP), (int)element.node.getLayoutMargin(YogaEdge.RIGHT), (int)element.node.getLayoutMargin(YogaEdge.BOTTOM), (int)element.node.getLayoutMargin(YogaEdge.LEFT));
-			this.padding = new EdgeInsets<>((int)element.node.getLayoutPadding(YogaEdge.TOP), (int)element.node.getLayoutPadding(YogaEdge.RIGHT), (int)element.node.getLayoutPadding(YogaEdge.BOTTOM), (int)element.node.getLayoutPadding(YogaEdge.LEFT));
-			this.border = new EdgeInsets<>((int)element.node.getLayoutBorder(YogaEdge.TOP), (int)element.node.getLayoutBorder(YogaEdge.RIGHT), (int)element.node.getLayoutBorder(YogaEdge.BOTTOM), (int)element.node.getLayoutBorder(YogaEdge.LEFT));
+			this.margin = new EdgeInsets<>((int)element.node.getLayoutMargin(YogaEdge.LEFT), (int)element.node.getLayoutMargin(YogaEdge.TOP), (int)element.node.getLayoutMargin(YogaEdge.RIGHT), (int)element.node.getLayoutMargin(YogaEdge.BOTTOM));
+			this.padding = new EdgeInsets<>((int)element.node.getLayoutPadding(YogaEdge.LEFT), (int)element.node.getLayoutPadding(YogaEdge.TOP), (int)element.node.getLayoutPadding(YogaEdge.RIGHT), (int)element.node.getLayoutPadding(YogaEdge.BOTTOM));
+			this.border = new EdgeInsets<>((int)element.node.getLayoutBorder(YogaEdge.LEFT), (int)element.node.getLayoutBorder(YogaEdge.TOP), (int)element.node.getLayoutBorder(YogaEdge.RIGHT), (int)element.node.getLayoutBorder(YogaEdge.BOTTOM));
 			this.innerX = x + margin.left() + padding.left() + border.left();
 			this.innerY = y + margin.top() + padding.top() + border.top();
 			this.innerWidth = width - margin.left() - margin.right() - padding.left() -padding.right() - border.left() - border.right();

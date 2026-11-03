@@ -1,11 +1,19 @@
 <Crafted renderer="default" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:noNamespaceSchemaLocation="CraftedUI.xsd">
-    <Box id="window" color="#282c34" flex="1" flexDirection="column">
-        <Text>Buttons</Text>
-        <Box id="buttons" gap="4" flexDirection="row">
-            <Button disabled="true">Disabled</Button>
-            <Button>Minecraft</Button>
-            <Button renderer="crafted">Crafted</Button>
+    <Box id="window" color="background" flex="1" flexDirection="column">
+        <Box id="header" color="primary" height="32" flexDirection="row" alignItems="center">
+            <Text color="onBackground" fontScale="1.5">Crafted UI Gallery</Text>
+        </Box>
+        <Text color="onBackground" margin="2">Buttons</Text>
+        <Box id="buttons" gap="4" flexDirection="row" flexWrap="wrap" margin="2">
+            <Button width="50" disabled="true">Disabled</Button>
+            <Button width="50">Minecraft</Button>
+            <Button renderer="crafted" width="50" disabled="true">Crafted</Button>
+            <Button renderer="crafted" width="50" style="primary">Crafted</Button>
+            <Button renderer="crafted" width="50" style="secondary">Crafted</Button>
+            <Button renderer="crafted" width="50" style="error">Crafted</Button>
+            <Button renderer="crafted" width="50" style="warning">Crafted</Button>
+            <Button renderer="crafted" width="50" style="success">Crafted</Button>
         </Box>
         <Text fontScale="1">ijJ</Text>
         <Button disabled="true">Click me</Button>
