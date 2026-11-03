@@ -7,9 +7,9 @@
     - [x] Handling
     - [x] Focus and state
     - [x] Markup callbacks (named only)
-  - [-] Navigation
+  - [x] Navigation
     - [x] Tab navigation
-    - [-] Arrow navigation
+    - [x] Arrow navigation
   - [x] Rendering
 - UI
   - [x] XML Parser

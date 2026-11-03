@@ -143,7 +143,7 @@ public class Input extends CraftedElement
         if(event.button == MouseButton.LEFT)
         {
             canStartDrag = true;
-            text.moveCursorToPoint(font.get(), new Float2(event.x - 4 + xOffset, event.y), fontScale.get());
+            text.moveCursorToPoint(font.get(), new Float2(event.x - getLayout().x - 4 + xOffset, event.y - getLayout().y), fontScale.get());
             text.setSelectionStart(text.getCursorPosition());
             event.consume();
         }
@@ -171,7 +171,7 @@ public class Input extends CraftedElement
         }
         if(isDragging)
         {
-            text.extendSelectionToPoint(font.get(), new Float2(event.x - 4 + xOffset, event.y), fontScale.get());
+            text.extendSelectionToPoint(font.get(), new Float2(event.x - getLayout().x - 4 + xOffset, event.y - getLayout().y), fontScale.get());
             event.consume();
         }
     }

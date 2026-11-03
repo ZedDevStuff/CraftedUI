@@ -6,19 +6,25 @@
         </Box>
         <Text color="onBackground" margin="2">Buttons</Text>
         <Box id="buttons" gap="4" flexDirection="row" flexWrap="wrap" margin="2">
-            <Button width="50" disabled="true">Disabled</Button>
-            <Button width="50">Minecraft</Button>
-            <Button renderer="crafted" width="50" disabled="true">Crafted</Button>
-            <Button renderer="crafted" width="50" style="primary">Crafted</Button>
-            <Button renderer="crafted" width="50" style="secondary">Crafted</Button>
-            <Button renderer="crafted" width="50" style="error">Crafted</Button>
-            <Button renderer="crafted" width="50" style="warning">Crafted</Button>
-            <Button renderer="crafted" width="50" style="success">Crafted</Button>
+            <Button width="60" disabled="true">Disabled</Button>
+            <Button width="60">Minecraft</Button>
+            <Button renderer="crafted" width="60" disabled="true">Crafted</Button>
+            <Button renderer="crafted" width="60" style="primary">Crafted</Button>
+            <Button renderer="crafted" width="60" style="secondary">Crafted</Button>
+            <Button renderer="crafted" width="60" style="error">Crafted</Button>
+            <Button renderer="crafted" width="60" style="warning">Crafted</Button>
+            <Button renderer="crafted" width="60" style="success">Crafted</Button>
         </Box>
-        <Text fontScale="1">ijJ</Text>
-        <Button disabled="true">Click me</Button>
-        <Input onSubmit="testSubmit" width="200" height="20" placeholder="Search..." />
-        <Image src="minecraft:textures/block/stone.png" width="64" height="64" />
-        <Button onClick="onDeepClick">Another button</Button>
+        <Text color="onBackground" margin="2">Inputs</Text>
+        <Box id="inputs" gap="4" flexDirection="row" flexWrap="wrap" margin="2">
+            <Input onSubmit="testSubmit" width="200" height="20" placeholder="Search..." />
+            <Input onSubmit="testSubmit" width="200" height="20" placeholder="Search..." />
+            <Input onSubmit="testSubmit" width="200" height="20" placeholder="Search..." />
+            <Input onSubmit="testSubmit" width="200" height="20" placeholder="Search..." />
+        </Box>
+        <Text color="onBackground" margin="2">Misc</Text>
+        <Box id="misc" gap="4" flexDirection="row" flexWrap="wrap" margin="2">
+            <Image src="minecraft:textures/block/stone.png" width="64" height="64" />
+        </Box>
     </Box>
 </Crafted>
