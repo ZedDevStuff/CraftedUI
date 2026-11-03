@@ -1,6 +1,8 @@
 package dev.zeddevstuff.crafted.rendering;
 
 import dev.zeddevstuff.crafted.platform.ICanvas;
+import dev.zeddevstuff.crafted.ui.CraftedElement;
+import org.appliedenergistics.yoga.YogaOverflow;
 
 /**
  * A renderer for a specific type of element.
@@ -28,4 +30,24 @@ public interface IRenders<T>
 	default void forceRender(ICanvas canvas, Object element) { render(canvas, (T) element); }
 	@SuppressWarnings("unchecked")
 	default void forceAfterRender(ICanvas canvas, Object element) { afterRender(canvas, (T) element); }
+
+	static void beginClip(ICanvas canvas, CraftedElement element, int xOffset, int yOffset)
+	{
+		var layout = element.getLayout();
+		if(element.overflow.get() != YogaOverflow.VISIBLE)
+			canvas.beginClip(layout.x + xOffset, layout.y + yOffset, layout.width, layout.height);
+		if(element.overflow.get() == YogaOverflow.SCROLL && xOffset != 0 || yOffset != 0)
+		{
+			canvas.beginTransform();
+			canvas.translate(-xOffset, -yOffset);
+		}
+	}
+
+	static void endClip(ICanvas canvas, CraftedElement element, int xOffset, int yOffset)
+	{
+		if(element.overflow.get() != YogaOverflow.VISIBLE)
+			canvas.endClip();
+		if(element.overflow.get() == YogaOverflow.SCROLL && xOffset != 0 || yOffset != 0)
+			canvas.endTransform();
+	}
 }

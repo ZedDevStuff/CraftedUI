@@ -87,23 +87,25 @@ public class Button extends CraftedElement
 		if(event.keyCode == ImportantKeys.SPACE || event.keyCode == ImportantKeys.ENTER)
 			revertLayoutChanges();
 	}
-
+	private boolean appliedLayoutChanges = false;
 	private void applyLayoutChanges()
 	{
-		if(renderer.get() instanceof CraftedButtonRenderer)
+		if(renderer.get() instanceof CraftedButtonRenderer && !appliedLayoutChanges)
 		{
 			marginTop.set(StyleLength.points(3));
 			paddingBottom.set(StyleLength.points(3));
 			height.set(StyleSizeLength.points(height.get().value().getValue() - 3));
+			appliedLayoutChanges = true;
 		}
 	}
 	private void revertLayoutChanges()
 	{
-		if(renderer.get() instanceof CraftedButtonRenderer)
+		if(renderer.get() instanceof CraftedButtonRenderer && appliedLayoutChanges)
 		{
 			marginTop.set(StyleLength.points(0));
 			paddingBottom.set(StyleLength.points(0));
 			height.set(StyleSizeLength.points(height.get().value().getValue() + 3));
+			appliedLayoutChanges = false;
 		}
 	}
 

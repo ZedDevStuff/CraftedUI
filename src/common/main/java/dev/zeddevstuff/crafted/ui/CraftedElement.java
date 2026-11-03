@@ -340,17 +340,14 @@ public abstract class CraftedElement
 	protected YogaStyle initLayoutNode(YogaStyle style, Map<String, String> attributes) { return style; }
 	public boolean contains(float x, float y)
 	{
-		if(overflow.get() == YogaOverflow.HIDDEN)
-			return x >= layout.x && x <= layout.x + layout.width && y >= layout.y && y <= layout.y + layout.height;
-		else
-			// TODO: Figure out the best way to do this
-			return x >= layout.x && x <= layout.x + layout.width && y >= layout.y && y <= layout.y + layout.height;
+		return layout.contains(x, y);
 	}
 
-	// Thank you Wulferis
+	// Thank you Wulferis for the base method
 	public CraftedElement findTopmostAt(float x, float y)
 	{
-		if (!contains(x, y)) // Clip parent, so even the one calling this clips and doesnt get its clip/bounds ignored
+		boolean inside = contains(x, y);
+		if (!inside && overflow.get() != YogaOverflow.VISIBLE)
 			return null;
 
 		// check each child, starting with the topmost one
@@ -370,7 +367,7 @@ public abstract class CraftedElement
 		// no child contained a valid input target
 		// fall back to this element if it receives input events
 		// otherwise, return null so the caller can check another child
-		return receivesInputEvents() && !state.isDisabled() ? this : null;
+		return inside && receivesInputEvents() && !state.isDisabled() ? this : null;
 	}
 	private void udpateSortedChildrenCaches()
 	{

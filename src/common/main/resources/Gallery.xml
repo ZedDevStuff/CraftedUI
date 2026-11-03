@@ -27,9 +27,19 @@
             <Checkbox renderer="crafted" size="20,20" indeterminate="true" style="warning" />
             <Checkbox renderer="crafted" size="20,20" indeterminate="true" style="success" />
         </Box>
-        <Text color="onBackground" margin="2">Misc</Text>
-        <Box id="misc" gap="4" flexDirection="row" flexWrap="wrap" margin="2">
-            <Image src="minecraft:textures/block/stone.png" width="64" height="64" />
-        </Box>
+        <ScrollView height="200" alignSelf="stretch" horizontalScrollbar="false">
+            <Text color="onBackground" margin="2">Misc</Text>
+            <Box id="misc" gap="4" flexDirection="row" flexWrap="wrap" margin="2">
+                <Image src="minecraft:textures/block/stone.png" width="64" height="64" />
+            </Box>
+            <Box>
+                <Box width="25">
+                    <Button onClick="sayHi" renderer="crafted">Overflow</Button>
+                </Box>
+                <Box width="25" overflow="hidden">
+                    <Button onClick="sayHi" renderer="crafted">Hidden</Button>
+                </Box>
+            </Box>
+        </ScrollView>
     </Box>
 </Crafted>

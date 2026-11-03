@@ -13,5 +13,6 @@ public class All
 		Checkbox.register(crafted);
 		Input.register(crafted);
 		Image.register(crafted);
+		ScrollView.register(crafted);
 	}
 }

@@ -14,6 +14,8 @@ import java.util.*;
 // This whole class is awful but it works. Might replace it later with a library (or
 public class SchemaGenerator
 {
+	// TODO: Generate each complexType first, then the elements that will use them.
+	// Right now it's broken because i somehow didn't think of stuff with more than one level of inheritance.
 	public static String generateSchema(Crafted crafted)
 	{
 		XmlSchemaNode root = new XmlSchemaNode("xs:schema")
