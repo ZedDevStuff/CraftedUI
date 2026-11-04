@@ -1,16 +1,9 @@
 package dev.zeddevstuff.crafted;
 
 import com.mojang.logging.LogUtils;
-import dev.zeddevstuff.crafted.input.events.IClickEventHandler;
-import dev.zeddevstuff.crafted.input.events.ISubmitEventHandler;
-import dev.zeddevstuff.crafted.parsing.CraftedXmlParser;
-import dev.zeddevstuff.crafted.parsing.DocumentBuilder;
 import dev.zeddevstuff.crafted.parsing.ParsedNode;
 import dev.zeddevstuff.crafted.platform.*;
-import dev.zeddevstuff.crafted.ui.CraftedContext;
 import dev.zeddevstuff.crafted.ui.elements.All;
-import dev.zeddevstuff.crafted.ui.elements.CraftedRoot;
-import dev.zeddevstuff.crafted.ui.elements.Input;
 import dev.zeddevstuff.crafted.utils.SchemaGenerator;
 import net.minecraft.client.Minecraft;
 

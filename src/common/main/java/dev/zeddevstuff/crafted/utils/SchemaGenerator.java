@@ -9,253 +9,188 @@ import dev.zeddevstuff.crafted.ui.CraftedElement;
 import dev.zeddevstuff.crafted.ui.elements.CraftedRoot;
 
 import java.lang.reflect.Field;
-import java.util.*;
+import java.lang.reflect.Modifier;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
-// This whole class is awful but it works. Might replace it later with a library (or
-public class SchemaGenerator
+public final class SchemaGenerator
 {
-	// TODO: Generate each complexType first, then the elements that will use them.
-	// Right now it's broken because i somehow didn't think of stuff with more than one level of inheritance.
+	private SchemaGenerator() {}
+
 	public static String generateSchema(Crafted crafted)
 	{
-		XmlSchemaNode root = new XmlSchemaNode("xs:schema")
+		var types = new LinkedHashMap<Class<?>, XmlSchemaNode>();
+		addType(CraftedElement.class, types, new HashSet<>());
+		addType(CraftedRoot.class, types, new HashSet<>());
+
+		var elements = new ArrayList<XmlSchemaNode>();
+		for(var entry : crafted.elements.getClassToTagMap())
+		{
+			var elementClass = entry.getKey();
+			var annotation = elementClass.getAnnotation(DefineElement.class);
+			if(annotation == null || !CraftedElement.class.isAssignableFrom(elementClass))
+				continue;
+
+			addType(elementClass, types, new HashSet<>());
+			elements.add(elementNode(entry.getValue(), elementClass));
+		}
+
+		var root = new XmlSchemaNode("xs:schema")
 			.addAttribute("xmlns:xs", "http://www.w3.org/2001/XMLSchema");
-		root.addChild(craftedElementType());
-		root.addChild(craftedElementNode());
-		for(var element : crafted.elements.getClassToTagMap())
-		{
-			if(Objects.equals(element.getValue(), "Crafted"))
-				continue;
-			var elementClass = element.getKey();
-			var elementAnnotation = elementClass.getAnnotation(DefineElement.class);
-			if(elementAnnotation == null)
-				continue;
-			XmlSchemaNode elementNode = elementNode(elementAnnotation, element.getKey());
-			root.addChild(elementNode);
-		}
-		return "<?xml version=\"1.0\" encoding=\"utf-16\"?>\n" + root.toXmlString();
+		for(var type : types.values())
+			root.addChild(type);
+		for(var element : elements)
+			root.addChild(element);
+
+		return "<?xml version=\"1.0\" encoding=\"utf-8\"?>\n" + root.toXmlString();
 	}
 
-	private static XmlSchemaNode craftedElementType()
+	private static void addType(Class<?> elementClass, Map<Class<?>, XmlSchemaNode> types, Set<Class<?>> visiting)
 	{
-		XmlSchemaNode complexTypeNode = new XmlSchemaNode("xs:complexType")
-			.addAttribute("name", "CraftedElement")
-			.addAttribute("mixed", "true");
-		var sequenceNode = new XmlSchemaNode("xs:sequence");
-		sequenceNode.addChild(anySequenceNode());
-		complexTypeNode.addChild(sequenceNode);
-		var fields = Arrays.stream(CraftedElement.class.getDeclaredFields()).filter(f -> IProp.class.isAssignableFrom(f.getType()) && !f.isAnnotationPresent(Ignore.class)).toList();
-		for(var field : fields)
+		if(types.containsKey(elementClass) || !visiting.add(elementClass))
+			return;
+
+		var parent = elementClass.getSuperclass();
+		if (parent != null && CraftedElement.class.isAssignableFrom(parent))
+			addType(parent, types, visiting);
+
+		var type = new XmlSchemaNode("xs:complexType").addAttribute("name", typeName(elementClass));
+		if (parent != null && CraftedElement.class.isAssignableFrom(parent))
 		{
-			XmlSchemaNode attributeNode = new XmlSchemaNode("xs:attribute")
-				.addAttribute("name", field.getName());
-			var propDoc = field.getAnnotation(Description.class);
-			if(propDoc != null)
-				attributeNode.addChild(documentNode(propDoc));
-			complexTypeNode.addChild(attributeNode);
+			var extension = new XmlSchemaNode("xs:extension")
+				.addAttribute("base", typeName(parent));
+			type.addChild(new XmlSchemaNode("xs:complexContent").addChild(extension));
+			addAttributes(extension, elementClass);
 		}
-		return complexTypeNode;
-	}
-	private static XmlSchemaNode craftedElementNode()
-	{
-		XmlSchemaNode elementNode = new XmlSchemaNode("xs:element")
-			.addAttribute("name", "Crafted");
-		XmlSchemaNode complexTypeNode = new XmlSchemaNode("xs:complexType");
-		elementNode.addChild(documentNode("The root element of a CraftedUI XML document."));
-		var sequenceNode = new XmlSchemaNode("xs:sequence");
-		sequenceNode.addChild(anySequenceNode());
-		complexTypeNode.addChild(sequenceNode);
-		var fields = Arrays.stream(CraftedRoot.class.getDeclaredFields()).filter(f -> IProp.class.isAssignableFrom(f.getType()) && !f.isAnnotationPresent(Ignore.class)).toList();
-		for(var field : fields)
+		else
 		{
-			XmlSchemaNode attributeNode = new XmlSchemaNode("xs:attribute")
-				.addAttribute("name", field.getName());
-			var propDoc = field.getAnnotation(Description.class);
-			if(propDoc != null)
-				attributeNode.addChild(documentNode(propDoc));
-			complexTypeNode.addChild(attributeNode);
+			type.addAttribute("mixed", "true");
+			type.addChild(new XmlSchemaNode("xs:sequence").addChild(anySequenceNode()));
+			addAttributes(type, elementClass);
 		}
-		elementNode.addChild(complexTypeNode);
-		return elementNode;
+
+		visiting.remove(elementClass);
+		types.put(elementClass, type);
 	}
 
-	private static XmlSchemaNode documentNode(Description doc)
+	private static void addAttributes(XmlSchemaNode parent, Class<?> elementClass)
 	{
-		XmlSchemaNode docNode = new XmlSchemaNode("xs:annotation");
-		if(doc != null)
-			docNode.addChild(new XmlSchemaNode("xs:documentation", null, doc.value()));
-		return docNode;
+		for(var field : elementClass.getDeclaredFields())
+		{
+			if (!isSchemaProperty(field))
+				continue;
+
+			var attribute = new XmlSchemaNode("xs:attribute").addAttribute("name", field.getName());
+			var description = field.getAnnotation(Description.class);
+			if (description != null)
+				attribute.addChild(documentNode(description.value()));
+			parent.addChild(attribute);
+		}
 	}
+
+	private static boolean isSchemaProperty(Field field)
+	{
+		return IProp.class.isAssignableFrom(field.getType())
+			&& !field.isAnnotationPresent(Ignore.class)
+			&& !Modifier.isStatic(field.getModifiers());
+	}
+
+	private static XmlSchemaNode elementNode(String tag, Class<?> elementClass)
+	{
+		var element = new XmlSchemaNode("xs:element")
+			.addAttribute("name", tag)
+			.addAttribute("type", typeName(elementClass));
+		var description = elementClass.getAnnotation(Description.class);
+		if (description != null)
+			element.addChild(documentNode(description.value()));
+		return element;
+	}
+
+	private static String typeName(Class<?> elementClass)
+	{
+		return elementClass.getSimpleName();
+	}
+
 	private static XmlSchemaNode documentNode(String documentation)
 	{
-		XmlSchemaNode docNode = new XmlSchemaNode("xs:annotation");
-		if(documentation != null && !documentation.isEmpty())
-			docNode.addChild(new XmlSchemaNode("xs:documentation", null, documentation));
-		return docNode;
-	}
-
-	private static XmlSchemaNode elementNode(DefineElement element, Class<?> elementClass)
-	{
-		XmlSchemaNode elementNode = new XmlSchemaNode("xs:element")
-			.addAttribute("name", element.value());
-		var elDoc = elementClass.getAnnotation(Description.class);
-		if(elDoc != null)
-			elementNode.addChild(documentNode(elDoc));
-		var properties = Arrays.stream(elementClass.getDeclaredFields()).filter(f -> IProp.class.isAssignableFrom(f.getType()) && !f.isAnnotationPresent(Ignore.class)).toList();
-		elementNode.addChild(complexTypeNode(elementClass.getSuperclass().getSimpleName(), element, properties));
-		return elementNode;
-	}
-	private static XmlSchemaNode elementNode(String parentType, String name, String documentation)
-	{
-		XmlSchemaNode elementNode = new XmlSchemaNode("xs:element")
-			.addAttribute("name", name);
-		if(documentation != null && !documentation.isEmpty())
-			elementNode.addChild(documentNode(documentation));
-		elementNode.addChild(complexTypeNode(parentType, name, List.of()));
-		return elementNode;
-	}
-
-	private static XmlSchemaNode complexTypeNode(String parentType, DefineElement element, List<Field> properties)
-	{
-		XmlSchemaNode complexTypeNode = new XmlSchemaNode("xs:complexType");
-		if(parentType != null)
-		{
-			XmlSchemaNode complexContentNode = new XmlSchemaNode("xs:complexContent");
-			XmlSchemaNode extensionNode = new XmlSchemaNode("xs:extension").addAttribute("base", parentType);
-			complexContentNode.addChild(extensionNode);
-			complexTypeNode.addChild(complexContentNode);
-			if(!properties.isEmpty())
-			{
-				for(var property : properties)
-				{
-					XmlSchemaNode attributeNode = new XmlSchemaNode("xs:attribute")
-						.addAttribute("name", property.getName());
-					var propDoc = property.getAnnotation(Description.class);
-					if(propDoc != null)
-						attributeNode.addChild(documentNode(propDoc));
-					extensionNode.addChild(attributeNode);
-				}
-			}
-		}
-		return complexTypeNode;
-	}
-	private static XmlSchemaNode complexTypeNode(String parentType, String name, List<Field> properties)
-	{
-		XmlSchemaNode complexTypeNode = new XmlSchemaNode("xs:complexType");
-		if(parentType != null)
-		{
-			XmlSchemaNode complexContentNode = new XmlSchemaNode("xs:complexContent");
-			XmlSchemaNode extensionNode = new XmlSchemaNode("xs:extension").addAttribute("base", parentType);
-			complexContentNode.addChild(extensionNode);
-			complexTypeNode.addChild(complexContentNode);
-			if(!properties.isEmpty())
-			{
-				for(var property : properties)
-				{
-					XmlSchemaNode attributeNode = new XmlSchemaNode("xs:attribute")
-						.addAttribute("name", property.getName());
-					var propDoc = property.getAnnotation(Description.class);
-					if(propDoc != null)
-						attributeNode.addChild(documentNode(propDoc));
-					extensionNode.addChild(attributeNode);
-				}
-			}
-		}
-		return complexTypeNode;
+		return new XmlSchemaNode("xs:annotation")
+			.addChild(new XmlSchemaNode("xs:documentation", null, documentation));
 	}
 
 	private static XmlSchemaNode anySequenceNode()
 	{
-		HashMap<String, String> anyAttributes = new HashMap<>(){{
-			put("minOccurs", "0");
-			put("maxOccurs", "unbounded");
-		}};
-		return new XmlSchemaNode("xs:any", anyAttributes, new ArrayList<>());
+		return new XmlSchemaNode("xs:any")
+			.addAttribute("minOccurs", "0")
+			.addAttribute("maxOccurs", "unbounded")
+			.addAttribute("processContents", "lax");
 	}
-	static class XmlSchemaNode
+
+	private static final class XmlSchemaNode
 	{
-		public final String name;
-		public final HashMap<String, String> attributes;
-		public final String textContent;
-		public final ArrayList<XmlSchemaNode> children;
+		private final String name;
+		private final Map<String, String> attributes = new LinkedHashMap<>();
+		private final List<XmlSchemaNode> children = new ArrayList<>();
+		private final String textContent;
 
-		public XmlSchemaNode(String name)
+		private XmlSchemaNode(String name)
 		{
-			this.name = name;
-			this.attributes = new HashMap<>();
-			this.children = new ArrayList<>();
-			this.textContent = null;
+			this(name, null, null);
 		}
 
-		public XmlSchemaNode(String name, HashMap<String, String> attributes, ArrayList<XmlSchemaNode> children)
+		private XmlSchemaNode(String name, Map<String, String> attributes, String textContent)
 		{
 			this.name = name;
-			if(attributes == null)
-				attributes = new HashMap<>();
-			this.attributes = attributes;
-			if(children == null)
-				children = new ArrayList<>();
-			this.children = children;
-			this.textContent = null;
-		}
-		public XmlSchemaNode(String name, HashMap<String, String> attributes, String textContent)
-		{
-			this.name = name;
-			if(attributes == null)
-				attributes = new HashMap<>();
-			this.attributes = attributes;
+			if (attributes != null)
+				this.attributes.putAll(attributes);
 			this.textContent = textContent;
-			this.children = null;
 		}
 
-		public XmlSchemaNode addAttribute(String key, String value)
+		private XmlSchemaNode addAttribute(String key, String value)
 		{
-			this.attributes.put(key, value);
-			return this;
-		}
-		public XmlSchemaNode addChild(XmlSchemaNode child)
-		{
-			this.children.add(child);
+			attributes.put(key, value);
 			return this;
 		}
 
-		public String toXmlString()
+		private XmlSchemaNode addChild(XmlSchemaNode child)
 		{
-			return getXmlStringWithIndent(0);
+			children.add(child);
+			return this;
 		}
-		private String getXmlStringWithIndent(int indentLevel)
+
+		private String toXmlString()
 		{
-			StringBuilder sb = new StringBuilder();
-			String indent = "  ".repeat(indentLevel);
-			sb.append(indent).append("<").append(name);
-			for (var entry : attributes.entrySet())
-				sb.append(" ").append(entry.getKey()).append("=\"").append(entry.getValue()).append("\"");
-			if (children != null && !children.isEmpty())
+			return toXmlString(0);
+		}
+
+		private String toXmlString(int indentLevel)
+		{
+			var indent = "  ".repeat(indentLevel);
+			var xml = new StringBuilder(indent).append('<').append(name);
+			for (var attribute : attributes.entrySet())
+				xml.append(' ').append(attribute.getKey()).append("=\"").append(escape(attribute.getValue())).append("\"");
+
+			if (!children.isEmpty())
 			{
-				sb.append(">\n");
+				xml.append(">\n");
 				for (var child : children)
-					sb.append(child.getXmlStringWithIndent(indentLevel + 1));
-				sb.append(indent).append("</").append(name).append(">\n");
+					xml.append(child.toXmlString(indentLevel + 1));
+				xml.append(indent).append("</").append(name).append(">\n");
 			}
+			else if (textContent != null)
+				xml.append('>').append(escape(textContent)).append("</").append(name).append(">\n");
 			else
-			{
-				if (textContent != null)
-					sb.append(">").append(textContent).append("</").append(name).append(">\n");
-				else if (isSelfClosingTag(name))
-					sb.append(" />\n");
-				else
-					sb.append("></").append(name).append(">\n");
-			}
-			return sb.toString();
+				xml.append(" />\n");
+			return xml.toString();
 		}
-	}
 
-	private static boolean isSelfClosingTag(String tagName)
-	{
-		return switch (tagName)
+		private static String escape(String value)
 		{
-			case "xs:any", "xs:attribute" -> true;
-			default -> false;
-		};
+			return value.replace("&", "&amp;").replace("<", "&lt;").replace(">", "&gt;")
+				.replace("\"", "&quot;").replace("'", "&apos;");
+		}
 	}
 }
