@@ -11,8 +11,8 @@ import java.util.function.BiFunction;
  */
 public class Prop<T> implements IProp<T>
 {
-	private final Class<T> type;
-	public final Class<T> getType() { return type; }
+	private final Class<?> type;
+	public final Class<?> getType() { return type; }
 	private final String name;
 	public final String getName() { return name; }
 	private T value;
@@ -37,17 +37,19 @@ public class Prop<T> implements IProp<T>
 
 	private final ArrayList<PropChangeListener<T>> listeners = new ArrayList<>();
 
-	public Prop(Class<T> type, String name, T value)
+	public Prop(Class<?> type, String name, T value)
 	{
 		this.type = type;
 		this.name = name;
+		validate(value);
 		this.value = value;
 		parser = (str, defaultVal) -> defaultVal;
 	}
-	public Prop(Class<T> type, String name, T value, BiFunction<String, T, T> parser)
+	public Prop(Class<?> type, String name, T value, BiFunction<String, T, T> parser)
 	{
 		this.type = type;
 		this.name = name;
+		validate(value);
 		this.value = value;
 		this.parser = parser;
 	}
@@ -61,6 +63,12 @@ public class Prop<T> implements IProp<T>
 	public Prop(String name, @Nonnull T value, BiFunction<String, T, T> parser)
 	{
 		this((Class<T>)value.getClass(), name, value, parser);
+	}
+
+	private void validate(T value)
+	{
+		if(value != null && !type.isInstance(value))
+			throw new IllegalArgumentException("Invalid value type for prop " + name + ": " + value);
 	}
 
 	public void addListener(PropChangeListener<T> listener)

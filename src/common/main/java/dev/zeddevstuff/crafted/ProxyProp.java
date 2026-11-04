@@ -16,18 +16,18 @@ public class ProxyProp<T> implements IProp<T>
 	private final Consumer<T> setter;
 	private final Supplier<T> getter;
 	private final BiFunction<String, T, T> parser;
-	private final Class<T> type;
+	private final Class<?> type;
 	@Override
-	public Class<T> getType() { return type; }
+	public Class<?> getType() { return type; }
 	private final String name;
 	@Override
 	public String getName() { return name; }
 
-	public ProxyProp(Class<T> type, String name, Consumer<T> setter, Supplier<T> getter)
+	public ProxyProp(Class<?> type, String name, Consumer<T> setter, Supplier<T> getter)
 	{
 		this(type, name, setter, getter, (str, defaultVal) -> defaultVal);
 	}
-	public ProxyProp(Class<T> type, String name, Consumer<T> setter, Supplier<T> getter, BiFunction<String, T, T> parser)
+	public ProxyProp(Class<?> type, String name, Consumer<T> setter, Supplier<T> getter, BiFunction<String, T, T> parser)
 	{
 		this.type = type;
 		this.name = name;
@@ -38,7 +38,12 @@ public class ProxyProp<T> implements IProp<T>
 	@Override
 	public T get() { return getter.get(); }
 	@Override
-	public void set(T newValue) { setter.accept(newValue); }
+	public void set(T newValue)
+	{
+		if(newValue != null && !type.isInstance(newValue))
+			throw new IllegalArgumentException("Invalid value type for prop " + name + ": " + newValue);
+		setter.accept(newValue);
+	}
 
 	@Override
 	public void setFromString(String str) { set(parser.apply(str, get())); }

@@ -73,7 +73,7 @@ public abstract class CraftedElement
 	}
 
 	@SuppressWarnings("unchecked")
-	protected <T, TProp extends IProp<T>> TProp registerProp(Class<T> type, String name, BiFunction<String, T, T> parser)
+	protected <T, TProp extends IProp<T>> TProp registerProp(Class<?> type, String name, BiFunction<String, T, T> parser)
 	{
 		if(props.containsKey(name))
 			throw new IllegalArgumentException("Property with name '" + name + "' is already registered for this element.");
@@ -101,7 +101,7 @@ public abstract class CraftedElement
 	 * This will allow the property to be set via attributes in the XML.
 	 * @return The registered property.
 	 */
-	protected <T> Prop<T> registerProp(Class<T> type, String name, T value, BiFunction<String, T, T> parser)
+	protected <T> Prop<T> registerProp(Class<?> type, String name, T value, BiFunction<String, T, T> parser)
 	{
 		if(props.containsKey(name))
 			throw new IllegalArgumentException("Property with name '" + name + "' is already registered for this element.");
@@ -114,7 +114,7 @@ public abstract class CraftedElement
 	 * This will allow the property to be set via attributes in the XML.
 	 * @return The registered property.
 	 */
-	protected <T> ProxyProp<T> registerProp(Class<T> type, String name, Supplier<T> getter, Consumer<T> setter, BiFunction<String, T, T> parser)
+	protected <T> ProxyProp<T> registerProp(Class<?> type, String name, Supplier<T> getter, Consumer<T> setter, BiFunction<String, T, T> parser)
 	{
 		if(props.containsKey(name))
 			throw new IllegalArgumentException("Property with name '" + name + "' is already registered for this element.");

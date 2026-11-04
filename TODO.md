@@ -17,20 +17,21 @@
   - [-] File Loader
     - [ ] Load from file
     - [x] Load from jar resources
-  - [-] Basic elements
+  - [-] Essential elements
     - [x] Box
     - [x] Text
     - [x] Image
     - [x] Button
     - [x] Input
+      - [ ] Text Area (Basically just a multi-line input)
     - [x] Checkbox
-    - [ ] Text Area (Basically just a multi-line input)
-    - [ ] Scroll
-    - [ ] List
+    - [x] Scroll
+      - [ ] List
+    - [-] Dropdown
+  - [ ] Extra elements
     - [ ] Slider
     - [ ] Progress bar
     - [ ] Tabs
-    - [ ] Dropdown
     - [ ] Tooltip
     - [ ] Modal
     - [ ] Menu

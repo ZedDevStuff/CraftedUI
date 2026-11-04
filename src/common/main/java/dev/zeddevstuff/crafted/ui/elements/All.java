@@ -14,5 +14,6 @@ public class All
 		Input.register(crafted);
 		Image.register(crafted);
 		ScrollView.register(crafted);
+		Dropdown.register(crafted);
 	}
 }

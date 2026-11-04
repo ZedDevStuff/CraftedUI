@@ -1,4 +1,4 @@
-<Crafted renderer="default" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+<Crafted title="Gallery" renderer="default" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:noNamespaceSchemaLocation="CraftedUI.xsd">
     <Box id="window" color="background" flex="1" flexDirection="column">
         <Box id="header" color="primary" height="32" flexDirection="row" alignItems="center">
@@ -26,6 +26,7 @@
             <Checkbox renderer="crafted" size="20,20" indeterminate="true" style="error" />
             <Checkbox renderer="crafted" size="20,20" indeterminate="true" style="warning" />
             <Checkbox renderer="crafted" size="20,20" indeterminate="true" style="success" />
+            <Dropdown options="testOptions" size="50,20" />
         </Box>
         <ScrollView height="200" alignSelf="stretch" horizontalScrollbar="false">
             <Text color="onBackground" margin="2">Misc</Text>

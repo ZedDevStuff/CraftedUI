@@ -10,6 +10,7 @@ import dev.zeddevstuff.crafted.input.events.IClickEventHandler;
 import dev.zeddevstuff.crafted.input.events.ISubmitEventHandler;
 import dev.zeddevstuff.crafted.ui.CraftedContext;
 import dev.zeddevstuff.crafted.ui.elements.Input;
+import dev.zeddevstuff.crafted.utils.TypedList;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.gui.screens.TitleScreen;
@@ -19,6 +20,9 @@ import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
+
+import java.util.ArrayList;
+import java.util.List;
 
 @Mixin(TitleScreen.class)
 public abstract class TitleScreenMixin extends Screen
@@ -51,6 +55,7 @@ public abstract class TitleScreenMixin extends Screen
 		ctx.registerCallback(ISubmitEventHandler.class, "printSubmit", event -> {
 			System.out.println("Submitted value: '" + event.getTargetAs(Input.class).value.get() + "'");
 		});
+		ctx.setVar("testOptions", new TypedList<>(String.class, List.of("Option 1", "Option 2", "Option 3")));
 		crafted$start = System.nanoTime();
 		var screen = new CraftedScreen(ctx, Entry.gallery);
 		crafted$end = System.nanoTime();
