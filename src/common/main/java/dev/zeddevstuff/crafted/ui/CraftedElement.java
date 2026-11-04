@@ -430,11 +430,12 @@ public abstract class CraftedElement
 			return;
 		if(children.contains(child))
 			return;
-		if(child.parent != null)
+		if(child.parent != null && child.parent != this)
 			child.parent.removeChild(child);
 		children.add(child);
 		child.parent = this;
 		node.addChildAt(child.node, node.getChildCount());
+		udpateSortedChildrenCaches();
 	}
 	public void addChildren(Collection<CraftedElement> children)
 	{
@@ -454,7 +455,10 @@ public abstract class CraftedElement
 			return;
 		children.remove(child);
 		child.parent = null;
-		node.removeChild(child.node);
+		node.removeChildAndInvalidate(child.node);
+		if(child.node.getOwner() == node)
+			child.node.setOwner(null);
+		udpateSortedChildrenCaches();
 	}
 	public void removeChildren(Collection<CraftedElement> children)
 	{
