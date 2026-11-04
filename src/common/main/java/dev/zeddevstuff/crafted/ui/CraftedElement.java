@@ -352,6 +352,7 @@ public abstract class CraftedElement
 	}
 	protected int getRenderOffsetX() { return 0; }
 	protected int getRenderOffsetY() { return 0; }
+	public void scrollIntoView(CraftedElement element) {}
 	protected float transformChildInputX(float x) { return x; }
 	protected float transformChildInputY(float y) { return y; }
 

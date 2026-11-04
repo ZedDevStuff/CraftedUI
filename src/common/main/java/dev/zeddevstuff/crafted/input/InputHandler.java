@@ -87,6 +87,8 @@ public class InputHandler
 		{
 			newFocus.state.set(InteractionState.FOCUSED, true);
 			newFocus.handleFocusGained(FocusEvent.gained(newFocus, previous));
+			for (var ancestor = newFocus.getParent(); ancestor != null; ancestor = ancestor.getParent())
+				ancestor.scrollIntoView(newFocus);
 		}
 	}
 

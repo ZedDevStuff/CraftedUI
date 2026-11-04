@@ -10,6 +10,7 @@ import dev.zeddevstuff.crafted.input.events.MouseEvent;
 import dev.zeddevstuff.crafted.rendering.IRenders;
 import dev.zeddevstuff.crafted.types.Color;
 import dev.zeddevstuff.crafted.ui.CraftedContext;
+import dev.zeddevstuff.crafted.ui.CraftedElement;
 import org.appliedenergistics.yoga.YogaEdge;
 import org.appliedenergistics.yoga.YogaOverflow;
 import org.appliedenergistics.yoga.style.YogaStyle;
@@ -176,6 +177,35 @@ public class ScrollView extends Box
 	{
 		scrollX.set(Math.clamp(scrollX.get(), 0, maxScrollX()));
 		scrollY.set(Math.clamp(scrollY.get(), 0, maxScrollY()));
+	}
+
+	@Override
+	public void scrollIntoView(CraftedElement element)
+	{
+		var target = element.getLayout();
+		var viewport = getLayout();
+		int ancestorOffsetX = getAncestorRenderOffsetX();
+		int ancestorOffsetY = getAncestorRenderOffsetY();
+		int targetBaseX = target.x - element.getAncestorRenderOffsetX() + scrollX.get();
+		int targetBaseY = target.y - element.getAncestorRenderOffsetY() + scrollY.get();
+		int viewportX = viewport.innerX - ancestorOffsetX;
+		int viewportY = viewport.innerY - ancestorOffsetY;
+		int targetLeft = targetBaseX - scrollX.get();
+		int targetTop = targetBaseY - scrollY.get();
+		int targetRight = targetLeft + target.width;
+		int targetBottom = targetTop + target.height;
+		int viewportRight = viewportX + viewport.innerWidth;
+		int viewportBottom = viewportY + viewport.innerHeight;
+
+		if(targetLeft < viewportX)
+			scrollX.set(targetBaseX - viewportX);
+		else if(targetRight > viewportRight)
+			scrollX.set(targetBaseX + target.width - viewportRight);
+		if(targetTop < viewportY)
+			scrollY.set(targetBaseY - viewportY);
+		else if(targetBottom > viewportBottom)
+			scrollY.set(targetBaseY + target.height - viewportBottom);
+		clampScroll();
 	}
 
 	@Override
