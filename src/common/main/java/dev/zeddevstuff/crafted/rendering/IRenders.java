@@ -35,8 +35,12 @@ public interface IRenders<T>
 	{
 		var layout = element.getLayout();
 		if(element.overflow.get() != YogaOverflow.VISIBLE)
-			canvas.beginClip(layout.x + xOffset, layout.y + yOffset, layout.width, layout.height);
-		if(element.overflow.get() == YogaOverflow.SCROLL && xOffset != 0 || yOffset != 0)
+			canvas.beginClip(
+				layout.x - element.getAncestorRenderOffsetX(),
+				layout.y - element.getAncestorRenderOffsetY(),
+				layout.width,
+				layout.height);
+		if(element.overflow.get() == YogaOverflow.SCROLL && (xOffset != 0 || yOffset != 0))
 		{
 			canvas.beginTransform();
 			canvas.translate(-xOffset, -yOffset);
@@ -45,9 +49,9 @@ public interface IRenders<T>
 
 	static void endClip(ICanvas canvas, CraftedElement element, int xOffset, int yOffset)
 	{
+		if(element.overflow.get() == YogaOverflow.SCROLL && (xOffset != 0 || yOffset != 0))
+			canvas.endTransform();
 		if(element.overflow.get() != YogaOverflow.VISIBLE)
 			canvas.endClip();
-		if(element.overflow.get() == YogaOverflow.SCROLL && xOffset != 0 || yOffset != 0)
-			canvas.endTransform();
 	}
 }

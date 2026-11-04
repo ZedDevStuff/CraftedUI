@@ -40,6 +40,23 @@
                     <Button onClick="sayHi" renderer="crafted">Hidden</Button>
                 </Box>
             </Box>
+            <ScrollView height="150" alignSelf="stretch" horizontalScrollbar="false">
+            <Box id="scrollboxes" color="white">
+                <Box color="primary" height="20"><Text color="onPrimary">Primary</Text></Box>
+                <Box color="primaryContainer" height="20"><Text color="onPrimaryContainer">Primary Container</Text></Box>
+                <Box color="secondary" height="20"><Text color="onSecondary">Secondary</Text></Box>
+                <Box color="background" height="20"><Text color="onBackground">Background</Text></Box>
+                <Box color="surface" height="20"><Text color="onSurface">Surface</Text></Box>
+                <Box color="surfaceVariant" height="20"><Text color="onSurface">Surface Variant</Text></Box>
+                <Box color="outline" height="20">Outline</Box>
+                <Box color="disabled" height="20">Disabled</Box>
+                <Box color="scrim" height="20">Scrim</Box>
+                <Box color="error" height="20"><Text color="onError">Error</Text></Box>
+                <Box color="warning" height="20"><Text color="onWarning">Warning</Text></Box>
+                <Box color="success" height="20"><Text color="onSuccess">Success</Text></Box>
+                <Box color="info" height="20"><Text color="onInfo">Info</Text></Box>
+            </Box>
+            </ScrollView>
         </ScrollView>
     </Box>
 </Crafted>

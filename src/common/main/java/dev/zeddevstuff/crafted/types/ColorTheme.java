@@ -31,7 +31,9 @@ public record ColorTheme(
     Color warning,
     Color onWarning,
     Color success,
-    Color onSuccess
+    Color onSuccess,
+    Color info,
+    Color onInfo
 ) 
 {
 	public static final ColorTheme DARK_RED = fromSeed(Color.Tomato, true);
@@ -62,6 +64,8 @@ public record ColorTheme(
             case "onWarning" -> onWarning;
 			case "success" -> success;
             case "onSuccess" -> onSuccess;
+            case "info" -> info;
+            case "onInfo" -> onInfo;
 			default -> null;
 		};
 	}
@@ -95,6 +99,7 @@ public record ColorTheme(
         Color error = tone(dark ? 0.76f : 0.58f, 0.16f, 0.02f);
         Color warning = tone(dark ? 0.82f : 0.68f, 0.15f, 0.14f);
         Color success = tone(dark ? 0.76f : 0.52f, 0.13f, 0.40f);
+        Color info = tone(dark ? 0.78f : 0.58f, 0.14f, 0.58f);
 
         return new ColorTheme(
             seed,
@@ -118,7 +123,9 @@ public record ColorTheme(
             warning,
             contrasting(warning),
             success,
-            contrasting(success)
+            contrasting(success),
+            info,
+            contrasting(info)
         );
     }
 

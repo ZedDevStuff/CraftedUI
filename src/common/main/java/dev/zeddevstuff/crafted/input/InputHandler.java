@@ -136,17 +136,36 @@ public class InputHandler
 		}
 		if(target != null)
 		{
-			var event = MouseEvent.move(target, x, y);
-			var currentTarget = target;
-			while (!event.isPropagationStopped())
-			{
-				event.setCurrentTarget(currentTarget);
-				currentTarget.handleMouseMove(event);
-				currentTarget = currentTarget.getParent();
-				if (currentTarget == null)
-					break;
-			}
+			dispatchMouseMove(target, x, y);
 		}
+		if (pressedElement != null && !isDescendantOf(target, pressedElement))
+		{
+			dispatchMouseMove(pressedElement, x, y);
+		}
+	}
+	private void dispatchMouseMove(CraftedElement target, float x, float y)
+	{
+		var event = MouseEvent.move(target, x, y);
+		var currentTarget = target;
+		while (!event.isPropagationStopped())
+		{
+			event.setCurrentTarget(currentTarget);
+			currentTarget.handleMouseMove(event);
+			currentTarget = currentTarget.getParent();
+			if (currentTarget == null)
+				break;
+		}
+	}
+	private boolean isDescendantOf(CraftedElement element, CraftedElement ancestor)
+	{
+		var current = element;
+		while (current != null)
+		{
+			if (current == ancestor)
+				return true;
+			current = current.getParent();
+		}
+		return false;
 	}
 	private void dispatchEnterExit(CraftedElement target, MouseEvent event)
 	{

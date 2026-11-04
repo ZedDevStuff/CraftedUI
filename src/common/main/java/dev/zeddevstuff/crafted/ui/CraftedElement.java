@@ -342,6 +342,18 @@ public abstract class CraftedElement
 	{
 		return layout.contains(x, y);
 	}
+	public int getAncestorRenderOffsetX()
+	{
+		return parent == null ? 0 : parent.getAncestorRenderOffsetX() + parent.getRenderOffsetX();
+	}
+	public int getAncestorRenderOffsetY()
+	{
+		return parent == null ? 0 : parent.getAncestorRenderOffsetY() + parent.getRenderOffsetY();
+	}
+	protected int getRenderOffsetX() { return 0; }
+	protected int getRenderOffsetY() { return 0; }
+	protected float transformChildInputX(float x) { return x; }
+	protected float transformChildInputY(float y) { return y; }
 
 	// Thank you Wulferis for the base method
 	public CraftedElement findTopmostAt(float x, float y)
@@ -349,6 +361,8 @@ public abstract class CraftedElement
 		boolean inside = contains(x, y);
 		if (!inside && overflow.get() != YogaOverflow.VISIBLE)
 			return null;
+		float childX = transformChildInputX(x);
+		float childY = transformChildInputY(y);
 
 		// check each child, starting with the topmost one
 		// don't filter out children that don't receive input events themselves they may still contain children that do
@@ -356,7 +370,7 @@ public abstract class CraftedElement
 		{
 			// recursively search the child's subtree for the topmost input target
 			// this will perform its own bounds check before searching deeper
-			var target = child.findTopmostAt(x, y);
+			var target = child.findTopmostAt(childX, childY);
 
 			// return immediately when a valid target is found
 			// since children are sorted by Z-index, this is the topmost valid target
@@ -491,7 +505,7 @@ public abstract class CraftedElement
 		else if(node.hasNewLayout())
 		{
 			layout = new LayoutResult(this, parent.layout);
-			node.calculateLayout(layout.innerWidth, layout.innerHeight);
+			node.calculateLayout(parent.layout.innerWidth, parent.layout.innerHeight);
 			node.markLayoutSeen();
 		}
 		for(var child : children)

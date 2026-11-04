@@ -38,7 +38,7 @@ public class Box extends CraftedElement
 		{
 			var layout = element.getLayout();
 			if(element.overflow.get() != YogaOverflow.VISIBLE)
-				canvas.beginClip(layout.x, layout.y, layout.width, layout.height);
+				IRenders.beginClip(canvas, element, 0, 0);
 			canvas.drawRect(layout.x, layout.y, layout.width, layout.height, element.color.get());
 		}
 
@@ -46,7 +46,7 @@ public class Box extends CraftedElement
 		public void afterRender(ICanvas canvas, Box element)
 		{
 			if(element.overflow.get() != YogaOverflow.VISIBLE)
-				canvas.endClip();
+				IRenders.endClip(canvas, element, 0, 0);
 		}
 	}
 }
