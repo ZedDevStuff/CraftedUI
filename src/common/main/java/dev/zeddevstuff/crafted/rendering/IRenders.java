@@ -10,6 +10,8 @@ import org.appliedenergistics.yoga.YogaOverflow;
  */
 public interface IRenders<T>
 {
+	default void beginRender(ICanvas canvas, T element) {}
+
 	/**
 	 * Renders the given element to the given canvas.
 	 * @param canvas The canvas to render to.
@@ -28,6 +30,8 @@ public interface IRenders<T>
 
 	@SuppressWarnings("unchecked")
 	default void forceRender(ICanvas canvas, Object element) { render(canvas, (T) element); }
+	@SuppressWarnings("unchecked")
+	default void forceBeginRender(ICanvas canvas, Object element) { beginRender(canvas, (T) element); }
 	@SuppressWarnings("unchecked")
 	default void forceAfterRender(ICanvas canvas, Object element) { afterRender(canvas, (T) element); }
 

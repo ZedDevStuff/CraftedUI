@@ -9,6 +9,7 @@ import dev.zeddevstuff.crafted.parsing.ParsedNode;
 import dev.zeddevstuff.crafted.platform.CanvasImpl;
 import dev.zeddevstuff.crafted.platform.ITexture;
 import dev.zeddevstuff.crafted.platform.TextConverter;
+import dev.zeddevstuff.crafted.rendering.CraftedRenderer;
 import dev.zeddevstuff.crafted.types.Rect;
 import dev.zeddevstuff.crafted.ui.CraftedContext;
 import dev.zeddevstuff.crafted.ui.elements.CraftedRoot;
@@ -24,12 +25,14 @@ public class CraftedScreen extends Screen
 	protected final CanvasImpl canvas;
 	protected final CraftedContext context;
 	protected final CraftedRoot rootElement;
+	protected final CraftedRenderer renderer;
 	public CraftedScreen(CraftedRoot rootElement)
 	{
 		super(TextConverter.toMinecraftText(rootElement.title.get()));
 		this.canvas = new CanvasImpl(Minecraft.getInstance());
 		this.context = rootElement.ctx;
 		this.rootElement = rootElement;
+		this.renderer = new CraftedRenderer(rootElement);
 		context.inputHandler.setRootElement(rootElement);
 		rootElement.refreshLayoutTree();
 	}
@@ -52,7 +55,7 @@ public class CraftedScreen extends Screen
 		super.render(guiGraphics, i, i1, v);
 		canvas.setGraphics(guiGraphics);
 		rootElement.layoutTree(width, height);
-		rootElement.renderTree(canvas);
+		renderer.render(canvas);
 	}
 
 	// I'm never finding a use for this
@@ -65,6 +68,7 @@ public class CraftedScreen extends Screen
 		super.resize(minecraft, width, height);
 		rootElement.width.set(StyleSizeLength.points(width));
 		rootElement.height.set(StyleSizeLength.points(height));
+		rootElement.refreshLayoutTree();
 		rootElement.layoutTree(width, height);
 	}
 

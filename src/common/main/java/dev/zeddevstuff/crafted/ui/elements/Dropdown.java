@@ -4,6 +4,7 @@ import dev.zeddevstuff.crafted.Prop;
 import dev.zeddevstuff.crafted.annotations.DefineElement;
 import dev.zeddevstuff.crafted.input.MouseButton;
 import dev.zeddevstuff.crafted.input.events.ClickEvent;
+import dev.zeddevstuff.crafted.input.events.FocusEvent;
 import dev.zeddevstuff.crafted.platform.ICanvas;
 import dev.zeddevstuff.crafted.rendering.IRenders;
 import dev.zeddevstuff.crafted.types.Color;
@@ -56,11 +57,7 @@ public class Dropdown extends CraftedElement
 		isOpen = !isOpen;
 		if(isOpen)
 		{
-			var layout = getLayout();
-			popup.left.set(StyleLength.points(layout.x));
-			popup.top.set(StyleLength.points(layout.y + layout.height));
-			popup.width.set(StyleSizeLength.points(layout.width));
-			popup.height.set(StyleSizeLength.points(50));
+			setPopupLayout();
 			addChild(popup);
 		}
 		else
@@ -69,10 +66,26 @@ public class Dropdown extends CraftedElement
 		}
 	}
 
+	private void setPopupLayout()
+	{
+		var layout = getLayout();
+		popup.left.set(StyleLength.points(layout.x));
+		popup.top.set(StyleLength.points(layout.y + layout.height));
+		popup.width.set(StyleSizeLength.points(layout.width));
+		popup.height.set(StyleSizeLength.points(50));
+	}
+
 	@Override
 	public boolean receivesInputEvents() { return true; }
 	@Override
 	public boolean isFocusable() { return true; }
+
+	@Override
+	public void handleFocusLost(FocusEvent event)
+	{
+		if(isOpen)
+			togglePopup();
+	}
 
 	@Override
 	public void onClick(ClickEvent event)
@@ -93,6 +106,7 @@ public class Dropdown extends CraftedElement
 		@Override
 		public void render(ICanvas canvas, Dropdown element)
 		{
+			element.setPopupLayout();
 			var layout = element.getLayout();
 			var theme = element.ctx.theme;
 			Color borderColor, backgroundColor, elevationColor;

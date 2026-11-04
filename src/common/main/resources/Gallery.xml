@@ -58,6 +58,6 @@
                 <Box color="info" height="20"><Text color="onInfo">Info</Text></Box>
             </Box>
             </ScrollView>
-        </ScrollView>
+        </ScrollView>-->
     </Box>
 </Crafted>

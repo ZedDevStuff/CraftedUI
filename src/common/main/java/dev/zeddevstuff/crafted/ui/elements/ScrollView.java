@@ -312,12 +312,17 @@ public class ScrollView extends Box
 	public static class ScrollViewRenderer implements IRenders<ScrollView>
 	{
 		@Override
-		public void render(ICanvas canvas, ScrollView element)
+		public void beginRender(ICanvas canvas, ScrollView element)
 		{
 			element.clampScroll();
+			IRenders.beginClip(canvas, element, element.scrollX.get(), element.scrollY.get());
+		}
+
+		@Override
+		public void render(ICanvas canvas, ScrollView element)
+		{
 			var layout = element.getLayout();
 			canvas.drawRect(layout.x, layout.y, layout.width, layout.height, element.color.get());
-			IRenders.beginClip(canvas, element, element.scrollX.get(), element.scrollY.get());
 		}
 
 		@Override

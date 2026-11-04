@@ -34,11 +34,16 @@ public class Box extends CraftedElement
 	public static class BoxRenderer implements IRenders<Box>
 	{
 		@Override
+		public void beginRender(ICanvas canvas, Box element)
+		{
+			if(element.overflow.get() != YogaOverflow.VISIBLE)
+				IRenders.beginClip(canvas, element, 0, 0);
+		}
+
+		@Override
 		public void render(ICanvas canvas, Box element)
 		{
 			var layout = element.getLayout();
-			if(element.overflow.get() != YogaOverflow.VISIBLE)
-				IRenders.beginClip(canvas, element, 0, 0);
 			canvas.drawRect(layout.x, layout.y, layout.width, layout.height, element.color.get());
 		}
 

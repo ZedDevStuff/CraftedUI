@@ -33,23 +33,14 @@ public abstract class CraftedElement
 	protected CraftedElement parent;
 	public CraftedElement getParent() { return parent; }
 	protected final List<CraftedElement> children = new ArrayList<>();
-	private CraftedElement[] sortedChildrenCache = null;
-	private CraftedElement[] getSortedChildrenCache()
+	private long treeVersion;
+	public List<CraftedElement> getChildren() { return Collections.unmodifiableList(children); }
+	public long getTreeVersion() { return treeVersion; }
+	private void markTreeChanged()
 	{
-		if(sortedChildrenCache == null)
-			sortedChildrenCache = children.stream()
-				.sorted(Comparator.<CraftedElement>comparingInt(a -> a.zIndex.get()).reversed())
-					.toArray(CraftedElement[]::new);
-		return sortedChildrenCache;
-	}
-	private CraftedElement[] renderSortedChildrenCache = null;
-	private CraftedElement[] getRenderSortedChildrenCache()
-	{
-		if(renderSortedChildrenCache == null)
-			renderSortedChildrenCache = children.stream()
-				.sorted(Comparator.<CraftedElement>comparingInt(a -> a.zIndex.get()))
-					.toArray(CraftedElement[]::new);
-		return renderSortedChildrenCache;
+		treeVersion++;
+		if(parent != null)
+			parent.markTreeChanged();
 	}
 
 	public final InteractionState state = new InteractionState(INTERNAL_KEY);
@@ -291,8 +282,7 @@ public abstract class CraftedElement
 			this.renderer = null;
 		this.node.setStyle(initLayoutNode(node.getStyle(), attributes));
 		zIndex.addListener((prop, oldValue, newValue) -> {
-			if(parent != null)
-				parent.udpateSortedChildrenCaches();
+			markTreeChanged();
 		});
 	}
 
@@ -367,7 +357,9 @@ public abstract class CraftedElement
 
 		// check each child, starting with the topmost one
 		// don't filter out children that don't receive input events themselves they may still contain children that do
-		for (var child : getSortedChildrenCache())
+		for (var child : children.stream()
+			.sorted(Comparator.<CraftedElement>comparingInt(a -> a.zIndex.get()).reversed())
+			.toArray(CraftedElement[]::new))
 		{
 			// recursively search the child's subtree for the topmost input target
 			// this will perform its own bounds check before searching deeper
@@ -384,18 +376,6 @@ public abstract class CraftedElement
 		// otherwise, return null so the caller can check another child
 		return inside && receivesInputEvents() && !state.isDisabled() ? this : null;
 	}
-	private void udpateSortedChildrenCaches()
-	{
-		sortedChildrenCache = children.stream()
-			.sorted(Comparator.<CraftedElement>comparingInt(a -> a.zIndex.get()).reversed())
-			.toArray(CraftedElement[]::new);
-		renderSortedChildrenCache = children.stream()
-			.sorted(Comparator.<CraftedElement>comparingInt(a -> a.zIndex.get()))
-			.toArray(CraftedElement[]::new);
-		if(parent != null)
-			parent.udpateSortedChildrenCaches();
-	}
-
 	public CraftedElement getElementById(String id)
 	{
 		if(this.id.get().equals(id))
@@ -435,7 +415,7 @@ public abstract class CraftedElement
 		children.add(child);
 		child.parent = this;
 		node.addChildAt(child.node, node.getChildCount());
-		udpateSortedChildrenCaches();
+		markTreeChanged();
 	}
 	public void addChildren(Collection<CraftedElement> children)
 	{
@@ -458,7 +438,7 @@ public abstract class CraftedElement
 		node.removeChildAndInvalidate(child.node);
 		if(child.node.getOwner() == node)
 			child.node.setOwner(null);
-		udpateSortedChildrenCaches();
+		markTreeChanged();
 	}
 	public void removeChildren(Collection<CraftedElement> children)
 	{
@@ -501,7 +481,7 @@ public abstract class CraftedElement
 
 	private void layoutElement()
 	{
-		if(parent == null && node.hasNewLayout())
+		if((parent == null || node.getPositionType() == YogaPositionType.ABSOLUTE) && node.hasNewLayout())
 		{
 			layout = new LayoutResult(this);
 			node.calculateLayout(layout.innerWidth, layout.innerHeight);
@@ -516,21 +496,20 @@ public abstract class CraftedElement
 		for(var child : children)
 			child.layoutElement();
 	}
-	public void renderTree(ICanvas canvas)
+	public void renderSelf(ICanvas canvas)
 	{
-		List<RenderCommand> renderCommands = new ArrayList<>();
-		collectRenderCommands(renderCommands);
-		for(var cmd : renderCommands)
-			cmd.execute(canvas);
+		if(renderer != null)
+			renderer.get().forceRender(canvas, this);
 	}
-	private void collectRenderCommands(List<RenderCommand> list)
+	public void beginRenderSelf(ICanvas canvas)
 	{
 		if(renderer != null)
-			list.add(new RenderCommand(this, RenderCommand.Phase.RENDER));
-		for(var child : getRenderSortedChildrenCache())
-			child.collectRenderCommands(list);
+			renderer.get().forceBeginRender(canvas, this);
+	}
+	public void afterRenderSelf(ICanvas canvas)
+	{
 		if(renderer != null)
-			list.add(new RenderCommand(this, RenderCommand.Phase.AFTER_RENDER));
+			renderer.get().forceAfterRender(canvas, this);
 	}
 
 	/**
@@ -672,28 +651,6 @@ public abstract class CraftedElement
 	}
 	public void onCharTyped(KeyEvent event) {}
 
-
-	private record RenderCommand(CraftedElement element, Phase commandPhase)
-	{
-		public void execute(ICanvas canvas)
-		{
-			switch (commandPhase)
-			{
-				case Phase.RENDER:
-					element.renderer.get().forceRender(canvas, element);
-					break;
-				case Phase.AFTER_RENDER:
-					element.renderer.get().forceAfterRender(canvas, element);
-					break;
-			}
-		}
-
-		public enum Phase
-		{
-			RENDER,
-			AFTER_RENDER
-		}
-	}
 	public static class LayoutResult
 	{
 		public final int width;
