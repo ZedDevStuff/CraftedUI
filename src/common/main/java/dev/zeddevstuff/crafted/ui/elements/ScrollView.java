@@ -3,7 +3,6 @@ package dev.zeddevstuff.crafted.ui.elements;
 import dev.zeddevstuff.crafted.Crafted;
 import dev.zeddevstuff.crafted.Prop;
 import dev.zeddevstuff.crafted.annotations.DefineElement;
-import dev.zeddevstuff.crafted.annotations.Description;
 import dev.zeddevstuff.crafted.parsing.Parsers;
 import dev.zeddevstuff.crafted.platform.ICanvas;
 import dev.zeddevstuff.crafted.input.events.MouseEvent;
@@ -306,10 +305,52 @@ public class ScrollView extends Box
 	public static void register(Crafted crafted)
 	{
 		crafted.elements.registerElement(ScrollView.class, "ScrollView", ScrollView::new);
-		crafted.renderers.registerRenderer(ScrollView.class, "default", new ScrollViewRenderer());
+		crafted.renderers.registerRenderer(ScrollView.class, "default", new DefaultScrollViewRenderer());
+		crafted.renderers.registerRenderer(ScrollView.class, "crafted", new CraftedScrollViewRenderer());
 	}
 
-	public static class ScrollViewRenderer implements IRenders<ScrollView>
+	public static class DefaultScrollViewRenderer implements IRenders<ScrollView>
+	{
+		private static final Color SCROLLBAR_THUMB_COLOR = new Color(192, 192, 192);
+		private static final Color SCROLLBAR_THUMB_SHADOW_COLOR = Color.Gray;
+		@Override
+		public void beginRender(ICanvas canvas, ScrollView element)
+		{
+			element.clampScroll();
+			IRenders.beginClip(canvas, element, element.scrollX.get(), element.scrollY.get());
+		}
+
+		@Override
+		public void render(ICanvas canvas, ScrollView element) { }
+
+		@Override
+		public void afterRender(ICanvas canvas, ScrollView element)
+		{
+			IRenders.endClip(canvas, element, element.scrollX.get(), element.scrollY.get());
+			if(element.horizontalScrollbar.get())
+			{
+				var layout = element.getLayout();
+				int trackWidth = layout.width - (element.verticalScrollbar.get() ? element.scrollbarSize.get() : 0);
+				int thumbWidth = element.horizontalThumbWidth();
+				int thumbX = element.horizontalThumbX();
+				canvas.drawRect(layout.x, layout.y + layout.height - element.scrollbarSize.get(), trackWidth, element.scrollbarSize.get(), Color.Black);
+				canvas.drawRect(thumbX, layout.y + layout.height - element.scrollbarSize.get(), thumbWidth, element.scrollbarSize.get(), SCROLLBAR_THUMB_SHADOW_COLOR);
+				canvas.drawRect(thumbX, layout.y + layout.height - element.scrollbarSize.get() - 1, thumbWidth - 1, element.scrollbarSize.get(), SCROLLBAR_THUMB_COLOR);
+			}
+			if(element.verticalScrollbar.get())
+			{
+				var layout = element.getLayout();
+				int trackHeight = layout.height - (element.horizontalScrollbar.get() ? element.scrollbarSize.get() : 0);
+				int thumbHeight = element.verticalThumbHeight();
+				int thumbY = element.verticalThumbY();
+				canvas.drawRect(layout.x + layout.width - element.scrollbarSize.get(), layout.y, element.scrollbarSize.get(), trackHeight, Color.Black);
+				canvas.drawRect(layout.x + layout.width - element.scrollbarSize.get(), thumbY, element.scrollbarSize.get(), thumbHeight, SCROLLBAR_THUMB_SHADOW_COLOR);
+				canvas.drawRect(layout.x + layout.width - element.scrollbarSize.get(), thumbY, element.scrollbarSize.get() - 1, thumbHeight - 1, SCROLLBAR_THUMB_COLOR);
+			}
+		}
+	}
+
+	public static class CraftedScrollViewRenderer implements IRenders<ScrollView>
 	{
 		@Override
 		public void beginRender(ICanvas canvas, ScrollView element)
