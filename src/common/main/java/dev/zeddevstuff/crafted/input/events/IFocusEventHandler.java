@@ -1,6 +1,8 @@
 package dev.zeddevstuff.crafted.input.events;
 
-public interface IFocusEventHandler extends IUIEventHandler
+import dev.zeddevstuff.crafted.utils.Event;
+
+public interface IFocusEventHandler extends Event.IEventListener<FocusEvent>, IUIEventHandler
 {
 	void onEvent(FocusEvent event);
 }

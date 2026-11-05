@@ -11,6 +11,7 @@ import dev.zeddevstuff.crafted.platform.ICanvas;
 import dev.zeddevstuff.crafted.rendering.IRenders;
 import dev.zeddevstuff.crafted.types.*;
 import dev.zeddevstuff.crafted.ui.elements.CraftedRoot;
+import dev.zeddevstuff.crafted.utils.Event;
 import org.appliedenergistics.yoga.*;
 import org.appliedenergistics.yoga.style.StyleLength;
 import org.appliedenergistics.yoga.style.StyleSizeLength;
@@ -254,21 +255,33 @@ public abstract class CraftedElement
 	public final ProxyProp<StyleSizeLength> maxWidth = registerProp(StyleSizeLength.class, "maxWidth", () -> node.getStyle().getMaxDimension(YogaDimension.WIDTH), node::setMaxWidth, Parsers::parseStyleSizeLength);
 	public final ProxyProp<StyleSizeLength> maxHeight = registerProp(StyleSizeLength.class, "maxHeight", () -> node.getStyle().getMaxDimension(YogaDimension.HEIGHT), node::setMaxHeight, Parsers::parseStyleSizeLength);
 
-	public final Prop<IFocusEventHandler> onFocusGained = registerProp(IFocusEventHandler.class, "onFocusGained", this::getFocusCallback);
-	public final Prop<IFocusEventHandler> onFocusLost = registerProp(IFocusEventHandler.class, "onFocusLost", this::getFocusCallback);
+	public final Event<FocusEvent> focusGained = new Event<>(INTERNAL_KEY, FocusEvent.class);
+	public final Prop<IFocusEventHandler> onFocusGained = registerProp(IFocusEventHandler.class, "onFocusGained", this::parseFocusCallback);
+	public final Event<FocusEvent> focusLost = new Event<>(INTERNAL_KEY, FocusEvent.class);
+	public final Prop<IFocusEventHandler> onFocusLost = registerProp(IFocusEventHandler.class, "onFocusLost", this::parseFocusCallback);
 
-	public final Prop<IMouseEventHandler> onMouseMove = registerProp(IMouseEventHandler.class, "onMouseMove", this::getMouseCallback);
-	public final Prop<IMouseEventHandler> onMouseScroll = registerProp(IMouseEventHandler.class, "onMouseScroll", this::getMouseCallback);
-	public final Prop<IMouseEventHandler> onMouseEnter = registerProp(IMouseEventHandler.class, "onMouseEnter", this::getMouseCallback);
-	public final Prop<IMouseEventHandler> onMouseExit = registerProp(IMouseEventHandler.class, "onMouseExit", this::getMouseCallback);
-	public final Prop<IMouseEventHandler> onMousePress = registerProp(IMouseEventHandler.class, "onMousePress", this::getMouseCallback);
-	public final Prop<IMouseEventHandler> onMouseRelease = registerProp(IMouseEventHandler.class, "onMouseRelease", this::getMouseCallback);
+	public final Event<MouseEvent> mouseMove = new Event<>(INTERNAL_KEY, MouseEvent.class);
+	public final Prop<IMouseEventHandler> onMouseMove = registerProp(IMouseEventHandler.class, "onMouseMove", this::parseMouseCallback);
+	public final Event<MouseEvent> mouseScroll = new Event<>(INTERNAL_KEY, MouseEvent.class);
+	public final Prop<IMouseEventHandler> onMouseScroll = registerProp(IMouseEventHandler.class, "onMouseScroll", this::parseMouseCallback);
+	public final Event<MouseEvent> mouseEnter = new Event<>(INTERNAL_KEY, MouseEvent.class);
+	public final Prop<IMouseEventHandler> onMouseEnter = registerProp(IMouseEventHandler.class, "onMouseEnter", this::parseMouseCallback);
+	public final Event<MouseEvent> mouseExit = new Event<>(INTERNAL_KEY, MouseEvent.class);
+	public final Prop<IMouseEventHandler> onMouseExit = registerProp(IMouseEventHandler.class, "onMouseExit", this::parseMouseCallback);
+	public final Event<MouseEvent> mousePress = new Event<>(INTERNAL_KEY, MouseEvent.class);
+	public final Prop<IMouseEventHandler> onMousePress = registerProp(IMouseEventHandler.class, "onMousePress", this::parseMouseCallback);
+	public final Event<MouseEvent> mouseRelease = new Event<>(INTERNAL_KEY, MouseEvent.class);
+	public final Prop<IMouseEventHandler> onMouseRelease = registerProp(IMouseEventHandler.class, "onMouseRelease", this::parseMouseCallback);
 
-	public final Prop<IClickEventHandler> onClick = registerProp(IClickEventHandler.class, "onClick", this::getClickCallback);
+	public final Event<ClickEvent> click = new Event<>(INTERNAL_KEY, ClickEvent.class);
+	public final Prop<IClickEventHandler> onClick = registerProp(IClickEventHandler.class, "onClick", this::parseClickCallback);
 
-	public final Prop<IKeyEventHandler> onKeyPress = registerProp(IKeyEventHandler.class, "onKeyPress", this::getKeyCallback);
-	public final Prop<IKeyEventHandler> onKeyRelease = registerProp(IKeyEventHandler.class, "onKeyRelease", this::getKeyCallback);
-	public final Prop<IKeyEventHandler> onKeyType = registerProp(IKeyEventHandler.class, "onKeyType", this::getKeyCallback);
+	public final Event<KeyEvent> keyPress = new Event<>(INTERNAL_KEY, KeyEvent.class);
+	public final Prop<IKeyEventHandler> onKeyPress = registerProp(IKeyEventHandler.class, "onKeyPress", this::parseKeyCallback);
+	public final Event<KeyEvent> keyRelease = new Event<>(INTERNAL_KEY, KeyEvent.class);
+	public final Prop<IKeyEventHandler> onKeyRelease = registerProp(IKeyEventHandler.class, "onKeyRelease", this::parseKeyCallback);
+	public final Event<KeyEvent> keyType = new Event<>(INTERNAL_KEY, KeyEvent.class);
+	public final Prop<IKeyEventHandler> onKeyType = registerProp(IKeyEventHandler.class, "onKeyType", this::parseKeyCallback);
 
 	@Description("The renderer to use for this element.")
 	public final Prop<IRenders<?>> renderer;
@@ -284,6 +297,42 @@ public abstract class CraftedElement
 		zIndex.addListener((prop, oldValue, newValue) -> {
 			markTreeChanged();
 		});
+		onFocusGained.addListener((prop, oldValue, newValue) -> {
+			handleCallbackChange(focusGained, oldValue, newValue);
+		});
+		onFocusLost.addListener((prop, oldValue, newValue) -> {
+			handleCallbackChange(focusLost, oldValue, newValue);
+		});
+		onMouseMove.addListener((prop, oldValue, newValue) -> {
+			handleCallbackChange(mouseMove, oldValue, newValue);
+		});
+		onMouseScroll.addListener((prop, oldValue, newValue) -> {
+			handleCallbackChange(mouseScroll, oldValue, newValue);
+		});
+		onMouseEnter.addListener((prop, oldValue, newValue) -> {
+			handleCallbackChange(mouseEnter, oldValue, newValue);
+		});
+		onMouseExit.addListener((prop, oldValue, newValue) -> {
+			handleCallbackChange(mouseExit, oldValue, newValue);
+		});
+		onMousePress.addListener((prop, oldValue, newValue) -> {
+			handleCallbackChange(mousePress, oldValue, newValue);
+		});
+		onMouseRelease.addListener((prop, oldValue, newValue) -> {
+			handleCallbackChange(mouseRelease, oldValue, newValue);
+		});
+		onClick.addListener((prop, oldValue, newValue) -> {
+			handleCallbackChange(click, oldValue, newValue);
+		});
+		onKeyPress.addListener((prop, oldValue, newValue) -> {
+			handleCallbackChange(keyPress, oldValue, newValue);
+		});
+		onKeyRelease.addListener((prop, oldValue, newValue) -> {
+			handleCallbackChange(keyRelease, oldValue, newValue);
+		});
+		onKeyType.addListener((prop, oldValue, newValue) -> {
+			handleCallbackChange(keyType, oldValue, newValue);
+		});
 	}
 
 	void parseAttributes(Map<String, String> attributes)
@@ -296,19 +345,28 @@ public abstract class CraftedElement
 		}
 	}
 
-	IFocusEventHandler getFocusCallback(String name, IFocusEventHandler defaultValue)
+	<TEvent extends UIEvent, THandler extends Event.IEventListener<TEvent>> void handleCallbackChange(Event<TEvent> event, THandler oldValue, THandler newValue)
+	{
+		if(oldValue == newValue)
+			return;
+		if(oldValue != null)
+			event.removeListener(oldValue);
+		event.addListener(newValue);
+	}
+
+	IFocusEventHandler parseFocusCallback(String name, IFocusEventHandler defaultValue)
 	{
 		return ctx.getCallback(IFocusEventHandler.class, name);
 	}
-	IMouseEventHandler getMouseCallback(String name, IMouseEventHandler defaultValue)
+	IMouseEventHandler parseMouseCallback(String name, IMouseEventHandler defaultValue)
 	{
 		return ctx.getCallback(IMouseEventHandler.class, name);
 	}
-	IClickEventHandler getClickCallback(String name, IClickEventHandler defaultValue)
+	IClickEventHandler parseClickCallback(String name, IClickEventHandler defaultValue)
 	{
 		return ctx.getCallback(IClickEventHandler.class, name);
 	}
-	IKeyEventHandler getKeyCallback(String name, IKeyEventHandler defaultValue)
+	IKeyEventHandler parseKeyCallback(String name, IKeyEventHandler defaultValue)
 	{
 		return ctx.getCallback(IKeyEventHandler.class, name);
 	}
@@ -524,9 +582,9 @@ public abstract class CraftedElement
 		if(!receivesInputEvents())
 			return;
 		onFocusGained(event);
-		var callback = onFocusGained.get();
-		if(callback != null)
-			callback.onEvent(event);
+		if(event.isImmediatePropagationStopped())
+			return;
+		focusGained.fire(INTERNAL_KEY, event);
 	}
 	public void onFocusGained(FocusEvent event) {}
 
@@ -535,9 +593,9 @@ public abstract class CraftedElement
 		if(!receivesInputEvents())
 			return;
 		onFocusLost(event);
-		var callback = onFocusLost.get();
-		if(callback != null)
-			callback.onEvent(event);
+		if(event.isImmediatePropagationStopped())
+			return;
+		focusLost.fire(INTERNAL_KEY, event);
 	}
 	public void onFocusLost(FocusEvent event) {}
 
@@ -546,9 +604,9 @@ public abstract class CraftedElement
 		if(!receivesInputEvents())
 			return;
 		onMouseEnter(event);
-		var callback = onMouseEnter.get();
-		if(callback != null)
-			callback.onEvent(event);
+		if(event.isImmediatePropagationStopped())
+			return;
+		mouseEnter.fire(INTERNAL_KEY, event);
 	}
 	public void onMouseEnter(MouseEvent event) {}
 
@@ -557,9 +615,9 @@ public abstract class CraftedElement
 		if(!receivesInputEvents())
 			return;
 		onMouseExit(event);
-		var callback = onMouseExit.get();
-		if(callback != null)
-			callback.onEvent(event);
+		if(event.isImmediatePropagationStopped())
+			return;
+		mouseExit.fire(INTERNAL_KEY, event);
 	}
 	public void onMouseExit(MouseEvent event) {}
 
@@ -568,9 +626,9 @@ public abstract class CraftedElement
 		if(!receivesInputEvents())
 			return;
 		onMouseMove(event);
-		var callback = onMouseMove.get();
-		if(callback != null)
-			callback.onEvent(event);
+		if(event.isImmediatePropagationStopped())
+			return;
+		mouseMove.fire(INTERNAL_KEY, event);
 	}
 	public void onMouseMove(MouseEvent event) {}
 
@@ -579,9 +637,9 @@ public abstract class CraftedElement
 		if(!receivesInputEvents())
 			return;
 		onMouseScroll(event);
-		var callback = onMouseScroll.get();
-		if(callback != null)
-			callback.onEvent(event);
+		if(event.isImmediatePropagationStopped())
+			return;
+		mouseScroll.fire(INTERNAL_KEY, event);
 	}
 	public void onMouseScroll(MouseEvent event) {}
 
@@ -590,9 +648,9 @@ public abstract class CraftedElement
 		if(!receivesInputEvents())
 			return;
 		onMousePress(event);
-		var callback = onMousePress.get();
-		if(callback != null)
-			callback.onEvent(event);
+		if(event.isImmediatePropagationStopped())
+			return;
+		mousePress.fire(INTERNAL_KEY, event);
 	}
 	public void onMousePress(MouseEvent event) {}
 
@@ -601,9 +659,9 @@ public abstract class CraftedElement
 		if(!receivesInputEvents())
 			return;
 		onMouseRelease(event);
-		var callback = onMouseRelease.get();
-		if(callback != null)
-			callback.onEvent(event);
+		if(event.isImmediatePropagationStopped())
+			return;
+		mouseRelease.fire(INTERNAL_KEY, event);
 	}
 	public void onMouseRelease(MouseEvent event) {}
 
@@ -612,9 +670,9 @@ public abstract class CraftedElement
 		if(!receivesInputEvents())
 			return;
 		onClick(event);
-		var callback = onClick.get();
-		if(callback != null)
-			callback.onEvent(event);
+		if(event.isImmediatePropagationStopped())
+			return;
+		click.fire(INTERNAL_KEY, event);
 	}
 	public void onClick(ClickEvent event) {}
 
@@ -623,9 +681,9 @@ public abstract class CraftedElement
 		if(!receivesInputEvents())
 			return;
 		onKeyPress(event);
-		var callback = onKeyPress.get();
-		if(callback != null)
-			callback.onEvent(event);
+		if(event.isImmediatePropagationStopped())
+			return;
+		keyPress.fire(INTERNAL_KEY, event);
 	}
 	public void onKeyPress(KeyEvent event) {}
 
@@ -634,9 +692,9 @@ public abstract class CraftedElement
 		if(!receivesInputEvents())
 			return;
 		onKeyRelease(event);
-		var callback = onKeyRelease.get();
-		if(callback != null)
-			callback.onEvent(event);
+		if(event.isImmediatePropagationStopped())
+			return;
+		keyRelease.fire(INTERNAL_KEY, event);
 	}
 	public void onKeyRelease(KeyEvent event) {}
 
@@ -645,9 +703,9 @@ public abstract class CraftedElement
 		if(!receivesInputEvents())
 			return;
 		onCharTyped(event);
-		var callback = onKeyType.get();
-		if(callback != null)
-			callback.onEvent(event);
+		if(event.isImmediatePropagationStopped())
+			return;
+		keyType.fire(INTERNAL_KEY, event);
 	}
 	public void onCharTyped(KeyEvent event) {}
 

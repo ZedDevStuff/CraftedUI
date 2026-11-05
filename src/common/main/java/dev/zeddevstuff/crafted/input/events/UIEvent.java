@@ -21,6 +21,9 @@ public abstract class UIEvent
 	private boolean propagationStopped;
 	public boolean isPropagationStopped() { return propagationStopped; }
 	public void stopPropagation() { propagationStopped = true; }
+	private boolean immediatePropagationStopped;
+	public boolean isImmediatePropagationStopped() { return immediatePropagationStopped; }
+	public void stopImmediatePropagation() { immediatePropagationStopped = true; }
 
 	public UIEvent(CraftedElement target)
 	{

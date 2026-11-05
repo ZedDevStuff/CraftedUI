@@ -9,6 +9,7 @@ public final class TypedList<T> extends AbstractList<T>
 {
 	private final Class<T> elementType;
 	private final ArrayList<T> values = new ArrayList<>();
+	private final ArrayList<IValuesChangeListener<T>> listeners = new ArrayList<>();
 
 	public TypedList(Class<T> elementType)
 	{
@@ -53,11 +54,26 @@ public final class TypedList<T> extends AbstractList<T>
 		return values.set(index, value);
 	}
 
+	public void addChangeListener(IValuesChangeListener<T> listener)
+	{
+		listeners.add(listener);
+	}
+
+	public void removeChangeListener(IValuesChangeListener<T> listener)
+	{
+		listeners.remove(listener);
+	}
+
 	private void validate(T value)
 	{
 		if(value != null && !elementType.isInstance(value))
 			throw new IllegalArgumentException(
 				"Expected " + elementType.getName() + ", got " + value.getClass().getName()
 			);
+	}
+
+	public interface IValuesChangeListener<T>
+	{
+		void onValuesChanged();
 	}
 }
