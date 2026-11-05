@@ -12,6 +12,7 @@ import dev.zeddevstuff.crafted.rendering.IRenders;
 import dev.zeddevstuff.crafted.rendering.IRendersType;
 import dev.zeddevstuff.crafted.types.*;
 import dev.zeddevstuff.crafted.ui.elements.CraftedRoot;
+import dev.zeddevstuff.crafted.ui.elements.ScrollView;
 import dev.zeddevstuff.crafted.utils.Event;
 import org.appliedenergistics.yoga.*;
 import org.appliedenergistics.yoga.style.StyleLength;
@@ -435,6 +436,23 @@ public abstract class CraftedElement
 		// otherwise, return null so the caller can check another child
 		return inside && receivesInputEvents() && !state.isDisabled() ? this : null;
 	}
+	public boolean isAncestorOf(CraftedElement element)
+	{
+		if(element == null)
+			return false;
+		if(element.parent == this)
+			return true;
+		return element.parent != null && isAncestorOf(element.parent);
+	}
+	public boolean isDescendantOf(CraftedElement element)
+	{
+		if(element == null)
+			return false;
+		if(parent == element)
+			return true;
+		return parent != null && parent.isDescendantOf(element);
+	}
+
 	public CraftedElement getElementById(String id)
 	{
 		if(this.id.get().equals(id))

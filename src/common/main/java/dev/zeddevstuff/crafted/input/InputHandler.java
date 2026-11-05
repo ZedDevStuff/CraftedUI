@@ -1,9 +1,6 @@
 package dev.zeddevstuff.crafted.input;
 
-import dev.zeddevstuff.crafted.input.events.ClickEvent;
-import dev.zeddevstuff.crafted.input.events.FocusEvent;
-import dev.zeddevstuff.crafted.input.events.KeyEvent;
-import dev.zeddevstuff.crafted.input.events.MouseEvent;
+import dev.zeddevstuff.crafted.input.events.*;
 import dev.zeddevstuff.crafted.ui.CraftedElement;
 
 public class InputHandler
@@ -69,7 +66,7 @@ public class InputHandler
 		return alignedBest != null ? alignedBest : fallbackBest;
 	}
 
-	public void setFocus(CraftedElement newFocus)
+	public void setFocus(CraftedElement newFocus, UIEvent source)
 	{
 		if (newFocus == focusedElement)
 			return;
@@ -80,25 +77,25 @@ public class InputHandler
 		if (previous != null)
 		{
 			previous.state.set(InteractionState.FOCUSED, false);
-			previous.handleFocusLost(FocusEvent.lost(previous, newFocus));
+			previous.handleFocusLost(FocusEvent.lost(previous, newFocus, source));
 		}
 		focusedElement = newFocus;
 		if (newFocus != null)
 		{
 			newFocus.state.set(InteractionState.FOCUSED, true);
-			newFocus.handleFocusGained(FocusEvent.gained(newFocus, previous));
+			newFocus.handleFocusGained(FocusEvent.gained(newFocus, previous, source));
 			for (var ancestor = newFocus.getParent(); ancestor != null; ancestor = ancestor.getParent())
 				ancestor.scrollIntoView(newFocus);
 		}
 	}
 
-	private void moveFocus(boolean forward)
+	private void moveFocus(boolean forward, UIEvent source)
 	{
 		var elements = focusableElements();
-		if (elements.length == 0) { setFocus(null); return; }
+		if (elements.length == 0) { setFocus(null, null); return; }
 		if (focusedElement == null)
 		{
-			setFocus(forward ? elements[0] : elements[elements.length - 1]);
+			setFocus(forward ? elements[0] : elements[elements.length - 1], source);
 			return;
 		}
 		int index = -1;
@@ -106,10 +103,10 @@ public class InputHandler
 			if (elements[i] == focusedElement) { index = i; break; }
 		if (index == -1)
 		{
-			setFocus(forward ? elements[0] : elements[elements.length - 1]);
+			setFocus(forward ? elements[0] : elements[elements.length - 1], source);
 			return;
 		}
-		setFocus(elements[(index + (forward ? 1 : elements.length - 1)) % elements.length]);
+		setFocus(elements[(index + (forward ? 1 : elements.length - 1)) % elements.length], source);
 	}
 
 	public void handleMouseMoved(float x, float y)
@@ -214,8 +211,8 @@ public class InputHandler
 			pressedButton = button;
 			target.state.set(InteractionState.PRESSED, true);
 			target.state.set(InteractionState.ARMED, true);
-			setFocus(target.isFocusable() ? target : null);
 			var event = MouseEvent.press(target, x, y, button);
+			setFocus(target.isFocusable() ? target : null, event);
 			var currentTarget = target;
 			while(!event.isPropagationStopped())
 			{
@@ -230,7 +227,7 @@ public class InputHandler
 		{
 			pressedElement = null;
 			pressedButton = null;
-			setFocus(null);
+			setFocus(null, MouseEvent.press(null, x, y, button));
 		}
 	}
 	public void handleMouseReleased(float x, float y, MouseButton button)
@@ -280,15 +277,15 @@ public class InputHandler
 		}
 
 		if (keyCode == ImportantKeys.TAB)
-			moveFocus(!modifiers.shift());
+			moveFocus(!modifiers.shift(), KeyEvent.press(focusedElement, keyCode, scanCode, (char) 0, modifiers));
 		else if(keyCode == ImportantKeys.UP)
-			setFocus(directionalTarget(focusedElement, 0, -1));
+			setFocus(directionalTarget(focusedElement, 0, -1), KeyEvent.press(focusedElement, keyCode, scanCode, (char) 0, modifiers));
 		else if(keyCode == ImportantKeys.DOWN)
-			setFocus(directionalTarget(focusedElement, 0, 1));
+			setFocus(directionalTarget(focusedElement, 0, 1), KeyEvent.press(focusedElement, keyCode, scanCode, (char) 0, modifiers));
 		else if(keyCode == ImportantKeys.LEFT)
-			setFocus(directionalTarget(focusedElement, -1, 0));
+			setFocus(directionalTarget(focusedElement, -1, 0), KeyEvent.press(focusedElement, keyCode, scanCode, (char) 0, modifiers));
 		else if(keyCode == ImportantKeys.RIGHT)
-			setFocus(directionalTarget(focusedElement, 1, 0));
+			setFocus(directionalTarget(focusedElement, 1, 0), KeyEvent.press(focusedElement, keyCode, scanCode, (char) 0, modifiers));
 		else if (focusedElement != null && (keyCode == ImportantKeys.ENTER || keyCode == ImportantKeys.SPACE))
 			focusedElement.handleClick(new ClickEvent(focusedElement, ClickEvent.Source.KEYBOARD, 0, 0, null));
 	}

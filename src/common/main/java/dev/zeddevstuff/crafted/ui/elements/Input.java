@@ -118,7 +118,7 @@ public class Input extends CraftedElement
 		if(event.keyCode == TAB && shouldConsume)
             text.insert("    ");
         if(event.keyCode == ENTER && !event.modifiers.shift())
-            ctx.inputHandler.setFocus(null);
+            ctx.inputHandler.setFocus(null, event);
         else if(event.keyCode == BACKSPACE)
             text.delete(true);
         else if(event.keyCode == DELETE)
@@ -191,7 +191,7 @@ public class Input extends CraftedElement
         if(handler != null)
             handler.onEvent(new SubmitEvent(this, event));
         if(!(event instanceof FocusEvent))
-            ctx.inputHandler.setFocus(null);
+            ctx.inputHandler.setFocus(null, event);
         text.clearDirty();
     }
 

@@ -7,8 +7,9 @@ public class FocusEvent extends UIEvent
 	public final Type type;
 	public final CraftedElement newFocus;
 	public final CraftedElement previousFocus;
+	public final UIEvent source;
 
-	private FocusEvent(CraftedElement target, Type type, CraftedElement other)
+	private FocusEvent(CraftedElement target, Type type, CraftedElement other, UIEvent source)
 	{
 		super(target);
 		this.type = type;
@@ -22,15 +23,16 @@ public class FocusEvent extends UIEvent
 			this.newFocus = other;
 			this.previousFocus = target;
 		}
+		this.source = source;
 	}
 
-	public static FocusEvent gained(CraftedElement target, CraftedElement previousFocus)
+	public static FocusEvent gained(CraftedElement target, CraftedElement previousFocus, UIEvent source)
 	{
-		return new FocusEvent(target, Type.GAINED, previousFocus);
+		return new FocusEvent(target, Type.GAINED, previousFocus, source);
 	}
-	public static FocusEvent lost(CraftedElement target, CraftedElement previousFocus)
+	public static FocusEvent lost(CraftedElement target, CraftedElement previousFocus, UIEvent source)
 	{
-		return new FocusEvent(target, Type.LOST, previousFocus);
+		return new FocusEvent(target, Type.LOST, previousFocus, source);
 	}
 
 	public enum Type
