@@ -92,7 +92,7 @@ public class InputHandler
 	private void moveFocus(boolean forward, UIEvent source)
 	{
 		var elements = focusableElements();
-		if (elements.length == 0) { setFocus(null, null); return; }
+		if (elements.length == 0) { setFocus(null, source); return; }
 		if (focusedElement == null)
 		{
 			setFocus(forward ? elements[0] : elements[elements.length - 1], source);
