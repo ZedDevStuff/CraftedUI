@@ -2,7 +2,6 @@ package dev.zeddevstuff.crafted.ui;
 
 import dev.zeddevstuff.crafted.Crafted;
 import dev.zeddevstuff.crafted.input.InputHandler;
-import dev.zeddevstuff.crafted.input.events.IUIEventHandler;
 import dev.zeddevstuff.crafted.types.ColorTheme;
 import dev.zeddevstuff.crafted.utils.Typed;
 
@@ -17,7 +16,7 @@ public class CraftedContext
 {
 	public final Crafted crafted;
 	public final InputHandler inputHandler = new InputHandler();
-	private final HashMap<String, IUIEventHandler> callbacks = new HashMap<>();
+	private final HashMap<String, Object> callbacks = new HashMap<>();
 	private final HashMap<String, Typed<?>> vars = new HashMap<>();
 	public ColorTheme theme = ColorTheme.BLUE;
 	/**
@@ -34,25 +33,20 @@ public class CraftedContext
 		this.crafted = crafted;
 	}
 
-	public <T extends IUIEventHandler> void registerCallback(String name, T callback)
+	public <T> void registerCallback(Class<T> type, String name, T callback)
 	{
-		callbacks.put(name, callback);
-	}
-	public <T extends IUIEventHandler> void registerCallback(Class<T> type, String name, T callback)
-	{
-		callbacks.put(name, callback);
+		callbacks.put(name, type.cast(callback));
 	}
 	public boolean unregisterCallback(String name)
 	{
 		return callbacks.remove(name) != null;
 	}
-	@SuppressWarnings("unchecked")
-	public <T extends IUIEventHandler> T getCallback(Class<T> type, String name)
+	public <T> T getCallback(Class<T> type, String name)
 	{
-		var result = callbacks.get(name);
-		if (result != null && !type.isAssignableFrom(result.getClass()))
-			return null;
-		return (T) result;
+		var callback = callbacks.get(name);
+		return callback == null
+			? null
+			: type.cast(callback);
 	}
 
 	public void setVar(String name, Typed<?> value)
