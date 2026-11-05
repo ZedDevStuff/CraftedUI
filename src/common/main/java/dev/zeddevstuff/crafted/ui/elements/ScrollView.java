@@ -335,7 +335,7 @@ public class ScrollView extends Box
 				int thumbX = element.horizontalThumbX();
 				canvas.drawRect(layout.x, layout.y + layout.height - element.scrollbarSize.get(), trackWidth, element.scrollbarSize.get(), Color.Black);
 				canvas.drawRect(thumbX, layout.y + layout.height - element.scrollbarSize.get(), thumbWidth, element.scrollbarSize.get(), SCROLLBAR_THUMB_SHADOW_COLOR);
-				canvas.drawRect(thumbX, layout.y + layout.height - element.scrollbarSize.get() - 1, thumbWidth - 1, element.scrollbarSize.get(), SCROLLBAR_THUMB_COLOR);
+				canvas.drawRect(thumbX, layout.y + layout.height - element.scrollbarSize.get(), thumbWidth - 1, element.scrollbarSize.get() - 1, SCROLLBAR_THUMB_COLOR);
 			}
 			if(element.verticalScrollbar.get())
 			{
