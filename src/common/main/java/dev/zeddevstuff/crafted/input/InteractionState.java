@@ -26,6 +26,7 @@ public class InteractionState
     public boolean isFocused()  { return has(FOCUSED); }
     public boolean isDisabled() { return has(DISABLED); }
     public boolean isActive()   { return has(PRESSED | ARMED); } // visual "pressed" feedback
+    public boolean isHoveredOrFocused() { return has(HOVERED | FOCUSED); } // visual "hovered" feedback
     void set(int state, boolean on) { flags = on ? flags | state : flags & ~state; }
     // Just so the disabled prop can bind to this
     public void set(Object key, int state, boolean on) { if(this.key == key) set(state, on); }

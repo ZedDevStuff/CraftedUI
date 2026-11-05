@@ -153,7 +153,7 @@ public class Button extends CraftedElement
 				case "secondary" -> {
 					borderColor = element.state.isDisabled()
 						? theme.disabled()
-						: (element.state.isFocused() || element.state.isHovered())
+						: element.state.isHoveredOrFocused()
 							? ColorUtils.bestContrast(theme.onSecondary(), Color.White, Color.Black)
 							: theme.onSecondary();
 					backgroundColor = theme.secondary();
@@ -162,7 +162,7 @@ public class Button extends CraftedElement
 				case "error" -> {
 					borderColor = element.state.isDisabled()
 						? theme.disabled()
-						: (element.state.isFocused() || element.state.isHovered())
+						: element.state.isHoveredOrFocused()
 							? ColorUtils.bestContrast(theme.onError(), Color.White, Color.Black)
 							: theme.onError();
 					backgroundColor = theme.error();
@@ -171,7 +171,7 @@ public class Button extends CraftedElement
 				case "warning" -> {
 					borderColor = element.state.isDisabled()
 						? theme.disabled()
-						: (element.state.isFocused() || element.state.isHovered())
+						: element.state.isHoveredOrFocused()
 							? ColorUtils.bestContrast(theme.onWarning(), Color.White, Color.Black)
 							: theme.onWarning();
 					backgroundColor = theme.warning();
@@ -180,18 +180,27 @@ public class Button extends CraftedElement
 				case "success" -> {
 					borderColor = element.state.isDisabled()
 						? theme.disabled()
-						: (element.state.isFocused() || element.state.isHovered())
+						: element.state.isHoveredOrFocused()
 							? ColorUtils.bestContrast(theme.onSuccess(), Color.White, Color.Black)
 							: theme.onSuccess();
 					backgroundColor = theme.success();
 					elevationColor = ColorUtils.adjustLightness(theme.success(), -0.15f);
 				}
+				case "info" -> {
+					borderColor = element.state.isDisabled()
+						? theme.disabled()
+						: element.state.isHoveredOrFocused()
+							? ColorUtils.bestContrast(theme.onInfo(), Color.White, Color.Black)
+							: theme.onInfo();
+					backgroundColor = theme.info();
+					elevationColor = ColorUtils.adjustLightness(theme.info(), -0.15f);
+				}
 				default -> {
 					borderColor = element.state.isDisabled()
 						? theme.disabled()
-						: (element.state.isFocused() || element.state.isHovered())
-						? ColorUtils.bestContrast(theme.onPrimary(), Color.White, Color.Black)
-						: theme.onPrimary();
+						: element.state.isHoveredOrFocused()
+							? ColorUtils.bestContrast(theme.onPrimary(), Color.White, Color.Black)
+							: theme.onPrimary();
 					backgroundColor = theme.primary();
 					elevationColor = ColorUtils.adjustLightness(theme.primary(), -0.15f);
 				}

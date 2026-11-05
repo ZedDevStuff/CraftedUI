@@ -26,7 +26,8 @@
             <Checkbox renderer="crafted" size="20,20" indeterminate="true" style="error" />
             <Checkbox renderer="crafted" size="20,20" indeterminate="true" style="warning" />
             <Checkbox renderer="crafted" size="20,20" indeterminate="true" style="success" />
-            <Dropdown options="testOptions" size="50,20" />
+            <Dropdown options="testOptions" size="100,20" />
+            <Dropdown renderer="crafted" options="testOptions" size="100,20" />
         </Box>
         <ScrollView height="200" alignSelf="stretch" horizontalScrollbar="false">
             <Text color="onBackground" margin="2">Misc</Text>

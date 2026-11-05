@@ -99,7 +99,7 @@ public class Checkbox extends CraftedElement
 		public void render(ICanvas canvas, Checkbox element)
 		{
 			var layout = element.getLayout();
-			if(element.state.isHovered() || element.state.isFocused() && !element.state.isDisabled())
+			if(element.state.isHoveredOrFocused() && !element.state.isDisabled())
 			{
 				if(element.checked.get() != null)
 				{
@@ -146,15 +146,15 @@ public class Checkbox extends CraftedElement
 				case "secondary" -> {
 					borderColor = element.state.isDisabled()
 						? theme.disabled()
-						: (element.state.isFocused() || element.state.isHovered())
-						? ColorUtils.bestContrast(theme.onSecondary(), Color.White, Color.Black)
-						: theme.onSecondary();
+						: element.state.isHoveredOrFocused()
+							? ColorUtils.bestContrast(theme.onSecondary(), Color.White, Color.Black)
+							: theme.onSecondary();
 					backgroundColor = theme.secondary();
 				}
 				case "error" -> {
 					borderColor = element.state.isDisabled()
 						? theme.disabled()
-						: (element.state.isFocused() || element.state.isHovered())
+						: element.state.isHoveredOrFocused()
 							? ColorUtils.bestContrast(theme.onError(), Color.White, Color.Black)
 							: theme.onError();
 					backgroundColor = theme.error();
@@ -162,7 +162,7 @@ public class Checkbox extends CraftedElement
 				case "warning" -> {
 					borderColor = element.state.isDisabled()
 						? theme.disabled()
-						: (element.state.isFocused() || element.state.isHovered())
+						: element.state.isHoveredOrFocused()
 							? ColorUtils.bestContrast(theme.onWarning(), Color.White, Color.Black)
 							: theme.onWarning();
 					backgroundColor = theme.warning();
@@ -170,7 +170,7 @@ public class Checkbox extends CraftedElement
 				case "success" -> {
 					borderColor = element.state.isDisabled()
 						? theme.disabled()
-						: (element.state.isFocused() || element.state.isHovered())
+						: element.state.isHoveredOrFocused()
 							? ColorUtils.bestContrast(theme.onSuccess(), Color.White, Color.Black)
 							: theme.onSuccess();
 					backgroundColor = theme.success();
@@ -178,9 +178,9 @@ public class Checkbox extends CraftedElement
 				default -> {
 					borderColor = element.state.isDisabled()
 						? theme.disabled()
-						: (element.state.isFocused() || element.state.isHovered())
-						? ColorUtils.bestContrast(theme.onPrimary(), Color.White, Color.Black)
-						: theme.onPrimary();
+						: element.state.isHoveredOrFocused()
+							? ColorUtils.bestContrast(theme.onPrimary(), Color.White, Color.Black)
+							: theme.onPrimary();
 					backgroundColor = theme.primary();
 				}
 			}

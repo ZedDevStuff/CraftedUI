@@ -224,7 +224,7 @@ public class Input extends CraftedElement
             if(element.font.get() == null)
                 return;
             var layout = element.getLayout();
-            if(element.state.isHovered() || element.state.isActive() || element.state.isFocused())
+            if(element.state.isHoveredOrFocused() || element.state.isActive())
                 canvas.drawTexture(textfieldHighlightedTexture, Rect.posAndSize(layout.x, layout.y, layout.width, layout.height));
             else
                 canvas.drawTexture(textfieldTexture, Rect.posAndSize(layout.x, layout.y, layout.width, layout.height));

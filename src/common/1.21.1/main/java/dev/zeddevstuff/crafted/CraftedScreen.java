@@ -3,6 +3,7 @@ package dev.zeddevstuff.crafted;
 import dev.zeddevstuff.crafted.input.ImportantKeys;
 import dev.zeddevstuff.crafted.input.KeyModifiers;
 import dev.zeddevstuff.crafted.input.MouseButton;
+import dev.zeddevstuff.crafted.input.events.KeyEvent;
 import dev.zeddevstuff.crafted.parsing.CraftedXmlParser;
 import dev.zeddevstuff.crafted.parsing.DocumentBuilder;
 import dev.zeddevstuff.crafted.parsing.ParsedNode;
@@ -13,6 +14,7 @@ import dev.zeddevstuff.crafted.rendering.CraftedRenderer;
 import dev.zeddevstuff.crafted.types.Rect;
 import dev.zeddevstuff.crafted.ui.CraftedContext;
 import dev.zeddevstuff.crafted.ui.elements.CraftedRoot;
+import dev.zeddevstuff.profiling.Timer;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.screens.Screen;
@@ -48,14 +50,17 @@ public class CraftedScreen extends Screen
 	{
 		this(ctx, CraftedXmlParser.parse(xml));
 	}
-	ITexture testTexture;
+	//Timer timer = new Timer();
 	@Override
 	public void render(GuiGraphics guiGraphics, int i, int i1, float v)
 	{
+//      timer.start();
 		super.render(guiGraphics, i, i1, v);
 		canvas.setGraphics(guiGraphics);
 		rootElement.layoutTree(width, height);
 		renderer.render(canvas);
+//		timer.stop();
+//		guiGraphics.drawString(minecraft.font, "render took " + timer.getElapsedTimeMillis() + " ms", 10, 10, 0xFFFFFFFF);
 	}
 
 	// I'm never finding a use for this
@@ -111,7 +116,7 @@ public class CraftedScreen extends Screen
 		if(keyCode == ImportantKeys.ESCAPE)
 		{
 			if(context.inputHandler.getFocusedElement() != null)
-				context.inputHandler.setFocus(null);
+				context.inputHandler.setFocus(null, KeyEvent.press(context.inputHandler.getFocusedElement(), keyCode, scanCode, (char) 0, KeyModifiers.fromFlags(modifiers)));
 			else
 				onClose();
 		}

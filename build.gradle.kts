@@ -9,7 +9,7 @@ plugins {
 }
 
 group = "dev.zeddevstuff"
-version = "1.0.0-PROTOTYPE"
+version = "0.8.0"
 
 repositories {
     mavenCentral()
