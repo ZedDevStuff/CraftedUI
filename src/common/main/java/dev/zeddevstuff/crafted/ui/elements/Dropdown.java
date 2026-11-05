@@ -11,6 +11,8 @@ import dev.zeddevstuff.crafted.types.Color;
 import dev.zeddevstuff.crafted.ui.CraftedContext;
 import dev.zeddevstuff.crafted.ui.CraftedElement;
 import dev.zeddevstuff.crafted.utils.ColorUtils;
+import dev.zeddevstuff.crafted.utils.ObjectPool;
+import dev.zeddevstuff.crafted.utils.Typed;
 import dev.zeddevstuff.crafted.utils.TypedList;
 import org.appliedenergistics.yoga.YogaPositionType;
 import org.appliedenergistics.yoga.style.StyleLength;
@@ -99,6 +101,8 @@ public class Dropdown extends CraftedElement
 	{
 		crafted.elements.registerElement(Dropdown.class, "Dropdown", Dropdown::new);
 		crafted.renderers.registerRenderer(Dropdown.class, "default", new DefaultDropdownRenderer());
+		crafted.renderers.registerRenderer(DropdownOption.class, "default", new DropdownOption.DefaultRenderer());
+		crafted.renderers.registerRenderer(DropdownOption.class, "crafted", new DropdownOption.CraftedRenderer());
 	}
 
 	public static class DefaultDropdownRenderer implements IRenders<Dropdown>
@@ -166,5 +170,55 @@ public class Dropdown extends CraftedElement
 	public interface IStringProvider
 	{
 		String getString(Object obj);
+	}
+
+	private class DropdownOption extends CraftedElement
+	{
+		public DropdownOption()
+		{
+			super(Dropdown.this.ctx, Map.of());
+		}
+
+		@Override
+		public boolean receivesInputEvents()
+		{
+			return true;
+		}
+
+		@Override
+		public boolean isFocusable()
+		{
+			return true;
+		}
+
+		private static class DefaultRenderer implements IRenders<DropdownOption>
+		{
+			@Override
+			public void render(ICanvas canvas, DropdownOption element)
+			{
+
+			}
+
+			@Override
+			public void afterRender(ICanvas canvas, DropdownOption element)
+			{
+
+			}
+		}
+
+		private static class CraftedRenderer implements IRenders<DropdownOption>
+		{
+			@Override
+			public void render(ICanvas canvas, DropdownOption element)
+			{
+
+			}
+
+			@Override
+			public void afterRender(ICanvas canvas, DropdownOption element)
+			{
+
+			}
+		}
 	}
 }

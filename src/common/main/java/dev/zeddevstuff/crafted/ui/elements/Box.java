@@ -20,7 +20,7 @@ public class Box extends CraftedElement
 	public static void register(Crafted crafted)
 	{
 		crafted.elements.registerElement(Box.class, "Box", Box::new);
-		crafted.renderers.registerRenderer(Box.class, "default", new BoxRenderer());
+		crafted.renderers.registerRenderer(Box.class, "default", new Renderer());
 	}
 
 	@Description("Background color of the box")
@@ -31,7 +31,7 @@ public class Box extends CraftedElement
 		super(ctx, attributes);
 	}
 
-	public static class BoxRenderer implements IRenders<Box>
+	public static class Renderer implements IRenders<Box>
 	{
 		@Override
 		public void beginRender(ICanvas canvas, Box element)

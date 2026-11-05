@@ -32,10 +32,10 @@ public class Image extends CraftedElement
 	public static void register(Crafted crafted)
 	{
 		crafted.elements.registerElement(Image.class, "Image", Image::new);
-		crafted.renderers.registerRenderer(Image.class, "default", new ImageRenderer());
+		crafted.renderers.registerRenderer(Image.class, "default", new Renderer());
 	}
 
-	public static class ImageRenderer implements IRenders<Image>
+	public static class Renderer implements IRenders<Image>
 	{
 		@Override
 		public void render(ICanvas canvas, Image element)

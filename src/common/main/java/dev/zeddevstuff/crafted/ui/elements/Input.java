@@ -203,14 +203,14 @@ public class Input extends CraftedElement
     public static void register(Crafted crafted)
     {
         crafted.elements.registerElement(Input.class, "Input", Input::new);
-        crafted.renderers.registerRenderer(Input.class, "default", new DefaultInputRenderer(crafted.textures));
+        crafted.renderers.registerRenderer(Input.class, "default", new DefaultRenderer(crafted.textures));
     }
 
-    public static class DefaultInputRenderer implements IRenders<Input>
+    public static class DefaultRenderer implements IRenders<Input>
     {
         private static final Color borderColor = new Color(160, 160, 160);
         private final ITexture textfieldTexture, textfieldHighlightedTexture;
-        public DefaultInputRenderer(ITextureManager textures)
+        public DefaultRenderer(ITextureManager textures)
         {
             textfieldTexture = textures.get("minecraft", "widget/text_field");
             textfieldHighlightedTexture = textures.get("minecraft", "widget/text_field_highlighted");

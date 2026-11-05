@@ -1,7 +1,6 @@
 package dev.zeddevstuff.crafted.ui.elements;
 
 import dev.zeddevstuff.crafted.Crafted;
-import dev.zeddevstuff.crafted.Prop;
 import dev.zeddevstuff.crafted.annotations.DefineElement;
 import dev.zeddevstuff.crafted.annotations.Description;
 import dev.zeddevstuff.crafted.input.ImportantKeys;
@@ -15,7 +14,6 @@ import dev.zeddevstuff.crafted.platform.ITexture;
 import dev.zeddevstuff.crafted.platform.ITextureManager;
 import dev.zeddevstuff.crafted.rendering.IRenders;
 import dev.zeddevstuff.crafted.types.Color;
-import dev.zeddevstuff.crafted.types.ColorTheme;
 import dev.zeddevstuff.crafted.types.Rect;
 import dev.zeddevstuff.crafted.ui.CraftedContext;
 import dev.zeddevstuff.crafted.ui.CraftedElement;
@@ -90,7 +88,7 @@ public class Button extends CraftedElement
 	private boolean appliedLayoutChanges = false;
 	private void applyLayoutChanges()
 	{
-		if(renderer.get() instanceof CraftedButtonRenderer && !appliedLayoutChanges)
+		if(renderer.get() instanceof CraftedRenderer && !appliedLayoutChanges)
 		{
 			marginTop.set(StyleLength.points(3));
 			paddingBottom.set(StyleLength.points(3));
@@ -100,7 +98,7 @@ public class Button extends CraftedElement
 	}
 	private void revertLayoutChanges()
 	{
-		if(renderer.get() instanceof CraftedButtonRenderer && appliedLayoutChanges)
+		if(renderer.get() instanceof CraftedRenderer && appliedLayoutChanges)
 		{
 			marginTop.set(StyleLength.points(0));
 			paddingBottom.set(StyleLength.points(0));
@@ -112,15 +110,15 @@ public class Button extends CraftedElement
 	public static void register(Crafted crafted)
 	{
 		crafted.elements.registerElement(Button.class, "Button", Button::new);
-		crafted.renderers.registerRenderer(Button.class, "default", new DefaultButtonRenderer(crafted.textures));
-		crafted.renderers.registerRenderer(Button.class, "crafted", new CraftedButtonRenderer());
+		crafted.renderers.registerRenderer(Button.class, "default", new DefaultRenderer(crafted.textures));
+		crafted.renderers.registerRenderer(Button.class, "crafted", new CraftedRenderer());
 	}
 
-	public static class DefaultButtonRenderer implements IRenders<Button>
+	public static class DefaultRenderer implements IRenders<Button>
 	{
 		private final ITexture buttonTexture, buttonDisabledTexture, buttonHighlightedTexture;
 
-		public DefaultButtonRenderer(ITextureManager textures)
+		public DefaultRenderer(ITextureManager textures)
 		{
 			buttonTexture = textures.get("minecraft", "widget/button");
 			buttonDisabledTexture = textures.get("minecraft", "widget/button_disabled");
@@ -139,7 +137,7 @@ public class Button extends CraftedElement
 		}
 	}
 
-	public static class CraftedButtonRenderer implements IRenders<Button>
+	public static class CraftedRenderer implements IRenders<Button>
 	{
 		@Override
 		public void render(ICanvas canvas, Button element)

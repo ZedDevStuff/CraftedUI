@@ -75,18 +75,18 @@ public class Checkbox extends CraftedElement
 	public static void register(Crafted crafted)
 	{
 		crafted.elements.registerElement(Checkbox.class, "Checkbox", Checkbox::new);
-		crafted.renderers.registerRenderer(Checkbox.class, "default", new DefaultCheckboxRenderer(crafted.textures));
-		crafted.renderers.registerRenderer(Checkbox.class, "crafted", new CraftedCheckboxRenderer());
+		crafted.renderers.registerRenderer(Checkbox.class, "default", new DefaultRenderer(crafted.textures));
+		crafted.renderers.registerRenderer(Checkbox.class, "crafted", new CraftedRenderer());
 	}
 
-	public static class DefaultCheckboxRenderer implements IRenders<Checkbox>
+	public static class DefaultRenderer implements IRenders<Checkbox>
 	{
 		private final ITexture uncheckedTexture;
 		private final ITexture uncheckedHighlightedTexture;
 		private final ITexture checkedTexture;
 		private final ITexture checkedHighlightedTexture;
 
-		public DefaultCheckboxRenderer(ITextureManager textureManager)
+		public DefaultRenderer(ITextureManager textureManager)
 		{
 			this.uncheckedTexture = textureManager.get("minecraft", "widget/checkbox");
 			this.uncheckedHighlightedTexture = textureManager.get("minecraft", "widget/checkbox_highlighted");
@@ -130,7 +130,7 @@ public class Checkbox extends CraftedElement
 		}
 	}
 
-	public static class CraftedCheckboxRenderer implements IRenders<Checkbox>
+	public static class CraftedRenderer implements IRenders<Checkbox>
 	{
 		@Override
 		public void render(ICanvas canvas, Checkbox element)

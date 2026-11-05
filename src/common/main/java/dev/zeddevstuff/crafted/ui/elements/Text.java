@@ -26,7 +26,7 @@ public class Text extends CraftedElement
 	static void register(Crafted crafted)
 	{
 		crafted.elements.registerElement(Text.class, "Text", Text::new);
-		crafted.renderers.registerRenderer(Text.class, "default", new TextRenderer());
+		crafted.renderers.registerRenderer(Text.class, "default", new Renderer());
 	}
 
 	public final Prop<IText> text = registerProp(IText.class, "text", IText.literal("Text"), Parsers::parseText);
@@ -75,7 +75,7 @@ public class Text extends CraftedElement
 		this.height.set(StyleSizeLength.points(size.height()));
 	}
 
-	public static class TextRenderer implements IRenders<Text>
+	public static class Renderer implements IRenders<Text>
 	{
 		@Override
 		public void render(ICanvas canvas, Text element)

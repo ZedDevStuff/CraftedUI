@@ -305,11 +305,11 @@ public class ScrollView extends Box
 	public static void register(Crafted crafted)
 	{
 		crafted.elements.registerElement(ScrollView.class, "ScrollView", ScrollView::new);
-		crafted.renderers.registerRenderer(ScrollView.class, "default", new DefaultScrollViewRenderer());
-		crafted.renderers.registerRenderer(ScrollView.class, "crafted", new CraftedScrollViewRenderer());
+		crafted.renderers.registerRenderer(ScrollView.class, "default", new DefaultRenderer());
+		crafted.renderers.registerRenderer(ScrollView.class, "crafted", new CraftedRenderer());
 	}
 
-	public static class DefaultScrollViewRenderer implements IRenders<ScrollView>
+	public static class DefaultRenderer implements IRenders<ScrollView>
 	{
 		private static final Color SCROLLBAR_THUMB_COLOR = new Color(192, 192, 192);
 		private static final Color SCROLLBAR_THUMB_SHADOW_COLOR = Color.Gray;
@@ -350,7 +350,7 @@ public class ScrollView extends Box
 		}
 	}
 
-	public static class CraftedScrollViewRenderer implements IRenders<ScrollView>
+	public static class CraftedRenderer implements IRenders<ScrollView>
 	{
 		@Override
 		public void beginRender(ICanvas canvas, ScrollView element)
