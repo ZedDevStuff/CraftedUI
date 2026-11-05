@@ -9,7 +9,7 @@ import dev.zeddevstuff.crafted.parsing.Parsers;
 import dev.zeddevstuff.crafted.platform.ICanvas;
 import dev.zeddevstuff.crafted.platform.IFont;
 import dev.zeddevstuff.crafted.platform.IText;
-import dev.zeddevstuff.crafted.rendering.IRenders;
+import dev.zeddevstuff.crafted.rendering.IRendersType;
 import dev.zeddevstuff.crafted.types.Color;
 import dev.zeddevstuff.crafted.types.TextSettings;
 import dev.zeddevstuff.crafted.ui.CraftedContext;
@@ -75,8 +75,10 @@ public class Text extends CraftedElement
 		this.height.set(StyleSizeLength.points(size.height()));
 	}
 
-	public static class Renderer implements IRenders<Text>
+	public static class Renderer implements IRendersType<Text>
 	{
+		@Override
+		public Class<?> getElementType() { return Text.class; }
 		@Override
 		public void render(ICanvas canvas, Text element)
 		{

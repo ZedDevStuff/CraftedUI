@@ -9,6 +9,7 @@ import dev.zeddevstuff.crafted.input.events.*;
 import dev.zeddevstuff.crafted.parsing.Parsers;
 import dev.zeddevstuff.crafted.platform.ICanvas;
 import dev.zeddevstuff.crafted.rendering.IRenders;
+import dev.zeddevstuff.crafted.rendering.IRendersType;
 import dev.zeddevstuff.crafted.types.*;
 import dev.zeddevstuff.crafted.ui.elements.CraftedRoot;
 import dev.zeddevstuff.crafted.utils.Event;
@@ -284,13 +285,13 @@ public abstract class CraftedElement
 	public final Prop<IKeyEventHandler> onKeyType = registerProp(IKeyEventHandler.class, "onKeyType", this::parseKeyCallback);
 
 	@Description("The renderer to use for this element.")
-	public final Prop<IRenders<?>> renderer;
+	public final Prop<IRenders> renderer;
 
 	public CraftedElement(CraftedContext ctx, Map<String, String> attributes)
 	{
 		this.ctx = ctx;
 		if(!(this instanceof CraftedRoot))
-			this.renderer = registerProp("renderer", ctx.crafted.renderers.getRendererOrDefault(this.getClass(), attributes.getOrDefault("renderer", "default")), this::getRenderer);
+			this.renderer = registerProp(IRenders.class, "renderer", ctx.crafted.renderers.getRendererOrDefault(this.getClass(), attributes.getOrDefault("renderer", "default")), this::getRenderer);
 		else
 			this.renderer = null;
 		this.node.setStyle(initLayoutNode(node.getStyle(), attributes));
@@ -370,7 +371,7 @@ public abstract class CraftedElement
 	{
 		return ctx.getCallback(IKeyEventHandler.class, name);
 	}
-	IRenders<?> getRenderer(String name, IRenders<?> defaultValue)
+	IRenders getRenderer(String name, IRenders defaultValue)
 	{
 		return ctx.crafted.renderers.getRendererOrDefault(this.getClass(), name);
 	}
@@ -556,18 +557,18 @@ public abstract class CraftedElement
 	}
 	public void renderSelf(ICanvas canvas)
 	{
-		if(renderer != null)
-			renderer.get().forceRender(canvas, this);
+		if(renderer != null && renderer.get().getElementType().isInstance(this))
+			((IRendersType<?>)renderer.get()).forceRender(canvas, this);
 	}
 	public void beginRenderSelf(ICanvas canvas)
 	{
-		if(renderer != null)
-			renderer.get().forceBeginRender(canvas, this);
+		if(renderer != null && renderer.get().getElementType().isInstance(this))
+			((IRendersType<?>)renderer.get()).forceBeginRender(canvas, this);
 	}
 	public void afterRenderSelf(ICanvas canvas)
 	{
 		if(renderer != null)
-			renderer.get().forceAfterRender(canvas, this);
+			((IRendersType<?>)renderer.get()).forceAfterRender(canvas, this);
 	}
 
 	/**

@@ -5,13 +5,13 @@ import java.util.Objects;
 
 public class RendererRegistry
 {
-	private final HashMap<Class<?>, HashMap<String, IRenders<?>>> registry = new HashMap<>();
-	public <T> void registerRenderer(Class<T> elementClass, String rendererName, IRenders<T> renderer)
+	private final HashMap<Class<?>, HashMap<String, IRendersType<?>>> registry = new HashMap<>();
+	public <T> void registerRenderer(Class<T> elementClass, String rendererName, IRendersType<T> renderer)
 	{
 		registry.computeIfAbsent(elementClass, k -> new HashMap<>()).put(rendererName, renderer);
 	}
 	@SuppressWarnings("unchecked")
-	public <T> IRenders<T> getRenderer(Class<T> elementClass, String rendererName)
+	public <T> IRendersType<T> getRenderer(Class<T> elementClass, String rendererName)
 	{
 		var rendererMap = registry.get(elementClass);
 		if (rendererMap == null)
@@ -26,10 +26,10 @@ public class RendererRegistry
 				throw new RuntimeException("No default renderer registered for element class: " + elementClass.getName());
 			return null;
 		}
-		return (IRenders<T>) renderer;
+		return (IRendersType<T>) renderer;
 	}
 	@SuppressWarnings("unchecked")
-	public <T> IRenders<T> getRendererOrDefault(Class<T> elementClass, String rendererName)
+	public <T> IRendersType<T> getRendererOrDefault(Class<T> elementClass, String rendererName)
 	{
 		var rendererMap = registry.get(elementClass);
 		if (rendererMap == null)
@@ -44,6 +44,6 @@ public class RendererRegistry
 			if(renderer == null)
 				throw new RuntimeException("No default renderer registered for element class: " + elementClass.getName());
 		}
-		return (IRenders<T>) renderer;
+		return (IRendersType<T>) renderer;
 	}
 }

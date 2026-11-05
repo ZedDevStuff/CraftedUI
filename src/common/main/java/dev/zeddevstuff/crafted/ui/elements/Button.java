@@ -12,7 +12,7 @@ import dev.zeddevstuff.crafted.platform.ICanvas;
 import dev.zeddevstuff.crafted.platform.IText;
 import dev.zeddevstuff.crafted.platform.ITexture;
 import dev.zeddevstuff.crafted.platform.ITextureManager;
-import dev.zeddevstuff.crafted.rendering.IRenders;
+import dev.zeddevstuff.crafted.rendering.IRendersType;
 import dev.zeddevstuff.crafted.types.Color;
 import dev.zeddevstuff.crafted.types.Rect;
 import dev.zeddevstuff.crafted.ui.CraftedContext;
@@ -114,8 +114,10 @@ public class Button extends CraftedElement
 		crafted.renderers.registerRenderer(Button.class, "crafted", new CraftedRenderer());
 	}
 
-	public static class DefaultRenderer implements IRenders<Button>
+	public static class DefaultRenderer implements IRendersType<Button>
 	{
+		@Override
+		public Class<?> getElementType() { return Button.class; }
 		private final ITexture buttonTexture, buttonDisabledTexture, buttonHighlightedTexture;
 
 		public DefaultRenderer(ITextureManager textures)
@@ -137,8 +139,10 @@ public class Button extends CraftedElement
 		}
 	}
 
-	public static class CraftedRenderer implements IRenders<Button>
+	public static class CraftedRenderer implements IRendersType<Button>
 	{
+		@Override
+		public Class<?> getElementType() { return Button.class; }
 		@Override
 		public void render(ICanvas canvas, Button element)
 		{

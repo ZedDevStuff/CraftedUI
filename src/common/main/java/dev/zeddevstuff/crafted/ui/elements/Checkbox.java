@@ -9,7 +9,7 @@ import dev.zeddevstuff.crafted.parsing.Parsers;
 import dev.zeddevstuff.crafted.platform.ICanvas;
 import dev.zeddevstuff.crafted.platform.ITexture;
 import dev.zeddevstuff.crafted.platform.ITextureManager;
-import dev.zeddevstuff.crafted.rendering.IRenders;
+import dev.zeddevstuff.crafted.rendering.IRendersType;
 import dev.zeddevstuff.crafted.types.Color;
 import dev.zeddevstuff.crafted.types.Rect;
 import dev.zeddevstuff.crafted.ui.CraftedContext;
@@ -79,8 +79,10 @@ public class Checkbox extends CraftedElement
 		crafted.renderers.registerRenderer(Checkbox.class, "crafted", new CraftedRenderer());
 	}
 
-	public static class DefaultRenderer implements IRenders<Checkbox>
+	public static class DefaultRenderer implements IRendersType<Checkbox>
 	{
+		@Override
+		public Class<?> getElementType() { return Checkbox.class; }
 		private final ITexture uncheckedTexture;
 		private final ITexture uncheckedHighlightedTexture;
 		private final ITexture checkedTexture;
@@ -130,8 +132,10 @@ public class Checkbox extends CraftedElement
 		}
 	}
 
-	public static class CraftedRenderer implements IRenders<Checkbox>
+	public static class CraftedRenderer implements IRendersType<Checkbox>
 	{
+		@Override
+		public Class<?> getElementType() { return Checkbox.class; }
 		@Override
 		public void render(ICanvas canvas, Checkbox element)
 		{

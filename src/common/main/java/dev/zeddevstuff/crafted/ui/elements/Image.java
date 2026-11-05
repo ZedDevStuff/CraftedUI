@@ -6,7 +6,7 @@ import dev.zeddevstuff.crafted.annotations.DefineElement;
 import dev.zeddevstuff.crafted.annotations.Description;
 import dev.zeddevstuff.crafted.platform.ICanvas;
 import dev.zeddevstuff.crafted.platform.ITexture;
-import dev.zeddevstuff.crafted.rendering.IRenders;
+import dev.zeddevstuff.crafted.rendering.IRendersType;
 import dev.zeddevstuff.crafted.types.Rect;
 import dev.zeddevstuff.crafted.ui.CraftedContext;
 import dev.zeddevstuff.crafted.ui.CraftedElement;
@@ -35,8 +35,10 @@ public class Image extends CraftedElement
 		crafted.renderers.registerRenderer(Image.class, "default", new Renderer());
 	}
 
-	public static class Renderer implements IRenders<Image>
+	public static class Renderer implements IRendersType<Image>
 	{
+		@Override
+		public Class<?> getElementType() { return Image.class; }
 		@Override
 		public void render(ICanvas canvas, Image element)
 		{

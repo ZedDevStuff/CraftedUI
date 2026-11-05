@@ -13,7 +13,7 @@ import dev.zeddevstuff.crafted.platform.ICanvas;
 import dev.zeddevstuff.crafted.platform.IFont;
 import dev.zeddevstuff.crafted.platform.ITexture;
 import dev.zeddevstuff.crafted.platform.ITextureManager;
-import dev.zeddevstuff.crafted.rendering.IRenders;
+import dev.zeddevstuff.crafted.rendering.IRendersType;
 import dev.zeddevstuff.crafted.types.Color;
 import dev.zeddevstuff.crafted.types.Float2;
 import dev.zeddevstuff.crafted.types.Rect;
@@ -206,9 +206,11 @@ public class Input extends CraftedElement
         crafted.renderers.registerRenderer(Input.class, "default", new DefaultRenderer(crafted.textures));
     }
 
-    public static class DefaultRenderer implements IRenders<Input>
+    public static class DefaultRenderer implements IRendersType<Input>
     {
         private static final Color borderColor = new Color(160, 160, 160);
+        @Override
+        public Class<?> getElementType() { return Input.class; }
         private final ITexture textfieldTexture, textfieldHighlightedTexture;
         public DefaultRenderer(ITextureManager textures)
         {

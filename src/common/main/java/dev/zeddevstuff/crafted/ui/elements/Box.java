@@ -5,7 +5,7 @@ import dev.zeddevstuff.crafted.Prop;
 import dev.zeddevstuff.crafted.annotations.DefineElement;
 import dev.zeddevstuff.crafted.annotations.Description;
 import dev.zeddevstuff.crafted.platform.ICanvas;
-import dev.zeddevstuff.crafted.rendering.IRenders;
+import dev.zeddevstuff.crafted.rendering.IRendersType;
 import dev.zeddevstuff.crafted.types.Color;
 import dev.zeddevstuff.crafted.ui.CraftedContext;
 import dev.zeddevstuff.crafted.ui.CraftedElement;
@@ -31,13 +31,16 @@ public class Box extends CraftedElement
 		super(ctx, attributes);
 	}
 
-	public static class Renderer implements IRenders<Box>
+	public static class Renderer implements IRendersType<Box>
 	{
+		@Override
+		public Class<?> getElementType() { return Box.class; }
+
 		@Override
 		public void beginRender(ICanvas canvas, Box element)
 		{
 			if(element.overflow.get() != YogaOverflow.VISIBLE)
-				IRenders.beginClip(canvas, element, 0, 0);
+				IRendersType.beginClip(canvas, element, 0, 0);
 		}
 
 		@Override
@@ -51,7 +54,7 @@ public class Box extends CraftedElement
 		public void afterRender(ICanvas canvas, Box element)
 		{
 			if(element.overflow.get() != YogaOverflow.VISIBLE)
-				IRenders.endClip(canvas, element, 0, 0);
+				IRendersType.endClip(canvas, element, 0, 0);
 		}
 	}
 }

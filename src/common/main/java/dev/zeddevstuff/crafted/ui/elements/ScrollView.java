@@ -6,7 +6,7 @@ import dev.zeddevstuff.crafted.annotations.DefineElement;
 import dev.zeddevstuff.crafted.parsing.Parsers;
 import dev.zeddevstuff.crafted.platform.ICanvas;
 import dev.zeddevstuff.crafted.input.events.MouseEvent;
-import dev.zeddevstuff.crafted.rendering.IRenders;
+import dev.zeddevstuff.crafted.rendering.IRendersType;
 import dev.zeddevstuff.crafted.types.Color;
 import dev.zeddevstuff.crafted.ui.CraftedContext;
 import dev.zeddevstuff.crafted.ui.CraftedElement;
@@ -309,15 +309,17 @@ public class ScrollView extends Box
 		crafted.renderers.registerRenderer(ScrollView.class, "crafted", new CraftedRenderer());
 	}
 
-	public static class DefaultRenderer implements IRenders<ScrollView>
+	public static class DefaultRenderer implements IRendersType<ScrollView>
 	{
 		private static final Color SCROLLBAR_THUMB_COLOR = new Color(192, 192, 192);
 		private static final Color SCROLLBAR_THUMB_SHADOW_COLOR = Color.Gray;
 		@Override
+		public Class<?> getElementType() { return ScrollView.class; }
+		@Override
 		public void beginRender(ICanvas canvas, ScrollView element)
 		{
 			element.clampScroll();
-			IRenders.beginClip(canvas, element, element.scrollX.get(), element.scrollY.get());
+			IRendersType.beginClip(canvas, element, element.scrollX.get(), element.scrollY.get());
 		}
 
 		@Override
@@ -326,7 +328,7 @@ public class ScrollView extends Box
 		@Override
 		public void afterRender(ICanvas canvas, ScrollView element)
 		{
-			IRenders.endClip(canvas, element, element.scrollX.get(), element.scrollY.get());
+			IRendersType.endClip(canvas, element, element.scrollX.get(), element.scrollY.get());
 			if(element.horizontalScrollbar.get())
 			{
 				var layout = element.getLayout();
@@ -350,13 +352,15 @@ public class ScrollView extends Box
 		}
 	}
 
-	public static class CraftedRenderer implements IRenders<ScrollView>
+	public static class CraftedRenderer implements IRendersType<ScrollView>
 	{
+		@Override
+		public Class<?> getElementType() { return ScrollView.class; }
 		@Override
 		public void beginRender(ICanvas canvas, ScrollView element)
 		{
 			element.clampScroll();
-			IRenders.beginClip(canvas, element, element.scrollX.get(), element.scrollY.get());
+			IRendersType.beginClip(canvas, element, element.scrollX.get(), element.scrollY.get());
 		}
 
 		@Override
@@ -369,7 +373,7 @@ public class ScrollView extends Box
 		@Override
 		public void afterRender(ICanvas canvas, ScrollView element)
 		{
-			IRenders.endClip(canvas, element, element.scrollX.get(), element.scrollY.get());
+			IRendersType.endClip(canvas, element, element.scrollX.get(), element.scrollY.get());
 			if(element.horizontalScrollbar.get())
 			{
 				var layout = element.getLayout();
