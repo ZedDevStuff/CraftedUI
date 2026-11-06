@@ -68,24 +68,34 @@ public class InputHandler
 
     public void detachElement(CraftedElement element)
     {
-        if (element == hoveredElement)
+		if (isSameOrDescendant(hoveredElement, element))
         {
-            hoveredElement.state.set(InteractionState.HOVERED, false);
+			if (hoveredElement != null)
+				hoveredElement.state.set(InteractionState.HOVERED, false);
             hoveredElement = null;
         }
-        if (element == pressedElement)
+		if (isSameOrDescendant(pressedElement, element))
         {
-            pressedElement.state.set(InteractionState.PRESSED, false);
-            pressedElement.state.set(InteractionState.ARMED, false);
+			if (pressedElement != null)
+			{
+				pressedElement.state.set(InteractionState.PRESSED, false);
+				pressedElement.state.set(InteractionState.ARMED, false);
+			}
             pressedElement = null;
             pressedButton = null;
         }
-        if (element == focusedElement)
+		if (isSameOrDescendant(focusedElement, element))
         {
-            focusedElement.state.set(InteractionState.FOCUSED, false);
+			if (focusedElement != null)
+				focusedElement.state.set(InteractionState.FOCUSED, false);
             focusedElement = null;
         }
     }
+
+	private boolean isSameOrDescendant(CraftedElement candidate, CraftedElement ancestor)
+	{
+		return candidate != null && (candidate == ancestor || candidate.isDescendantOf(ancestor));
+	}
 
 	public void setFocus(CraftedElement newFocus, UIEvent source)
 	{
@@ -255,7 +265,13 @@ public class InputHandler
 	{
 		if(rootElement == null)
 			return;
-		if (pressedElement == null || button != pressedButton) return;
+		if (pressedElement == null)
+			return;
+		if (button != pressedButton)
+		{
+			clearPressedState();
+			return;
+		}
 		var target = pressedElement;
 		boolean clicked = target.state.isArmed();
 		target.state.set(InteractionState.PRESSED, false);
@@ -273,6 +289,16 @@ public class InputHandler
 		}
 		if (clicked)
 			target.handleClick(new ClickEvent(target, ClickEvent.Source.MOUSE, x, y, button));
+	}
+	private void clearPressedState()
+	{
+		if (pressedElement != null)
+		{
+			pressedElement.state.set(InteractionState.PRESSED, false);
+			pressedElement.state.set(InteractionState.ARMED, false);
+		}
+		pressedElement = null;
+		pressedButton = null;
 	}
 
 	public void handleCharTyped(char character, KeyModifiers modifiers)

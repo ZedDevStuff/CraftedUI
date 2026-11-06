@@ -45,7 +45,8 @@ public final class TypedList<T> extends AbstractList<T>
 	{
 		validate(value);
 		values.add(index, value);
-        for(var listener : listeners)
+        var copy = new ArrayList<>(listeners);
+		for(var listener : copy)
             listener.onValuesChanged();
 	}
 

@@ -300,6 +300,10 @@ public abstract class CraftedElement
 		zIndex.addListener((prop, oldValue, newValue) -> {
 			markTreeChanged();
 		});
+//		disabled.addListener((prop, oldValue, newValue) -> {
+//			if(Boolean.TRUE.equals(newValue))
+//				ctx.inputHandler.detachElement(this);
+//		});
 		onFocusGained.addListener((prop, oldValue, newValue) -> {
 			handleCallbackChange(focusGained, oldValue, newValue);
 		});

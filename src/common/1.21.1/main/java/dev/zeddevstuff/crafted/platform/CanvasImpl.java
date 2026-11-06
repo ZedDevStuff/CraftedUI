@@ -161,6 +161,6 @@ public class CanvasImpl implements ICanvas
 	@Override
 	public float deltaTime()
 	{
-		return (float) 1 / minecraft.getFps();
+		return minecraft.getFrameTimeNs() / 1_000_000_000f;
 	}
 }
