@@ -17,13 +17,13 @@ public class TextEditor
     {
         if(!Objects.equals(this.text, text))
             dirty = true;
-        this.text = text;
         if(cursorPosition > text.length())
             cursorPosition = text.length();
         if(selectionStart > text.length())
             selectionStart = text.length();
         if(selectionEnd > text.length())
             selectionEnd = text.length();
+        this.text = text;
 
     }
     private float cursorBlinkTimer;
