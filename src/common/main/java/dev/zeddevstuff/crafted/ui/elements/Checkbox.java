@@ -175,6 +175,14 @@ public class Checkbox extends CraftedElement
 							: theme.onSuccess();
 					backgroundColor = theme.success();
 				}
+                case "info" -> {
+                    borderColor = element.state.isDisabled()
+                        ? theme.disabled()
+                        : element.state.isHoveredOrFocused()
+                            ? ColorUtils.bestContrast(theme.onInfo(), Color.White, Color.Black)
+                            : theme.onInfo();
+                    backgroundColor = theme.info();
+                }
 				default -> {
 					borderColor = element.state.isDisabled()
 						? theme.disabled()

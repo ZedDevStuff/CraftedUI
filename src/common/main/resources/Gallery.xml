@@ -14,18 +14,19 @@
             <Button onClick="sayHi" renderer="crafted" width="60" style="error">Crafted</Button>
             <Button onClick="sayHi" renderer="crafted" width="60" style="warning">Crafted</Button>
             <Button onClick="sayHi" renderer="crafted" width="60" style="success">Crafted</Button>
+            <Button onClick="sayHi" renderer="crafted" width="60" style="info">Crafted</Button>
         </Box>
         <Text color="onBackground" margin="2">Inputs</Text>
         <Box id="inputs" gap="4" flexDirection="row" flexWrap="wrap" margin="2">
             <Input onSubmit="printSubmit" width="200" height="20" placeholder="Search..." />
             <Checkbox size="20,20" />
             <Checkbox renderer="crafted" size="20,20" />
-            <Checkbox renderer="crafted" size="20,20" indeterminate="true" checked="" />
             <Checkbox renderer="crafted" size="20,20" indeterminate="true" style="primary" />
             <Checkbox renderer="crafted" size="20,20" indeterminate="true" style="secondary" />
             <Checkbox renderer="crafted" size="20,20" indeterminate="true" style="error" />
             <Checkbox renderer="crafted" size="20,20" indeterminate="true" style="warning" />
             <Checkbox renderer="crafted" size="20,20" indeterminate="true" style="success" />
+            <Checkbox renderer="crafted" size="20,20" indeterminate="true" style="info" />
             <Dropdown options="testOptions" size="100,20" />
             <Dropdown renderer="crafted" options="testOptions" size="100,20" />
         </Box>
@@ -33,14 +34,6 @@
             <Text color="onBackground" margin="2">Misc</Text>
             <Box id="misc" gap="4" flexDirection="row" flexWrap="wrap" margin="2">
                 <Image src="minecraft:textures/block/stone.png" width="64" height="64" />
-            </Box>
-            <Box>
-                <Box width="25">
-                    <Button onClick="sayHi" renderer="crafted">Overflow</Button>
-                </Box>
-                <Box width="25" overflow="hidden">
-                    <Button onClick="sayHi" renderer="crafted">Hidden</Button>
-                </Box>
             </Box>
             <ScrollView height="150" alignSelf="stretch" horizontalScrollbar="false">
             <Box id="scrollboxes" color="white">
@@ -50,9 +43,9 @@
                 <Box color="background" height="20"><Text color="onBackground">Background</Text></Box>
                 <Box color="surface" height="20"><Text color="onSurface">Surface</Text></Box>
                 <Box color="surfaceVariant" height="20"><Text color="onSurface">Surface Variant</Text></Box>
-                <Box color="outline" height="20">Outline</Box>
-                <Box color="disabled" height="20">Disabled</Box>
-                <Box color="scrim" height="20">Scrim</Box>
+                <Box color="outline" height="20"><Text>Outline</Text></Box>
+                <Box color="disabled" height="20"><Text>Disabled</Text></Box>
+                <Box color="scrim" height="20"><Text>Scrim</Text></Box>
                 <Box color="error" height="20"><Text color="onError">Error</Text></Box>
                 <Box color="warning" height="20"><Text color="onWarning">Warning</Text></Box>
                 <Box color="success" height="20"><Text color="onSuccess">Success</Text></Box>

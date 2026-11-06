@@ -3,7 +3,6 @@ package dev.zeddevstuff.crafted.mixin.dev;
 //import dev.zeddevstuff.crafted.screen.GlazeScreen;
 //import dev.zeddevstuff.crafted.ui.Gallery;
 
-import dev.zeddevstuff.crafted.Crafted;
 import dev.zeddevstuff.crafted.CraftedScreen;
 import dev.zeddevstuff.crafted.Entry;
 import dev.zeddevstuff.crafted.input.events.IClickEventHandler;
@@ -21,7 +20,6 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
-import java.util.ArrayList;
 import java.util.List;
 
 @Mixin(TitleScreen.class)

@@ -1,6 +1,5 @@
 package dev.zeddevstuff.crafted.parsing;
 
-import dev.zeddevstuff.crafted.Crafted;
 import dev.zeddevstuff.crafted.ui.CraftedContext;
 import dev.zeddevstuff.crafted.ui.CraftedElement;
 

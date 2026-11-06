@@ -1,16 +1,14 @@
 package dev.zeddevstuff.crafted.platform;
 
+import com.mojang.logging.LogUtils;
 import dev.zeddevstuff.crafted.Constants;
 import dev.zeddevstuff.crafted.parsing.CraftedXmlParser;
 import dev.zeddevstuff.crafted.parsing.ParsedNode;
+import org.slf4j.Logger;
 
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.HashMap;
-
-import org.slf4j.Logger;
-
-import com.mojang.logging.LogUtils;
 
 public class Preloader implements IPreloader
 {

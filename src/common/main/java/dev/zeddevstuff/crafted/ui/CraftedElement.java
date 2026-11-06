@@ -12,7 +12,6 @@ import dev.zeddevstuff.crafted.rendering.IRenders;
 import dev.zeddevstuff.crafted.rendering.IRendersType;
 import dev.zeddevstuff.crafted.types.*;
 import dev.zeddevstuff.crafted.ui.elements.CraftedRoot;
-import dev.zeddevstuff.crafted.ui.elements.ScrollView;
 import dev.zeddevstuff.crafted.utils.Event;
 import org.appliedenergistics.yoga.*;
 import org.appliedenergistics.yoga.style.StyleLength;
@@ -37,6 +36,8 @@ public abstract class CraftedElement
 	public CraftedElement getParent() { return parent; }
 	protected final List<CraftedElement> children = new ArrayList<>();
 	private long treeVersion;
+	private long inputOrderTreeVersion = -1;
+	private List<ElementOrder.Entry> inputOrder;
 	public List<CraftedElement> getChildren() { return Collections.unmodifiableList(children); }
 	public long getTreeVersion() { return treeVersion; }
 	private void markTreeChanged()
@@ -406,35 +407,41 @@ public abstract class CraftedElement
 	protected float transformChildInputX(float x) { return x; }
 	protected float transformChildInputY(float y) { return y; }
 
-	// Thank you Wulferis for the base method
+	// Thank you Wulferis for the base method. It's been butchered a bit though. Probably won't recognize it anymore lol
 	public CraftedElement findTopmostAt(float x, float y)
 	{
-		boolean inside = contains(x, y);
-		if (!inside && overflow.get() != YogaOverflow.VISIBLE)
-			return null;
+		if(inputOrderTreeVersion != treeVersion)
+		{
+			inputOrder = ElementOrder.collect(this);
+			inputOrderTreeVersion = treeVersion;
+		}
+		for(int i = inputOrder.size() - 1; i >= 0; i--)
+		{
+			var candidate = inputOrder.get(i).element();
+			if(candidate.receivesInputEvents()
+				&& !candidate.state.isDisabled()
+				&& isInputPathVisible(candidate, x, y))
+				return candidate;
+		}
+		return null;
+	}
+	private boolean isInputPathVisible(CraftedElement target, float x, float y)
+	{
+		if(this == target)
+			return contains(x, y);
+		if(!target.isDescendantOf(this))
+			return false;
+		if(!contains(x, y) && overflow.get() != YogaOverflow.VISIBLE)
+			return false;
+
 		float childX = transformChildInputX(x);
 		float childY = transformChildInputY(y);
-
-		// check each child, starting with the topmost one
-		// don't filter out children that don't receive input events themselves they may still contain children that do
-		for (var child : children.stream()
-			.sorted(Comparator.<CraftedElement>comparingInt(a -> a.zIndex.get()).reversed())
-			.toArray(CraftedElement[]::new))
+		for(var child : children)
 		{
-			// recursively search the child's subtree for the topmost input target
-			// this will perform its own bounds check before searching deeper
-			var target = child.findTopmostAt(childX, childY);
-
-			// return immediately when a valid target is found
-			// since children are sorted by Z-index, this is the topmost valid target
-			if (target != null)
-				return target;
+			if(child == target || target.isDescendantOf(child))
+				return child.isInputPathVisible(target, childX, childY);
 		}
-
-		// no child contained a valid input target
-		// fall back to this element if it receives input events
-		// otherwise, return null so the caller can check another child
-		return inside && receivesInputEvents() && !state.isDisabled() ? this : null;
+		return false;
 	}
 	public boolean isAncestorOf(CraftedElement element)
 	{

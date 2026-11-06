@@ -10,12 +10,7 @@ import dev.zeddevstuff.crafted.ui.elements.CraftedRoot;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 public final class SchemaGenerator
 {

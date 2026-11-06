@@ -1,6 +1,5 @@
 package dev.zeddevstuff.crafted.input;
 
-import dev.zeddevstuff.crafted.Crafted;
 import dev.zeddevstuff.crafted.input.events.*;
 import dev.zeddevstuff.crafted.ui.CraftedElement;
 

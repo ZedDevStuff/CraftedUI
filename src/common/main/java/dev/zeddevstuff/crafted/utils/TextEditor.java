@@ -3,9 +3,8 @@ package dev.zeddevstuff.crafted.utils;
 import dev.zeddevstuff.crafted.platform.IFont;
 import dev.zeddevstuff.crafted.types.Float2;
 
-import java.util.Objects;
-
 import javax.annotation.Nonnull;
+import java.util.Objects;
 
 public class TextEditor
 {
