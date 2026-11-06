@@ -468,18 +468,26 @@ public abstract class CraftedElement
 	public CraftedElement[] findElements(Predicate<CraftedElement> predicate)
 	{
 		List<CraftedElement> results = new ArrayList<>();
+		collectElements(predicate, results);
+		return results.toArray(new CraftedElement[0]);
+	}
+	private void collectElements(Predicate<CraftedElement> predicate, List<CraftedElement> results)
+	{
 		if(predicate.test(this))
 			results.add(this);
 		for(var child : children)
-			results.addAll(Arrays.asList(child.findElements(predicate)));
-		return results.toArray(new CraftedElement[0]);
+			child.collectElements(predicate, results);
 	}
 
-	public void setParent(CraftedElement parent)
+	public void setParent(CraftedElement newParent)
 	{
-		if(this.parent != null)
-			this.parent.removeChild(this);
-		parent.addChild(this);
+		if(newParent == null)
+			throw new IllegalArgumentException("Parent cannot be null.");
+		if(newParent == this || isAncestorOf(newParent))
+			throw new IllegalArgumentException("Recursive parent-child relationship detected. Cannot set parent to a descendant.");
+		if(this.parent == newParent)
+			return;
+		newParent.addChild(this);
 	}
 	public void addChild(CraftedElement child)
 	{
@@ -487,6 +495,10 @@ public abstract class CraftedElement
 			return;
 		if(children.contains(child))
 			return;
+		if(child == this)
+			throw new IllegalArgumentException("Cannot add self as child.");
+		if(child.isAncestorOf(this))
+			throw new IllegalArgumentException("Recursive parent-child relationship detected. Cannot add ancestor as child.");
 		if(child.parent != null && child.parent != this)
 			child.parent.removeChild(child);
 		children.add(child);

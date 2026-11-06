@@ -33,7 +33,8 @@ public class Event<T>
 			throw new IllegalArgumentException("Invalid event key: " + key);
 		if(!type.isInstance(event))
 			throw new IllegalArgumentException("Invalid event type: " + event);
-		for(var listener : listeners)
+        var copy = new ArrayList<>(listeners);
+		for(var listener : copy)
 			listener.onEvent(event);
 	}
 

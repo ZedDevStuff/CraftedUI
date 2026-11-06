@@ -26,7 +26,8 @@ public class Prop<T> implements IProp<T>
 			return;
 		T oldValue = this.value;
 		this.value = newValue;
-		for(var listener : listeners)
+        var copy = new ArrayList<>(listeners);
+		for(var listener : copy)
 			listener.onPropChanged(this, oldValue, newValue);
 	}
 
