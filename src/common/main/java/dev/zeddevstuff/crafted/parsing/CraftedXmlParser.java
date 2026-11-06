@@ -3,15 +3,14 @@ package dev.zeddevstuff.crafted.parsing;
 import org.xml.sax.SAXException;
 
 import javax.xml.XMLConstants;
-import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 
 public class CraftedXmlParser
 {
 	static final DocumentBuilderFactory factory;
-	static final DocumentBuilder builder;
 	static
 	{
 		factory = DocumentBuilderFactory.newInstance();
@@ -27,14 +26,6 @@ public class CraftedXmlParser
 		{
 			throw new RuntimeException(e);
 		}
-		try
-		{
-			builder = factory.newDocumentBuilder();
-		}
-		catch (ParserConfigurationException e)
-		{
-			throw new RuntimeException(e);
-		}
 	}
 
 	/**
@@ -44,11 +35,12 @@ public class CraftedXmlParser
 	{
 		try
 		{
-			var document = builder.parse(new java.io.ByteArrayInputStream(xml.getBytes()));
+            var builder = factory.newDocumentBuilder();
+			var document = builder.parse(new java.io.ByteArrayInputStream(xml.getBytes(StandardCharsets.UTF_8)));
 			var rootElement = document.getDocumentElement();
 			return parsedNodeFromElement(rootElement);
 		}
-		catch (IOException | SAXException e)
+		catch (ParserConfigurationException | IOException | SAXException e)
 		{
 			throw new RuntimeException(e);
 		}

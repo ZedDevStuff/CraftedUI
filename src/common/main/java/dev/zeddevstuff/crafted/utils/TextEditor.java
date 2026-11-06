@@ -5,6 +5,8 @@ import dev.zeddevstuff.crafted.types.Float2;
 
 import java.util.Objects;
 
+import javax.annotation.Nonnull;
+
 public class TextEditor
 {
     private boolean dirty = false;
@@ -13,8 +15,9 @@ public class TextEditor
 
     private String text;
     public String getText() { return text; }
-    public void setText(String text)
+    public void setText(@Nonnull String text)
     {
+        Objects.requireNonNull(text, "Text cannot be null");
         if(!Objects.equals(this.text, text))
             dirty = true;
         if(cursorPosition > text.length())

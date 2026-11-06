@@ -93,7 +93,7 @@ public class Dropdown extends CraftedElement
 	{
 		if(isOpen)
 			togglePopup();
-		popup.removeChildren(popup.getChildren());
+		popup.removeChildren(popup.getChildren().toArray(new CraftedElement[0]));
 		if(newValue == null)
 			return;
 		for(var option : newValue)
@@ -101,7 +101,8 @@ public class Dropdown extends CraftedElement
 			var optionElement = new DropdownOption(option);
 			popup.addChild(optionElement);
 		}
-		setSelected(newValue.getFirst());
+        if(!newValue.isEmpty())
+		    setSelected(newValue.getFirst());
 	}
 
 	public void togglePopup()

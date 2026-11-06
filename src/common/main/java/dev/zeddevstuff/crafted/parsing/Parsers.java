@@ -65,14 +65,12 @@ public class Parsers
 	{
 		if (value == null)
 			return defaultValue;
-		try
-		{
-			return Boolean.parseBoolean(value);
-		}
-		catch (Exception e)
-		{
-			return defaultValue;
-		}
+		if(value.equalsIgnoreCase("true"))
+            return true;
+        else if(value.equalsIgnoreCase("false"))
+            return false;
+        else
+            return defaultValue;
 	}
 	public static Boolean parseBooleanIndeterminate(String value, Boolean defaultValue)
 	{

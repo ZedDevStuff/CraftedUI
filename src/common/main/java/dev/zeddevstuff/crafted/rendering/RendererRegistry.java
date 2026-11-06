@@ -8,7 +8,10 @@ public class RendererRegistry
 	private final HashMap<Class<?>, HashMap<String, IRendersType<?>>> registry = new HashMap<>();
 	public <T> void registerRenderer(Class<T> elementClass, String rendererName, IRendersType<T> renderer)
 	{
-		registry.computeIfAbsent(elementClass, k -> new HashMap<>()).put(rendererName, renderer);
+		var map = registry.computeIfAbsent(elementClass, k -> new HashMap<>());
+        if(map.containsKey(rendererName))
+            throw new IllegalArgumentException("A renderer is already registered for element class: " + elementClass.getName() + " and renderer name: " + rendererName);
+        map.put(rendererName, renderer);
 	}
 	@SuppressWarnings("unchecked")
 	public <T> IRendersType<T> getRenderer(Class<T> elementClass, String rendererName)
@@ -34,8 +37,7 @@ public class RendererRegistry
 		var rendererMap = registry.get(elementClass);
 		if (rendererMap == null)
 		{
-			System.err.println("No renderers registered for element class: " + elementClass.getName());
-			return null;
+			throw new RuntimeException("No renderers registered for element class: " + elementClass.getName());
 		}
 		var renderer = rendererMap.get(rendererName);
 		if (renderer == null)

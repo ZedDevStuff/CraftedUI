@@ -18,8 +18,8 @@ public class TestRunner
 			System.out.println("Running " + methods.length + " tests in class: " + testClass.getName());
 			for(var method : methods)
 			{
-				long startTime = 0;
-				long endTime = 0;
+                long endTime = 0;
+				long startTime = System.nanoTime();
 				try
 				{
 

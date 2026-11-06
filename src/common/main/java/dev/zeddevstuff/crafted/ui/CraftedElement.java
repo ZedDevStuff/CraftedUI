@@ -510,6 +510,7 @@ public abstract class CraftedElement
 			return;
 		if(!children.contains(child))
 			return;
+        ctx.inputHandler.detachElement(child);
 		children.remove(child);
 		child.parent = null;
 		node.removeChildAndInvalidate(child.node);

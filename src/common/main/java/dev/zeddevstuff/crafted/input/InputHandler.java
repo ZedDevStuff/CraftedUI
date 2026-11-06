@@ -1,5 +1,6 @@
 package dev.zeddevstuff.crafted.input;
 
+import dev.zeddevstuff.crafted.Crafted;
 import dev.zeddevstuff.crafted.input.events.*;
 import dev.zeddevstuff.crafted.ui.CraftedElement;
 
@@ -65,6 +66,27 @@ public class InputHandler
 		}
 		return alignedBest != null ? alignedBest : fallbackBest;
 	}
+
+    public void detachElement(CraftedElement element)
+    {
+        if (element == hoveredElement)
+        {
+            hoveredElement.state.set(InteractionState.HOVERED, false);
+            hoveredElement = null;
+        }
+        if (element == pressedElement)
+        {
+            pressedElement.state.set(InteractionState.PRESSED, false);
+            pressedElement.state.set(InteractionState.ARMED, false);
+            pressedElement = null;
+            pressedButton = null;
+        }
+        if (element == focusedElement)
+        {
+            focusedElement.state.set(InteractionState.FOCUSED, false);
+            focusedElement = null;
+        }
+    }
 
 	public void setFocus(CraftedElement newFocus, UIEvent source)
 	{

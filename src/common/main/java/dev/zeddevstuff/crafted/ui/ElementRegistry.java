@@ -11,6 +11,8 @@ public class ElementRegistry
 	public Set<Map.Entry<Class<?>, String>> getClassToTagMap() { return classToTag.entrySet(); }
 	public void registerElement(Class<?> elementClass, String tag, ElementFactory factory)
 	{
+        if(factories.containsKey(tag))
+            throw new IllegalArgumentException("An element factory is already registered for tag: " + tag);
 		classToTag.put(elementClass, tag);
 		factories.put(tag, factory);
 	}

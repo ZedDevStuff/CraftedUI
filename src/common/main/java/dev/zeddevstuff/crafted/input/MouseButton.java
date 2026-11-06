@@ -2,6 +2,7 @@ package dev.zeddevstuff.crafted.input;
 
 public enum MouseButton
 {
+    UNKNOWN(-1),
 	LEFT(0),
 	RIGHT(1),
 	MIDDLE(2),
@@ -22,6 +23,6 @@ public enum MouseButton
 		for(var button : values())
 			if(button.code == code)
 				return button;
-		return null;
+		return MouseButton.UNKNOWN;
 	}
 }

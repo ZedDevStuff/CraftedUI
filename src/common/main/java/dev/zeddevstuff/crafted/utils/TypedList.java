@@ -45,14 +45,41 @@ public final class TypedList<T> extends AbstractList<T>
 	{
 		validate(value);
 		values.add(index, value);
+        for(var listener : listeners)
+            listener.onValuesChanged();
 	}
 
 	@Override
 	public T set(int index, T value)
 	{
 		validate(value);
-		return values.set(index, value);
+		var replaced = values.set(index, value);
+        if(replaced != value)
+            for(var listener : listeners)
+                listener.onValuesChanged();
+        return replaced;
 	}
+
+    @Override
+    public boolean remove(Object o) 
+    {
+        var removed = values.remove(o);
+        if(removed)
+            for(var listener : listeners)
+                listener.onValuesChanged();
+        return removed;
+    }
+
+    @Override
+    public void clear() 
+    {
+        if(!values.isEmpty())
+        {
+            values.clear();
+            for(var listener : listeners)
+                listener.onValuesChanged();
+        }
+    }
 
 	public void addChangeListener(IValuesChangeListener<T> listener)
 	{
