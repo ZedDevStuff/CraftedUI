@@ -13,6 +13,26 @@ public class InputHandler
 	public CraftedElement getPressedElement() { return pressedElement; }
 	private CraftedElement focusedElement;
 	public CraftedElement getFocusedElement() { return focusedElement; }
+	public boolean isFocusedElementFirst()
+	{
+		var elements = focusableElements();
+		return focusedElement != null && elements.length > 0 && focusedElement == elements[0];
+	}
+	public boolean isFocusedElementLast()
+	{
+		var elements = focusableElements();
+		return focusedElement != null && elements.length > 0 && focusedElement == elements[elements.length - 1];
+	}
+	public void focusFirstElement()
+	{
+		var elements = focusableElements();
+		setFocus(elements.length == 0 ? null : elements[0], null);
+	}
+	public void focusLastElement()
+	{
+		var elements = focusableElements();
+		setFocus(elements.length == 0 ? null : elements[elements.length - 1], null);
+	}
 	private MouseButton pressedButton;
 	public MouseButton getPressedButton() { return pressedButton; }
 

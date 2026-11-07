@@ -20,17 +20,17 @@ public interface ContainerEventHandlerMixin
 					portal.mouseReleased(mouseX, mouseY, button);
 	}
 
-	@Inject(method = "keyPressed", at = @At("HEAD"), cancellable = true)
-	default void crafted$onKeyPressed(int keyCode, int scanCode, int modifiers, CallbackInfoReturnable<Boolean> ci)
-	{
-		boolean result = false;
-		if (this instanceof Screen screen)
-			for (var widget : screen.children())
-				if (widget instanceof CraftedPortal portal)
-					result = portal.keyPressed(keyCode, scanCode, modifiers) || result;
-		if(result)
-			ci.setReturnValue(true);
-	}
+//	@Inject(method = "keyPressed", at = @At("HEAD"), cancellable = true)
+//	default void crafted$onKeyPressed(int keyCode, int scanCode, int modifiers, CallbackInfoReturnable<Boolean> ci)
+//	{
+//		boolean result = false;
+//		if (this instanceof Screen screen)
+//			for (var widget : screen.children())
+//				if (widget instanceof CraftedPortal portal)
+//					result = portal.keyPressed(keyCode, scanCode, modifiers) || result;
+//		if(result)
+//			ci.setReturnValue(true);
+//	}
 
 	@Inject(method = "keyReleased", at = @At("HEAD"), cancellable = true)
 	default void crafted$onKeyReleased(int keyCode, int scanCode, int modifiers, CallbackInfoReturnable<Boolean> ci)

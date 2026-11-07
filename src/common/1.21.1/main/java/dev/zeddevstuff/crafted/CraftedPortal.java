@@ -15,10 +15,13 @@ import dev.zeddevstuff.crafted.types.Rect;
 import dev.zeddevstuff.crafted.ui.CraftedContext;
 import dev.zeddevstuff.crafted.ui.elements.CraftedRoot;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.ComponentPath;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.AbstractWidget;
 import net.minecraft.client.gui.narration.NarrationElementOutput;
+import net.minecraft.client.gui.navigation.FocusNavigationEvent;
 import org.appliedenergistics.yoga.style.StyleSizeLength;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 import java.util.function.Function;
 
@@ -105,28 +108,60 @@ public class CraftedPortal extends AbstractWidget
 	@Override
 	public boolean charTyped(char c, int modifiers)
 	{
-		//context.inputHandler.handleCharTyped(c, KeyModifiers.fromFlags(modifiers));
+		if(isFocused())
+			context.inputHandler.handleCharTyped(c, KeyModifiers.fromFlags(modifiers));
 		return false;
 	}
 	@Override
 	public boolean keyPressed(int keyCode, int scanCode, int modifiers)
 	{
 		// Not sure how to handle this
-//		if(keyCode == ImportantKeys.ESCAPE)
-//		{
-//			if(context.inputHandler.getFocusedElement() != null)
-//				context.inputHandler.setFocus(null, KeyEvent.press(context.inputHandler.getFocusedElement(), keyCode, scanCode, (char) 0, KeyModifiers.fromFlags(modifiers)));
-//		}
-//		context.inputHandler.handleKeyPressed(keyCode, scanCode, KeyModifiers.fromFlags(modifiers));
+		if(!isFocused())
+			return false;
+		if(keyCode == ImportantKeys.ESCAPE)
+		{
+			if(context.inputHandler.getFocusedElement() != null)
+				context.inputHandler.setFocus(null, KeyEvent.press(context.inputHandler.getFocusedElement(), keyCode, scanCode, (char) 0, KeyModifiers.fromFlags(modifiers)));
+		}
+		context.inputHandler.handleKeyPressed(keyCode, scanCode, KeyModifiers.fromFlags(modifiers));
 		return false;
 	}
-
 
 	@Override
 	public boolean keyReleased(int keyCode, int scanCode, int modifiers)
 	{
-		//context.inputHandler.handleKeyReleased(keyCode, scanCode, KeyModifiers.fromFlags(modifiers));
+		context.inputHandler.handleKeyReleased(keyCode, scanCode, KeyModifiers.fromFlags(modifiers));
 		return false;
+	}
+
+	@Override
+	public @Nullable ComponentPath nextFocusPath(FocusNavigationEvent focusNavigationEvent)
+	{
+		ComponentPath path = super.nextFocusPath(focusNavigationEvent);
+		if(focusNavigationEvent instanceof FocusNavigationEvent.TabNavigation tabNav)
+			if(tabNav.forward())
+			{
+				if(!isFocused())
+					context.inputHandler.focusFirstElement();
+				if(!context.inputHandler.isFocusedElementLast())
+					path = ComponentPath.path(this);
+				else if(isFocused())
+					context.inputHandler.setFocus(null, KeyEvent.press(null, ImportantKeys.TAB, 0, (char) 0, KeyModifiers.fromFlags(0)));
+			}
+			else
+			{
+				if(!isFocused())
+					context.inputHandler.focusLastElement();
+				if(context.inputHandler.isFocusedElementLast() && !context.inputHandler.isFocusedElementFirst())
+					path = ComponentPath.path(this);
+				else if(isFocused())
+					context.inputHandler.setFocus(null, KeyEvent.press(null, ImportantKeys.TAB, 0, (char) 0, KeyModifiers.fromFlags(0)));
+			}
+		else if(focusNavigationEvent instanceof FocusNavigationEvent.ArrowNavigation arrowNav)
+		{
+			// TODO: Handle arrow navigation
+		}
+		return path;
 	}
 
 	@Override
