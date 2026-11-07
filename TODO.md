@@ -17,6 +17,7 @@
   - [-] File Loader
     - [ ] Load from file
     - [x] Load from jar resources
+  - [x] Portal widget for rendering Crafted elements in non-Crafted screens
   - [-] Essential elements
     - [x] Box
     - [x] Text
