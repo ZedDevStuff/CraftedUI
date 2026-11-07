@@ -324,7 +324,7 @@ public class Dropdown extends CraftedElement
 				var layout = element.getLayout();
 				int centeredX = (int) (layout.x + (layout.width - textSize.width()) / 2);
 				int centeredY = (int) (layout.y + (layout.height - textSize.height()) / 2);
-				canvas.drawRect(layout.x, layout.y, layout.width, layout.height, element.state.isHoveredOrFocused() || element.isSelected() ? ColorUtils.adjustLightness(Color.Gray, 0.2f) : Color.Black);
+				canvas.drawRect(layout.x, layout.y, layout.width, layout.height, element.state.isHoveredOrFocused() || element.isSelected() ? Color.Gray : Color.Black);
 				canvas.drawText(label, centeredX, centeredY, element.ctx.crafted.defaultTextSettings, Color.White);
 			}
 		}

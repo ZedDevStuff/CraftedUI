@@ -50,10 +50,6 @@ public abstract class TitleScreenMixin extends Screen
 	}
 
 	@Unique
-	long crafted$start = 0;
-	@Unique
-	long crafted$end = 0;
-	@Unique
 	private void crafted$galleryButtonPressed(ClickEvent event)
 	{
 		var ctx = new CraftedContext();
@@ -62,10 +58,7 @@ public abstract class TitleScreenMixin extends Screen
 			System.out.println("Submitted value: '" + event.getTargetAs(Input.class).value.get() + "'");
 		});
 		ctx.setVar("testOptions", new TypedList<>(String.class, List.of("Option 1", "Option 2", "Option 3")));
-		crafted$start = System.nanoTime();
 		var screen = new CraftedScreen(ctx, Entry.gallery);
-		crafted$end = System.nanoTime();
-		System.out.println("Time to build screen: " + (crafted$end - crafted$start) / 1_000_000.0 + " ms");
 		minecraft.setScreen(screen);
 	}
 }
