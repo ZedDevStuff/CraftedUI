@@ -7,7 +7,8 @@
   "mixins": [
   ],
   "client": [
-    "dev.TitleScreenMixin"
+    "dev.TitleScreenMixin",
+    "GuiEventListenerMixin"
   ],
   "injectors": {
     "defaultRequire": 1

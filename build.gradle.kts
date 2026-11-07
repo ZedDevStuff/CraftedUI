@@ -5,6 +5,7 @@ import org.gradle.kotlin.dsl.withType
 plugins {
     //id("earth.terrarium.cloche") version "0.18.11-dust.20"
     id("earth.terrarium.cloche") version "0.19.13"
+    id("maven-publish")
     //id("com.gradleup.shadow") version "9.3.0"
 }
 
@@ -82,6 +83,17 @@ cloche {
             client {
                 properties.put("crafted.devMode", "true")
                 properties.put("crafted.debug", "true")
+            }
+        }
+    }
+
+    publishing {
+        publications {
+            create<MavenPublication>("maven") {
+                from(components["java"])
+                groupId = project.group.toString()
+                artifactId = rootProject.name
+                version = project.version.toString()
             }
         }
     }

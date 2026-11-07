@@ -293,7 +293,7 @@ public abstract class CraftedElement
 	{
 		this.ctx = ctx;
 		if(!(this instanceof CraftedRoot))
-			this.renderer = registerProp(IRenders.class, "renderer", ctx.crafted.renderers.getRendererOrDefault(this.getClass(), attributes.getOrDefault("renderer", "default")), this::getRenderer);
+			this.renderer = registerProp(IRenders.class, "renderer", ctx.crafted.renderers.getRendererOrDefault(this.getClass(), attributes.getOrDefault("renderer", ctx.currentRenderer)), this::getRenderer);
 		else
 			this.renderer = null;
 		this.node.setStyle(initLayoutNode(node.getStyle(), attributes));

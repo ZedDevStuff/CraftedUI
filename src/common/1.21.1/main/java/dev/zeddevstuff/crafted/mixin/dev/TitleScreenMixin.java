@@ -1,12 +1,12 @@
 package dev.zeddevstuff.crafted.mixin.dev;
 
-//import dev.zeddevstuff.crafted.screen.GlazeScreen;
-//import dev.zeddevstuff.crafted.ui.Gallery;
-
+import dev.zeddevstuff.crafted.CraftedPortal;
 import dev.zeddevstuff.crafted.CraftedScreen;
 import dev.zeddevstuff.crafted.Entry;
+import dev.zeddevstuff.crafted.input.events.ClickEvent;
 import dev.zeddevstuff.crafted.input.events.IClickEventHandler;
 import dev.zeddevstuff.crafted.input.events.ISubmitEventHandler;
+import dev.zeddevstuff.crafted.types.Rect;
 import dev.zeddevstuff.crafted.ui.CraftedContext;
 import dev.zeddevstuff.crafted.ui.elements.Input;
 import dev.zeddevstuff.crafted.utils.TypedList;
@@ -25,6 +25,7 @@ import java.util.List;
 @Mixin(TitleScreen.class)
 public abstract class TitleScreenMixin extends Screen
 {
+	private CraftedContext ctx;
 	protected TitleScreenMixin(Component component)
 	{
 		super(component);
@@ -33,10 +34,19 @@ public abstract class TitleScreenMixin extends Screen
 	@Inject(method = "init", at = @At("TAIL"))
 	public void init(CallbackInfo ci)
 	{
-		this.addRenderableWidget(Button.builder(Component.literal("C"), this::crafted$galleryButtonPressed)
-			.pos(20, this.height - 40)
-			.size(20, 20)
-			.build());
+		if(ctx == null)
+		{
+			ctx = new CraftedContext();
+			ctx.registerCallback(IClickEventHandler.class, "openGallery", this::crafted$galleryButtonPressed);
+		}
+		this.addRenderableWidget(new CraftedPortal(
+			Rect.posAndSize(20, this.height - 40, 20, 20),
+			ctx,
+			"""
+				<Crafted renderer="crafted" title="Portal Test">
+					<Button onClick="openGallery" size="20">C</Button>
+				</Crafted>
+				"""));
 	}
 
 	@Unique
@@ -44,13 +54,11 @@ public abstract class TitleScreenMixin extends Screen
 	@Unique
 	long crafted$end = 0;
 	@Unique
-	private void crafted$galleryButtonPressed(Button button)
+	private void crafted$galleryButtonPressed(ClickEvent event)
 	{
 		var ctx = new CraftedContext();
-		ctx.registerCallback(IClickEventHandler.class, "sayHi", event -> {
-			System.out.println("Hi!");
-		});
-		ctx.registerCallback(ISubmitEventHandler.class, "printSubmit", event -> {
+		ctx.registerCallback(IClickEventHandler.class, "sayHi", e -> System.out.println("Hi!"));
+		ctx.registerCallback(ISubmitEventHandler.class, "printSubmit", e -> {
 			System.out.println("Submitted value: '" + event.getTargetAs(Input.class).value.get() + "'");
 		});
 		ctx.setVar("testOptions", new TypedList<>(String.class, List.of("Option 1", "Option 2", "Option 3")));
