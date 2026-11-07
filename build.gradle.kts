@@ -1,12 +1,10 @@
 import earth.terrarium.cloche.api.target.FabricTarget
-import earth.terrarium.cloche.api.target.NeoforgeTarget
 import org.gradle.kotlin.dsl.withType
 
 plugins {
     //id("earth.terrarium.cloche") version "0.18.11-dust.20"
     id("earth.terrarium.cloche") version "0.19.13"
     id("maven-publish")
-    //id("com.gradleup.shadow") version "9.3.0"
 }
 
 group = "dev.zeddevstuff"
