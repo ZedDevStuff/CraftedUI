@@ -36,8 +36,8 @@ public record ColorTheme(
     Color onInfo
 ) 
 {
-	public static final ColorTheme DARK_RED = fromSeed(Color.Tomato, true);
-	public static final ColorTheme DARK_GREEN = fromSeed(Color.SpringGreen, true);
+	public static final ColorTheme RED = fromSeed(Color.Tomato, true);
+	public static final ColorTheme GREEN = fromSeed(Color.SpringGreen, true);
 	public static final ColorTheme BLUE = fromSeed(Color.DodgerBlue, true);
 
 	public Color getColorByName(String name)
@@ -96,10 +96,10 @@ public record ColorTheme(
         Color disabled = ColorUtils.mix(onSurface, surface, 0.50f).withAlpha(150);
         Color scrim = Color.Black.withAlpha(140);
 
-        Color error = tone(dark ? 0.76f : 0.58f, 0.16f, 0.02f);
-        Color warning = tone(dark ? 0.82f : 0.68f, 0.15f, 0.14f);
-        Color success = tone(dark ? 0.76f : 0.52f, 0.13f, 0.40f);
-        Color info = tone(dark ? 0.78f : 0.58f, 0.14f, 0.58f);
+        Color error = new Color(255, 98, 102);//tone(dark ? 0.76f : 0.58f, 0.16f, 0.02f);
+        Color warning = new Color(252, 183, 0);//tone(dark ? 0.82f : 0.68f, 0.15f, 0.14f);
+        Color success = new Color(0, 211, 144);//tone(dark ? 0.76f : 0.52f, 0.13f, 0.40f);
+        Color info = new Color(0, 186, 254);//tone(dark ? 0.78f : 0.58f, 0.14f, 0.58f);
 
         return new ColorTheme(
             seed,
