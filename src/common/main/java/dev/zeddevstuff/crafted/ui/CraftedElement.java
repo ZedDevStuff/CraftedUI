@@ -582,18 +582,11 @@ public abstract class CraftedElement
 
 	private void layoutElement()
 	{
-		if((parent == null || node.getPositionType() == YogaPositionType.ABSOLUTE) && node.hasNewLayout())
-		{
-			layout = new LayoutResult(this);
-			node.calculateLayout(layout.innerWidth, layout.innerHeight);
+		layout = parent == null || node.getPositionType() == YogaPositionType.ABSOLUTE
+			? new LayoutResult(this)
+			: new LayoutResult(this, parent.layout);
+		if(node.hasNewLayout())
 			node.markLayoutSeen();
-		}
-		else if(node.hasNewLayout())
-		{
-			layout = new LayoutResult(this, parent.layout);
-			node.calculateLayout(parent.layout.innerWidth, parent.layout.innerHeight);
-			node.markLayoutSeen();
-		}
 		for(var child : children)
 			child.layoutElement();
 	}
