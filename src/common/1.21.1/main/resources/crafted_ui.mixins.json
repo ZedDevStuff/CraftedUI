@@ -5,11 +5,8 @@
   "package": "dev.zeddevstuff.crafted.mixin",
   "compatibilityLevel": "JAVA_21",
   "mixins": [
-
   ],
   "client": [
-    "ContainerEventHandlerMixin",
-    "GuiEventListenerMixin",
     "dev.TitleScreenMixin"
   ],
   "injectors": {

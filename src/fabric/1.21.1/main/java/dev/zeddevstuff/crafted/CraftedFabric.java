@@ -17,5 +17,6 @@ public class CraftedFabric implements ClientModInitializer
 			? paths.stream().filter(p -> p.toString().contains("resources")).findFirst().orElseThrow(() -> new RuntimeException("Could not find resources path for CraftedUI"))
 			: paths.getFirst();
 		ClientLifecycleEvents.CLIENT_STARTED.register(event -> Entry.init(path));
+		InputEvents.register();
 	}
 }

@@ -4,7 +4,6 @@ import dev.zeddevstuff.crafted.input.ImportantKeys;
 import dev.zeddevstuff.crafted.input.KeyModifiers;
 import dev.zeddevstuff.crafted.input.MouseButton;
 import dev.zeddevstuff.crafted.input.events.KeyEvent;
-import dev.zeddevstuff.crafted.input.events.MouseEvent;
 import dev.zeddevstuff.crafted.parsing.CraftedXmlParser;
 import dev.zeddevstuff.crafted.parsing.DocumentBuilder;
 import dev.zeddevstuff.crafted.parsing.ParsedNode;
@@ -71,32 +70,31 @@ public class CraftedPortal extends AbstractWidget
 		canvas.endTransform();
 	}
 
-	@Override
-	public void mouseMoved(double mouseX, double mouseY)
+
+	public void handleMouseMoved(double mouseX, double mouseY)
 	{
 		if(rootElement.contains((float) mouseX - getX(), (float) mouseY - getY()))
 			context.inputHandler.handleMouseMoved((float) mouseX - getX(), (float) mouseY - getY());
 		else
 			context.inputHandler.handleMouseMoved(Float.MAX_VALUE, Float.MAX_VALUE);
 	}
-	@Override
-	public boolean mouseScrolled(double mouseX, double mouseY, double scrollX, double scrollY)
+
+	public boolean handleMouseScrolled(double mouseX, double mouseY, double scrollX, double scrollY)
 	{
 		if(rootElement.contains((float) mouseX - getX(), (float) mouseY - getY()))
 			context.inputHandler.handleMouseScrolled((float)mouseX, (float)mouseY, (float)scrollX, (float)scrollY);
 		return false;
 	}
-	@Override
-	public boolean mouseClicked(double mouseX, double mouseY, int button)
+
+	public void handleMouseClicked(double mouseX, double mouseY, int button)
 	{
 		if(rootElement.contains((float) mouseX - getX(), (float) mouseY - getY()))
 			context.inputHandler.handleMousePressed((float) mouseX - getX(), (float) mouseY - getY(), MouseButton.fromCode(button));
 		else
 			context.inputHandler.handleMousePressed(Float.MAX_VALUE, Float.MAX_VALUE, MouseButton.fromCode(button));
-		return false;
 	}
-	@Override
-	public boolean mouseReleased(double mouseX, double mouseY, int button)
+
+	public boolean handleMouseReleased(double mouseX, double mouseY, int button)
 	{
 		if(rootElement.contains((float) mouseX - getX(), (float) mouseY - getY()))
 			context.inputHandler.handleMouseReleased((float) mouseX - getX(), (float) mouseY - getY(), MouseButton.fromCode(button));
@@ -105,35 +103,35 @@ public class CraftedPortal extends AbstractWidget
 		return false;
 	}
 
-	@Override
-	public boolean charTyped(char c, int modifiers)
+
+	public void handleCharTyped(char c, int modifiers)
 	{
 		if(isFocused())
 			context.inputHandler.handleCharTyped(c, KeyModifiers.fromFlags(modifiers));
-		return false;
 	}
-	@Override
-	public boolean keyPressed(int keyCode, int scanCode, int modifiers)
+
+	public void handleKeyPressed(int keyCode, int scanCode, int modifiers)
 	{
 		// Not sure how to handle this
 		if(!isFocused())
-			return false;
+			return;
 		if(keyCode == ImportantKeys.ESCAPE)
 		{
 			if(context.inputHandler.getFocusedElement() != null)
 				context.inputHandler.setFocus(null, KeyEvent.press(context.inputHandler.getFocusedElement(), keyCode, scanCode, (char) 0, KeyModifiers.fromFlags(modifiers)));
 		}
-		context.inputHandler.handleKeyPressed(keyCode, scanCode, KeyModifiers.fromFlags(modifiers));
-		return false;
+		if(!wasJustFocused)
+			context.inputHandler.handleKeyPressed(keyCode, scanCode, KeyModifiers.fromFlags(modifiers));
+		wasJustFocused = false;
 	}
 
-	@Override
-	public boolean keyReleased(int keyCode, int scanCode, int modifiers)
+
+	public void handleKeyReleased(int keyCode, int scanCode, int modifiers)
 	{
 		context.inputHandler.handleKeyReleased(keyCode, scanCode, KeyModifiers.fromFlags(modifiers));
-		return false;
 	}
 
+	private boolean wasJustFocused = false;
 	@Override
 	public @Nullable ComponentPath nextFocusPath(FocusNavigationEvent focusNavigationEvent)
 	{
@@ -142,7 +140,10 @@ public class CraftedPortal extends AbstractWidget
 			if(tabNav.forward())
 			{
 				if(!isFocused())
+				{
+					wasJustFocused = true;
 					context.inputHandler.focusFirstElement();
+				}
 				if(!context.inputHandler.isFocusedElementLast())
 					path = ComponentPath.path(this);
 				else if(isFocused())
@@ -151,7 +152,10 @@ public class CraftedPortal extends AbstractWidget
 			else
 			{
 				if(!isFocused())
+				{
+					wasJustFocused = true;
 					context.inputHandler.focusLastElement();
+				}
 				if(context.inputHandler.isFocusedElementLast() && !context.inputHandler.isFocusedElementFirst())
 					path = ComponentPath.path(this);
 				else if(isFocused())

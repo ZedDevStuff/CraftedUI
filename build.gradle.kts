@@ -8,7 +8,7 @@ plugins {
 }
 
 group = "dev.zeddevstuff"
-version = "0.10.0"
+version = "0.10.3"
 
 repositories {
     mavenCentral()
@@ -43,6 +43,8 @@ cloche {
     neoforge("neoforge:1.21.1") {
         loaderVersion = "21.1.219"
 
+        mixins.from("crafted_ui.mixins.json", "crafted_ui.neoforge.mixins.json")
+
         dependsOn(common1211)
     }
     fabric("fabric:1.21.1") {
@@ -51,6 +53,9 @@ cloche {
         dependencies {
             fabricApi("0.116.8")
         }
+
+        mixins.from("crafted_ui.mixins.json", "crafted_ui.fabric.mixins.json")
+
         metadata {
             dependency("fabric-api", "0.116.8")
         }
@@ -74,7 +79,6 @@ cloche {
         }
 
         metadata {
-            mixins = files("crafted_ui.mixins.json")
         }
 
         runs {
