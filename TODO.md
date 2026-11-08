@@ -18,6 +18,7 @@
     - [ ] Load from file
     - [x] Load from jar resources
   - [x] Portal widget for rendering Crafted elements in non-Crafted screens
+  - [ ] Hot Reloading
   - [-] Essential elements
     - [x] Box
     - [x] Text
