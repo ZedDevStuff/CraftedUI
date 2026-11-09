@@ -300,10 +300,6 @@ public abstract class CraftedElement
 		zIndex.addListener((prop, oldValue, newValue) -> {
 			markTreeChanged();
 		});
-//		disabled.addListener((prop, oldValue, newValue) -> {
-//			if(Boolean.TRUE.equals(newValue))
-//				ctx.inputHandler.detachElement(this);
-//		});
 		onFocusGained.addListener((prop, oldValue, newValue) -> {
 			handleCallbackChange(focusGained, oldValue, newValue);
 		});
@@ -580,6 +576,48 @@ public abstract class CraftedElement
 			removeChild(child);
 	}
 
+	private CraftedElement detachedParent;
+	private int detachedIndex = -1;
+
+	/**
+	 * Detaches this element (and its subtree) from its parent, remembering its position
+	 * so it can be re-attached later with {@link #attach()}. <br>
+	 * While detached, the element stops rendering, receiving input and being focusable —
+	 * effectively disabling it. Useful for things like tabs. <br>
+	 * Does nothing if this element has no parent.
+	 */
+	public void detach()
+	{
+		if(parent == null)
+			return;
+		detachedParent = parent;
+		detachedIndex = parent.children.indexOf(this);
+		parent.removeChild(this);
+	}
+
+	/**
+	 * Re-attaches this element to the parent it was detached from, at the same index. <br>
+	 * Does nothing if this element was not detached (or was already re-attached).
+	 */
+	public void attach()
+	{
+		if(detachedParent == null)
+			return;
+		var target = detachedParent;
+		var index = Math.min(detachedIndex, target.children.size());
+		detachedParent = null;
+		detachedIndex = -1;
+		target.insertChildAt(this, index);
+	}
+
+	/**
+	 * @return Whether this element is currently detached (awaiting {@link #attach()}).
+	 */
+	public boolean isDetached()
+	{
+		return detachedParent != null;
+	}
+
 	public CraftedElement cloneElement(boolean deep)
 	{
 		var tag = ctx.crafted.elements.getTagForClass(getClass());
@@ -851,8 +889,8 @@ public abstract class CraftedElement
 		}
 		private LayoutResult(CraftedElement element, LayoutResult container)
 		{
-			this.x = container.innerX + (int)element.node.getLayoutX();
-			this.y = container.innerY + (int)element.node.getLayoutY();
+			this.x = container.x + (int)element.node.getLayoutX();
+			this.y = container.y + (int)element.node.getLayoutY();
 			this.width = (int)element.node.getLayoutWidth();
 			this.height = (int)element.node.getLayoutHeight();
 			this.margin = new EdgeInsets<>((int)element.node.getLayoutMargin(YogaEdge.LEFT), (int)element.node.getLayoutMargin(YogaEdge.TOP), (int)element.node.getLayoutMargin(YogaEdge.RIGHT), (int)element.node.getLayoutMargin(YogaEdge.BOTTOM));

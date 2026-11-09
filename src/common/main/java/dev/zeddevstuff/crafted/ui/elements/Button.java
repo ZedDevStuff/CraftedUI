@@ -91,7 +91,6 @@ public class Button extends CraftedElement
 		if(renderer.get() instanceof CraftedRenderer && !appliedLayoutChanges)
 		{
 			marginTop.set(StyleLength.points(3));
-			paddingBottom.set(StyleLength.points(3));
 			height.set(StyleSizeLength.points(height.get().value().getValue() - 3));
 			appliedLayoutChanges = true;
 		}
@@ -101,7 +100,6 @@ public class Button extends CraftedElement
 		if(renderer.get() instanceof CraftedRenderer && appliedLayoutChanges)
 		{
 			marginTop.set(StyleLength.points(0));
-			paddingBottom.set(StyleLength.points(0));
 			height.set(StyleSizeLength.points(height.get().value().getValue() + 3));
 			appliedLayoutChanges = false;
 		}

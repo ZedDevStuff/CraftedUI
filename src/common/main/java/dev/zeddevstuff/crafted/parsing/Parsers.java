@@ -54,7 +54,7 @@ public class Parsers
 			return defaultValue;
 		try
 		{
-			return Float.parseFloat(value);
+			return Float.parseFloat(value.replace(",", "."));
 		}
 		catch (NumberFormatException e)
 		{
