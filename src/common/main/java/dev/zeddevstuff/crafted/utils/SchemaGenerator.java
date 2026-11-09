@@ -23,7 +23,7 @@ public final class SchemaGenerator
 		addType(CraftedRoot.class, types, new HashSet<>());
 
 		var elements = new ArrayList<XmlSchemaNode>();
-		for(var entry : crafted.elements.getClassToTagMap())
+		for(var entry : crafted.elements.getClassToTagMapEntrySet())
 		{
 			var elementClass = entry.getKey();
 			var annotation = elementClass.getAnnotation(DefineElement.class);

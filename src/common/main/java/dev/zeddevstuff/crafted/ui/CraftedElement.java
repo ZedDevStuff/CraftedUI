@@ -527,6 +527,27 @@ public abstract class CraftedElement
 		for(var child : children)
 			addChild(child);
 	}
+	public void insertChildAt(CraftedElement child, int index)
+	{
+		if(child == null)
+			return;
+		if(children.contains(child))
+			return;
+		if(child == this)
+			throw new IllegalArgumentException("Cannot add self as child.");
+		if(child.isAncestorOf(this))
+			throw new IllegalArgumentException("Recursive parent-child relationship detected. Cannot add ancestor as child.");
+		if(child.parent != null && child.parent != this)
+			child.parent.removeChild(child);
+		if(index < 0 || index > children.size())
+			throw new IndexOutOfBoundsException("Index: " + index + ", Size: " + children.size());
+		if(index > node.getChildCount())
+			throw new IndexOutOfBoundsException("Index: " + index + ", Node Child Count: " + node.getChildCount());
+		children.add(index, child);
+		child.parent = this;
+		node.addChildAt(child.node, index);
+		markTreeChanged();
+	}
 	public void removeChild(CraftedElement child)
 	{
 		if(child == null)
@@ -541,6 +562,13 @@ public abstract class CraftedElement
 			child.node.setOwner(null);
 		markTreeChanged();
 	}
+	public void removeChildAt(int index)
+	{
+		if(index < 0 || index >= children.size())
+			throw new IndexOutOfBoundsException("Index: " + index + ", Size: " + children.size());
+		var child = children.get(index);
+		removeChild(child);
+	}
 	public void removeChildren(Collection<CraftedElement> children)
 	{
 		for(var child : children)
@@ -551,6 +579,38 @@ public abstract class CraftedElement
 		for(var child : children)
 			removeChild(child);
 	}
+
+	public CraftedElement cloneElement(boolean deep)
+	{
+		var tag = ctx.crafted.elements.getTagForClass(getClass());
+		if(tag == null)
+			throw new IllegalStateException("Cannot clone unregistered element class: " + getClass().getName());
+
+		var clone = ctx.crafted.elements.createElement(ctx, tag, Map.of());
+		copyPropsTo(clone);
+		copyExtraStateTo(clone);
+		if(deep)
+			for(var child : children)
+				clone.addChild(child.cloneElement(true));
+		return clone;
+	}
+
+	@SuppressWarnings({"rawtypes", "unchecked"})
+	private void copyPropsTo(CraftedElement target)
+	{
+		for(var entry : props.entrySet())
+		{
+			var targetProp = target.props.get(entry.getKey());
+			if(targetProp != null)
+				((IProp)targetProp).set(((IProp)entry.getValue()).get());
+		}
+	}
+
+	/**
+	 * Hook for subclasses to copy transient state that is not stored in props (or are in unregistered props) <br>
+	 * Called by {@link #cloneElement(boolean)} after registered props have been copied.
+	 */
+	protected void copyExtraStateTo(CraftedElement clone) {}
 
 	public void setRenderer(String renderer)
 	{

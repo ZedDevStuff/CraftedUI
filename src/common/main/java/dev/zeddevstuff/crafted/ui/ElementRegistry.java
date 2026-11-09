@@ -8,7 +8,7 @@ public class ElementRegistry
 {
 	private final HashMap<String, ElementFactory> factories = new HashMap<>();
 	private final HashMap<Class<?>, String> classToTag = new HashMap<>();
-	public Set<Map.Entry<Class<?>, String>> getClassToTagMap() { return classToTag.entrySet(); }
+	public Set<Map.Entry<Class<?>, String>> getClassToTagMapEntrySet() { return classToTag.entrySet(); }
 	public void registerElement(Class<?> elementClass, String tag, ElementFactory factory)
 	{
         if(factories.containsKey(tag))
@@ -19,6 +19,10 @@ public class ElementRegistry
 	public ElementFactory getElementFactory(String tag)
 	{
 		return factories.get(tag);
+	}
+	public String getTagForClass(Class<?> elementClass)
+	{
+		return classToTag.get(elementClass);
 	}
 	public CraftedElement createElement(CraftedContext ctx, String tag, Map<String, String> attributes)
 	{
