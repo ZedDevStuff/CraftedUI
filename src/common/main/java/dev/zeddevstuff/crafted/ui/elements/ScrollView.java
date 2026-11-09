@@ -367,7 +367,10 @@ public class ScrollView extends Box
 		public void render(ICanvas canvas, ScrollView element)
 		{
 			var layout = element.getLayout();
+			canvas.beginTransform();
+			canvas.translate(element.scrollX.get(), element.scrollY.get());
 			canvas.drawRect(layout.x, layout.y, layout.width, layout.height, element.color.get());
+			canvas.endTransform();
 		}
 
 		@Override

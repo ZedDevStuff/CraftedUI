@@ -7,7 +7,9 @@ import dev.zeddevstuff.crafted.input.events.KeyEvent;
 import dev.zeddevstuff.crafted.parsing.CraftedXmlParser;
 import dev.zeddevstuff.crafted.parsing.DocumentBuilder;
 import dev.zeddevstuff.crafted.parsing.ParsedNode;
+import dev.zeddevstuff.crafted.parsing.Parsers;
 import dev.zeddevstuff.crafted.platform.CanvasImpl;
+import dev.zeddevstuff.crafted.platform.IText;
 import dev.zeddevstuff.crafted.platform.TextConverter;
 import dev.zeddevstuff.crafted.rendering.CraftedRenderer;
 import dev.zeddevstuff.crafted.ui.CraftedContext;
@@ -25,6 +27,7 @@ public class CraftedScreen extends Screen
 	protected final CraftedContext context;
 	protected final CraftedRoot rootElement;
 	protected final CraftedRenderer renderer;
+
 	public CraftedScreen(CraftedRoot rootElement)
 	{
 		super(TextConverter.toMinecraftText(rootElement.title.get()));
@@ -35,18 +38,36 @@ public class CraftedScreen extends Screen
 		context.inputHandler.setRootElement(rootElement);
 		rootElement.refreshLayoutTree();
 	}
-	public CraftedScreen(CraftedContext ctx, Function<CraftedContext, CraftedRoot> rootElementFactory)
-	{
-		this(rootElementFactory.apply(ctx));
-	}
 	public CraftedScreen(CraftedContext ctx, ParsedNode rootElementNode)
 	{
-		this(ctx, (context) -> (CraftedRoot) DocumentBuilder.buildTree(ctx, rootElementNode));
+		super(TextConverter.toMinecraftText(Parsers.parseText(rootElementNode.attributes().getOrDefault("title", null), IText.literal("Crafted Screen"))));
+		this.canvas = new CanvasImpl(Minecraft.getInstance());
+		this.context = ctx;
+		initContext(ctx);
+		var rootElement = (CraftedRoot) DocumentBuilder.buildTree(ctx, rootElementNode);
+		this.rootElement = rootElement;
+		this.renderer = new CraftedRenderer(rootElement);
+		context.inputHandler.setRootElement(rootElement);
+		treeBuilt(rootElement);
+		rootElement.refreshLayoutTree();
 	}
 	public CraftedScreen(CraftedContext ctx, String xml)
 	{
 		this(ctx, CraftedXmlParser.parse(xml));
 	}
+
+	/**
+	 * Override this method to initialize the {@link CraftedContext} before the tree is built. <br>
+	 * This is useful for registering callbacks and other context-related things.
+	 * @param ctx
+	 */
+	public void initContext(CraftedContext ctx) {}
+	/**
+	 * Override this method to do something after the tree is built. <br>
+	 * This is mostly used for finding and storing references to elements for later use.
+	 * @param rootElement
+	 */
+	public void treeBuilt(CraftedRoot rootElement) {}
 	//Timer timer = new Timer();
 	@Override
 	public void render(GuiGraphics guiGraphics, int i, int i1, float v)
