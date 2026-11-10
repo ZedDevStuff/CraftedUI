@@ -460,6 +460,17 @@ public abstract class CraftedElement
 		return parent != null && parent.isDescendantOf(element);
 	}
 
+	public boolean is(Class<?> type)
+	{
+		return type.isInstance(this);
+	}
+	public <T extends CraftedElement> T as(Class<T> type)
+	{
+		if(!type.isInstance(this))
+			throw new ClassCastException("Cannot cast " + this.getClass().getName() + " to " + type.getName());
+		return type.cast(this);
+	}
+
 	public CraftedElement getElementById(String id)
 	{
 		if(this.id.get().equals(id))
@@ -473,6 +484,71 @@ public abstract class CraftedElement
 		return null;
 	}
 	public CraftedElement[] findElements(Predicate<CraftedElement> predicate)
+	{
+		List<CraftedElement> results = new ArrayList<>();
+		collectElements(predicate, results);
+		return results.toArray(new CraftedElement[0]);
+	}
+	public CraftedElement findAncestor(Predicate<CraftedElement> predicate)
+	{
+		if(predicate.test(this))
+			return this;
+		if(parent != null)
+			return parent.findAncestor(predicate);
+		return null;
+	}
+	public <T extends CraftedElement> T findAncestorOfType(Class<T> type)
+	{
+		var ancestor = findAncestor(type::isInstance);
+		if(ancestor == null)
+			return null;
+		return type.cast(ancestor);
+	}
+	public CraftedElement[] findAncestors(Predicate<CraftedElement> predicate)
+	{
+		List<CraftedElement> results = new ArrayList<>();
+		CraftedElement current = this;
+		while(current != null)
+		{
+			if(predicate.test(current))
+				results.add(current);
+			current = current.parent;
+		}
+		return results.toArray(new CraftedElement[0]);
+	}
+	@SuppressWarnings("unchecked")
+	public <T extends CraftedElement> T[] findAncestorsOfType(Class<T> type)
+	{
+		List<T> results = new ArrayList<>();
+		CraftedElement current = this;
+		while(current != null)
+		{
+			if(type.isInstance(current))
+				results.add(type.cast(current));
+			current = current.parent;
+		}
+		return results.toArray((T[]) java.lang.reflect.Array.newInstance(type, 0));
+	}
+	public CraftedElement findDescendant(Predicate<CraftedElement> predicate)
+	{
+		if(predicate.test(this))
+			return this;
+		for(var child : children)
+		{
+			var result = child.findDescendant(predicate);
+			if(result != null)
+				return result;
+		}
+		return null;
+	}
+	public <T extends CraftedElement> T findDescendantOfType(Class<T> type)
+	{
+		var descendant = findDescendant(type::isInstance);
+		if(descendant == null)
+			return null;
+		return type.cast(descendant);
+	}
+	public CraftedElement[] findDescendants(Predicate<CraftedElement> predicate)
 	{
 		List<CraftedElement> results = new ArrayList<>();
 		collectElements(predicate, results);
@@ -574,6 +650,41 @@ public abstract class CraftedElement
 	{
 		for(var child : children)
 			removeChild(child);
+	}
+
+	public CraftedElement getChild(int index)
+	{
+		if(index < 0 || index >= children.size())
+			throw new IndexOutOfBoundsException("Index: " + index + ", Size: " + children.size());
+		return children.get(index);
+	}
+	public <T extends CraftedElement> T getChildAs(int index, Class<T> type)
+	{
+		var child = getChild(index);
+		if(!type.isInstance(child))
+			throw new ClassCastException("Child at index " + index + " is not of type " + type.getName() + ". Actual type: " + child.getClass().getName());
+		return type.cast(child);
+	}
+
+	public CraftedElement getChild(int... path)
+	{
+		CraftedElement current = this;
+		for(int index : path)
+		{
+			if(current == null)
+				throw new IllegalArgumentException("Path leads to a null element.");
+			if(index < 0 || index >= current.children.size())
+				throw new IndexOutOfBoundsException("Index: " + index + ", Size: " + current.children.size());
+			current = current.children.get(index);
+		}
+		return current;
+	}
+	public <T extends CraftedElement> T getChildAs(Class<T> type, int... path)
+	{
+		var child = getChild(path);
+		if(!type.isInstance(child))
+			throw new ClassCastException("Child at path " + Arrays.toString(path) + " is not of type " + type.getName() + ". Actual type: " + child.getClass().getName());
+		return type.cast(child);
 	}
 
 	private CraftedElement detachedParent;
