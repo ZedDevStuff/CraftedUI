@@ -6,6 +6,7 @@ import dev.zeddevstuff.crafted.platform.*;
 import dev.zeddevstuff.crafted.ui.elements.All;
 import dev.zeddevstuff.crafted.utils.SchemaGenerator;
 import net.minecraft.client.Minecraft;
+import net.minecraft.resources.ResourceLocation;
 
 import java.nio.file.Path;
 
@@ -15,14 +16,13 @@ public class Entry
 
 	static void init(Path resources)
 	{
-		IPreloader loader = new Preloader(resources);
-		loader.load();
 		Crafted.setDefaultInstance(new Crafted(
 			new MinecraftLocalization(),
 			new MinecraftFont("minecraft", Minecraft.getInstance().font),
 			new MainThreadDispatcher(),
 			new MinecraftTextureManager(),
-			new Clipboard()
+			new Clipboard(),
+			new DocumentLoader()
 		));
 		LogUtils.getLogger().info("CraftedUI initialized");
 		All.registerInto(Crafted.defaultInstance());
@@ -31,6 +31,6 @@ public class Entry
 			var schema = SchemaGenerator.generateSchema(Crafted.defaultInstance());
 			System.out.println(schema);
 		}
-		gallery = loader.getDocument("Gallery");
+		gallery = Crafted.defaultInstance().getDocument(Constants.MOD_ID, "ui/gallery.xml").get();
 	}
 }

@@ -1,11 +1,13 @@
 package dev.zeddevstuff.crafted;
 
+import dev.zeddevstuff.crafted.parsing.ParsedNode;
 import dev.zeddevstuff.crafted.platform.*;
 import dev.zeddevstuff.crafted.rendering.RendererRegistry;
 import dev.zeddevstuff.crafted.types.TextSettings;
 import dev.zeddevstuff.crafted.ui.CraftedContext;
 import dev.zeddevstuff.crafted.ui.CraftedElement;
 import dev.zeddevstuff.crafted.ui.ElementRegistry;
+import dev.zeddevstuff.crafted.utils.Lazy;
 
 import java.util.Map;
 
@@ -22,18 +24,20 @@ public class Crafted
 	public final IDispatcher dispatcher;
 	public final ITextureManager textures;
 	public final IClipboard clipboard;
+	public final IDocumentLoader documentLoader;
 	public final TextSettings defaultTextSettings;
 	public final ElementRegistry elements = new ElementRegistry();
 	public final RendererRegistry renderers = new RendererRegistry();
 	private final Map<String, IFont> fonts = new java.util.HashMap<>();
 
-	public Crafted(ILocalization localization, IFont defaultFont, IDispatcher dispatcher, ITextureManager textures, IClipboard clipboard)
+	public Crafted(ILocalization localization, IFont defaultFont, IDispatcher dispatcher, ITextureManager textures, IClipboard clipboard, IDocumentLoader documentLoader)
 	{
 		this.localization = localization;
 		this.defaultFont = defaultFont;
 		this.dispatcher = dispatcher;
 		this.textures = textures;
 		this.clipboard = clipboard;
+		this.documentLoader = documentLoader;
 		this.defaultTextSettings = TextSettings.DEFAULT.withFont(defaultFont);
 		registerFont("default", defaultFont);
 	}
@@ -43,6 +47,15 @@ public class Crafted
 		if(instance == null)
 			throw new RuntimeException("Either forgot to initialize crafted in the versioned entrypoint or called defaultInstance() too early");
 		return instance;
+	}
+
+	public Lazy<ParsedNode> getDocument(String name)
+	{
+		return documentLoader.getDocument(name);
+	}
+	public Lazy<ParsedNode> getDocument(String namespace, String path)
+	{
+		return documentLoader.getDocument(namespace, path);
 	}
 
 	public CraftedElement createElement(CraftedContext ctx, String tag, Map<String, String> attributes)
