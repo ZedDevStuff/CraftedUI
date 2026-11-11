@@ -5,6 +5,12 @@ import net.minecraft.resources.ResourceLocation;
 public class MinecraftTextureManager implements ITextureManager
 {
 	@Override
+	public ITexture web(String url)
+	{
+		return new MinecraftTexture(url);
+	}
+
+	@Override
 	public ITexture get(String path)
 	{
 		return new MinecraftTexture(ResourceLocation.parse(path));

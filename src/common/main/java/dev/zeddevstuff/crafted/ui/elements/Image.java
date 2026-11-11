@@ -26,7 +26,10 @@ public class Image extends CraftedElement
 
 	private ITexture parseTexture(String s, ITexture iTexture)
 	{
-		return ctx.crafted.textures.get(s);
+		if(s.startsWith("http://") || s.startsWith("https://"))
+			return ctx.crafted.textures.web(s);
+		else
+			return ctx.crafted.textures.get(s);
 	}
 
 	public static void register(Crafted crafted)

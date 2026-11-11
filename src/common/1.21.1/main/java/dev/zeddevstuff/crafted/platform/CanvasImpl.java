@@ -91,10 +91,10 @@ public class CanvasImpl implements ICanvas
 	{
 		if(texture instanceof MinecraftTexture mcTex)
 		{
-			if(mcTex.getKind() == ITexture.Kind.SIMPLE)
-				graphics.blit(mcTex.resourceLocation, (int) dest.minX(), (int) dest.minY(), 0f, 0f, (int) dest.width(), (int) dest.height(), (int) dest.width(), (int) dest.height());
-			else if(mcTex.getKind() == ITexture.Kind.SPRITE)
-				graphics.blitSprite(mcTex.resourceLocation, (int) dest.minX(), (int) dest.minY(), (int) dest.width(), (int) dest.height());
+			if(mcTex.getKind() == ITexture.Kind.SIMPLE && mcTex.getResourceLocation() != null)
+				graphics.blit(mcTex.getResourceLocation(), (int) dest.minX(), (int) dest.minY(), 0f, 0f, (int) dest.width(), (int) dest.height(), (int) dest.width(), (int) dest.height());
+			else if(mcTex.getKind() == ITexture.Kind.SPRITE && mcTex.getResourceLocation() != null)
+				graphics.blitSprite(mcTex.getResourceLocation(), (int) dest.minX(), (int) dest.minY(), (int) dest.width(), (int) dest.height());
 		}
 	}
 
@@ -108,11 +108,11 @@ public class CanvasImpl implements ICanvas
 			// void blitSprite(ResourceLocation sprite, int x, int y, int blitOffset, int width, int height)
 			// void blitSprite(ResourceLocation sprite, int textureWidth, int textureHeight, int uPosition, int vPosition, int x, int y, int uWidth, int vHeight)
 			// void blitSprite(ResourceLocation sprite, int textureWidth, int textureHeight, int uPosition, int vPosition, int x, int y, int blitOffset, int uWidth, int vHeight)
-			if(mcTex.getKind() == ITexture.Kind.SIMPLE)
+			if(mcTex.getKind() == ITexture.Kind.SIMPLE && mcTex.getResourceLocation() != null)
 				// It sorta works? I really hate programming without documentation
-				graphics.blit(mcTex.resourceLocation, (int) dest.minX(), (int) dest.minY(), src.uOffset(texture.getWidth()), src.vOffset(texture.getHeight()), (int) dest.width(), (int) dest.height(), (int) (dest.width() * src.uScale(16)), (int) (dest.height() * src.vScale(16)));
-			else if(mcTex.getKind() == ITexture.Kind.SPRITE)
-				graphics.blitSprite(mcTex.resourceLocation, (int) src.width(), (int) src.height(), (int) src.minX(), (int) src.minY(), (int) dest.minX(), (int) dest.minY(), (int) dest.width(), (int) dest.height());
+				graphics.blit(mcTex.getResourceLocation(), (int) dest.minX(), (int) dest.minY(), src.uOffset(texture.getWidth()), src.vOffset(texture.getHeight()), (int) dest.width(), (int) dest.height(), (int) (dest.width() * src.uScale(16)), (int) (dest.height() * src.vScale(16)));
+			else if(mcTex.getKind() == ITexture.Kind.SPRITE && mcTex.getResourceLocation() != null)
+				graphics.blitSprite(mcTex.getResourceLocation(), (int) src.width(), (int) src.height(), (int) src.minX(), (int) src.minY(), (int) dest.minX(), (int) dest.minY(), (int) dest.width(), (int) dest.height());
 		}
 	}
 
