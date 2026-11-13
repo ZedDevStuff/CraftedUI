@@ -5,6 +5,7 @@ import net.neoforged.bus.api.IEventBus;
 import net.neoforged.fml.ModContainer;
 import net.neoforged.fml.common.Mod;
 import net.neoforged.fml.event.lifecycle.FMLLoadCompleteEvent;
+import net.neoforged.neoforge.client.event.RegisterClientReloadListenersEvent;
 
 import java.net.URISyntaxException;
 import java.nio.file.Path;
@@ -12,13 +13,8 @@ import java.nio.file.Path;
 @Mod(value = Constants.MOD_ID, dist = Dist.CLIENT)
 public class CraftedNeoForge
 {
-	public CraftedNeoForge(IEventBus modEventBus, ModContainer mod)
+	public CraftedNeoForge(IEventBus modEventBus)
 	{
-		modEventBus.addListener((FMLLoadCompleteEvent e) -> Entry.init(mod.getModInfo()
-			.getOwningFile()
-			.getFile()
-			.findResource("META-INF/neoforge.mods.toml")
-			.getParent()
-			.getParent()));
+		modEventBus.addListener((FMLLoadCompleteEvent e) -> Entry.init());
 	}
 }

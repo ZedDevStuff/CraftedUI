@@ -14,15 +14,14 @@ public class Entry
 {
 	public static ParsedNode gallery;
 
-	static void init(Path resources)
+	static void init()
 	{
 		Crafted.setDefaultInstance(new Crafted(
 			new MinecraftLocalization(),
 			new MinecraftFont("minecraft", Minecraft.getInstance().font),
 			new MainThreadDispatcher(),
 			new MinecraftTextureManager(),
-			new Clipboard(),
-			new DocumentLoader()
+			new Clipboard()
 		));
 		LogUtils.getLogger().info("CraftedUI initialized");
 		All.registerInto(Crafted.defaultInstance());
@@ -31,6 +30,6 @@ public class Entry
 			var schema = SchemaGenerator.generateSchema(Crafted.defaultInstance());
 			System.out.println(schema);
 		}
-		gallery = Crafted.defaultInstance().getDocument(Constants.MOD_ID, "ui/gallery.xml").get();
+		gallery = Crafted.defaultInstance().getLoader(Crafted.class).getDocument("/assets/crafted_ui/ui/Gallery.xml").get();
 	}
 }

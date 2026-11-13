@@ -24,21 +24,21 @@ public class Crafted
 	public final IDispatcher dispatcher;
 	public final ITextureManager textures;
 	public final IClipboard clipboard;
-	public final IDocumentLoader documentLoader;
 	public final TextSettings defaultTextSettings;
 	public final ElementRegistry elements = new ElementRegistry();
 	public final RendererRegistry renderers = new RendererRegistry();
 	private final Map<String, IFont> fonts = new java.util.HashMap<>();
+	private final Map<Class<?>, DocumentLoader> loaders = new java.util.HashMap<>();
 
-	public Crafted(ILocalization localization, IFont defaultFont, IDispatcher dispatcher, ITextureManager textures, IClipboard clipboard, IDocumentLoader documentLoader)
+	public Crafted(ILocalization localization, IFont defaultFont, IDispatcher dispatcher, ITextureManager textures, IClipboard clipboard)
 	{
 		this.localization = localization;
 		this.defaultFont = defaultFont;
 		this.dispatcher = dispatcher;
 		this.textures = textures;
 		this.clipboard = clipboard;
-		this.documentLoader = documentLoader;
 		this.defaultTextSettings = TextSettings.DEFAULT.withFont(defaultFont);
+		this.loaders.put(Crafted.class, new DocumentLoader(Crafted.class));
 		registerFont("default", defaultFont);
 	}
 
@@ -49,13 +49,11 @@ public class Crafted
 		return instance;
 	}
 
-	public Lazy<ParsedNode> getDocument(String name)
+	public DocumentLoader getLoader(Class<?> sourceClass)
 	{
-		return documentLoader.getDocument(name);
-	}
-	public Lazy<ParsedNode> getDocument(String namespace, String path)
-	{
-		return documentLoader.getDocument(namespace, path);
+		if(!loaders.containsKey(sourceClass))
+			loaders.put(sourceClass, new DocumentLoader(sourceClass));
+		return loaders.get(sourceClass);
 	}
 
 	public CraftedElement createElement(CraftedContext ctx, String tag, Map<String, String> attributes)
