@@ -1,7 +1,6 @@
 package dev.zeddevstuff.crafted.rendering;
 
 import java.util.HashMap;
-import java.util.Objects;
 
 public class RendererRegistry
 {
@@ -16,35 +15,39 @@ public class RendererRegistry
 	@SuppressWarnings("unchecked")
 	public <T> IRendersType<T> getRenderer(Class<T> elementClass, String rendererName)
 	{
-		var rendererMap = registry.get(elementClass);
-		if (rendererMap == null)
-		{
-			System.err.println("No renderers registered for element class: " + elementClass.getName());
-			return null;
-		}
-		var renderer = rendererMap.get(rendererName);
+		var renderer = findRenderer(elementClass, rendererName);
 		if (renderer == null)
 		{
-			if(Objects.equals(rendererName, "default"))
-				throw new RuntimeException("No default renderer registered for element class: " + elementClass.getName());
+			System.err.println("No registered renderer compatible with element class: " + elementClass.getName());
 			return null;
 		}
 		return (IRendersType<T>) renderer;
 	}
+
+	private IRendersType<?> findRenderer(Class<?> elementClass, String rendererName)
+	{
+		var rendererMap = registry.get(elementClass);
+		var renderer = rendererMap == null
+			? null
+			: rendererMap.get(rendererName);
+		if (renderer != null)
+			return renderer;
+
+		var parent = elementClass.getSuperclass();
+		return parent == null
+			? null
+			: findRenderer(parent, rendererName);
+	}
+
 	@SuppressWarnings("unchecked")
 	public <T> IRendersType<T> getRendererOrDefault(Class<T> elementClass, String rendererName)
 	{
-		var rendererMap = registry.get(elementClass);
-		if (rendererMap == null)
-		{
-			throw new RuntimeException("No renderers registered for element class: " + elementClass.getName());
-		}
-		var renderer = rendererMap.get(rendererName);
+		var renderer = findRenderer(elementClass, rendererName);
+		if (renderer == null)
+			renderer = findRenderer(elementClass, "default");
 		if (renderer == null)
 		{
-			renderer = rendererMap.get("default");
-			if(renderer == null)
-				throw new RuntimeException("No default renderer registered for element class: " + elementClass.getName());
+			throw new RuntimeException("No registered renderer compatible with element class: " + elementClass.getName());
 		}
 		return (IRendersType<T>) renderer;
 	}

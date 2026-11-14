@@ -1,6 +1,6 @@
 <Crafted title="Gallery" renderer="default" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:noNamespaceSchemaLocation="CraftedUI.xsd">
-    <Box id="window" color="background" flex="1" flexDirection="column">
+    <ScrollView id="window" horizontalScrollbar="false" color="background" flex="1" flexDirection="column">
         <Box id="header" color="primary" height="32" flexDirection="row" alignItems="center">
             <Text color="onBackground" fontScale="1.5">Crafted UI Gallery</Text>
         </Box>
@@ -20,7 +20,7 @@
         <Box id="inputs" gap="4" flexDirection="row" flexWrap="wrap" margin="2">
             <Input onSubmit="printSubmit" width="200" height="20" placeholder="Search..." />
             <Checkbox size="20,20" />
-            <Checkbox renderer="crafted" size="20,20" />
+            <Checkbox renderer="crafted" size="20,20" onClick="switchEither"/>
             <Checkbox renderer="crafted" size="20,20" indeterminate="true" style="primary" />
             <Checkbox renderer="crafted" size="20,20" indeterminate="true" style="secondary" />
             <Checkbox renderer="crafted" size="20,20" indeterminate="true" style="error" />
@@ -30,6 +30,13 @@
             <Dropdown options="testOptions" size="100,20" />
             <Dropdown renderer="crafted" options="testOptions" size="100,20" />
         </Box>
+        <List items="testOptions" extractor="optionExtractor" width="100">
+            <Text color="onBackground" text="value" />
+        </List>
+        <Either id="either" value="true">
+            <Text color="success">Either: primary</Text>
+            <Text color="error">Either: fallback</Text>
+        </Either>
         <ScrollView height="200" alignSelf="stretch" horizontalScrollbar="false">
             <Text color="onBackground" margin="2">Misc</Text>
             <Box id="misc" gap="4" flexDirection="row" flexWrap="wrap" margin="2">
@@ -53,5 +60,5 @@
                 </Box>
             </ScrollView>
         </ScrollView>
-    </Box>
+    </ScrollView>
 </Crafted>

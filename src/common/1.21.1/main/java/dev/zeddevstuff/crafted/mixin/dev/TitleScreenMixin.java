@@ -7,7 +7,12 @@ import dev.zeddevstuff.crafted.input.events.ClickEvent;
 import dev.zeddevstuff.crafted.input.events.IClickEventHandler;
 import dev.zeddevstuff.crafted.input.events.ISubmitEventHandler;
 import dev.zeddevstuff.crafted.types.Rect;
+import dev.zeddevstuff.crafted.ui.BindingExtractor;
+import dev.zeddevstuff.crafted.ui.BindingScope;
 import dev.zeddevstuff.crafted.ui.CraftedContext;
+import dev.zeddevstuff.crafted.ui.elements.Checkbox;
+import dev.zeddevstuff.crafted.ui.elements.CraftedRoot;
+import dev.zeddevstuff.crafted.ui.elements.Either;
 import dev.zeddevstuff.crafted.ui.elements.Input;
 import dev.zeddevstuff.crafted.utils.TypedList;
 import net.minecraft.client.gui.components.Button;
@@ -43,7 +48,7 @@ public abstract class TitleScreenMixin extends Screen
 			Rect.posAndSize(20, this.height - 40, 20, 20),
 			ctx,
 			"""
-				<Crafted renderer="crafted" title="Portal Test">
+				<Crafted treeRenderer="crafted" title="Portal Test">
 					<Button onClick="openGallery" size="20">C</Button>
 				</Crafted>
 				"""));
@@ -55,9 +60,16 @@ public abstract class TitleScreenMixin extends Screen
 		var ctx = new CraftedContext();
 		ctx.registerCallback(IClickEventHandler.class, "sayHi", e -> System.out.println("Hi!"));
 		ctx.registerCallback(ISubmitEventHandler.class, "printSubmit", e -> {
-			System.out.println("Submitted value: '" + event.getTargetAs(Input.class).value.get() + "'");
+			System.out.println("Submitted value: '" + e.getTargetAs(Input.class).value.get() + "'");
+		});
+		ctx.registerCallback(IClickEventHandler.class, "switchEither", e -> {
+			var root = e.getTarget().findAncestorOfType(CraftedRoot.class);
+			var either = root.getElementById("either").as(Either.class);
+			either.value.set(e.getTargetAs(Checkbox.class).checked.get());
 		});
 		ctx.setVar("testOptions", new TypedList<>(String.class, List.of("Option 1", "Option 2", "Option 3")));
+		ctx.setVar("optionExtractor", BindingExtractor.class,
+			value -> new BindingScope(java.util.Map.of("value", value)));
 		var screen = new CraftedScreen(ctx, Entry.gallery);
 		minecraft.setScreen(screen);
 	}

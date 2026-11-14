@@ -2,6 +2,7 @@ package dev.zeddevstuff.crafted.parsing;
 
 import dev.zeddevstuff.crafted.ui.CraftedContext;
 import dev.zeddevstuff.crafted.ui.CraftedElement;
+import dev.zeddevstuff.crafted.ui.MetaElement;
 
 public class DocumentBuilder
 {
@@ -16,6 +17,11 @@ public class DocumentBuilder
 	private static CraftedElement buildElementRecursive(CraftedContext ctx, ParsedNode node)
 	{
 		var element = buildElement(ctx, node);
+		if(element instanceof MetaElement metaElement)
+		{
+			metaElement.setTemplateNodes(node.children());
+			return element;
+		}
 		for (var childNode : node.children())
 		{
 			var childElement = buildElementRecursive(ctx, childNode);

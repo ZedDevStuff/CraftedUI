@@ -44,7 +44,10 @@ public class Prop<T> implements IProp<T>
 		this.name = name;
 		validate(value);
 		this.value = value;
-		parser = (str, defaultVal) -> defaultVal;
+		if(type == String.class)
+			parser = (str, defaultVal) -> (T) str;
+		else
+			parser = (str, defaultVal) -> defaultVal;
 	}
 	public Prop(Class<?> type, String name, T value, BiFunction<String, T, T> parser)
 	{

@@ -337,14 +337,31 @@ public abstract class CraftedElement
 			handleCallbackChange(keyType, oldValue, newValue);
 		});
 	}
-
+	@SuppressWarnings("unchecked")
 	void parseAttributes(Map<String, String> attributes)
 	{
 		for(var entry : attributes.entrySet())
 		{
 			var prop = props.get(entry.getKey());
 			if(prop != null)
-				prop.setFromString(entry.getValue());
+			{
+				var boundValue = ctx.resolveBinding(entry.getValue());
+				if(boundValue != null)
+				{
+					if(boundValue instanceof String) //In what world would i ever want this? This overshadows string props
+						prop.setFromString((String) boundValue);
+					else if(prop.getType() != Object.class && !prop.getType().isInstance(boundValue))
+						throw new IllegalArgumentException("Invalid bound value for prop " + prop.getName() + ": " + boundValue);
+					else
+					{
+						@SuppressWarnings("rawtypes")
+						var rawProp = (IProp) prop;
+						rawProp.set(boundValue);
+					}
+				}
+				else
+					prop.setFromString(entry.getValue());
+			}
 		}
 	}
 

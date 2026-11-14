@@ -22,12 +22,12 @@ public class CraftedRoot extends CraftedElement
 	@Description("Title of the document, used for screen title and other purposes")
 	public final Prop<IText> title = registerProp(IText.class, "title", IText.literal("Crafted Document"), Parsers::parseText);
 	@Description("The renderer to use for elements in the tree")
-	public final Prop<String> renderer = registerProp("renderer", "default", Parsers::parseString);
+	public final Prop<String> treeRenderer = registerProp("treeRenderer", "default", Parsers::parseString);
 
 	public CraftedRoot(CraftedContext ctx, Map<String, String> attributes)
 	{
 		super(ctx, attributes);
-		renderer.addListener((prop, oldValue, newValue) -> {
+		treeRenderer.addListener((prop, oldValue, newValue) -> {
 			ctx.currentRenderer = newValue;
 			setRendererRecursive(newValue);
 		});

@@ -7,6 +7,8 @@ import dev.zeddevstuff.crafted.utils.Typed;
 
 import javax.annotation.Nonnull;
 import java.util.HashMap;
+import java.util.ArrayDeque;
+import java.util.Deque;
 
 /**
  * Context class holding useful data and methods. <br>
@@ -18,6 +20,7 @@ public class CraftedContext
 	public final InputHandler inputHandler = new InputHandler();
 	private final HashMap<String, Object> callbacks = new HashMap<>();
 	private final HashMap<String, Typed<?>> vars = new HashMap<>();
+	private final Deque<BindingScope> bindingScopes = new ArrayDeque<>();
 	public ColorTheme theme = ColorTheme.BLUE;
 	/**
 	 * The renderer to use for future elements created in this context.
@@ -82,5 +85,28 @@ public class CraftedContext
 		var newVar = new Typed<>(type, defaultValue);
 		setVar(name, newVar);
 		return newVar;
+	}
+
+	public void pushBindingScope(BindingScope scope)
+	{
+		bindingScopes.push(scope);
+	}
+
+	public void popBindingScope()
+	{
+		if(bindingScopes.isEmpty())
+			throw new IllegalStateException("No binding scope is active.");
+		bindingScopes.pop();
+	}
+
+	public Object resolveBinding(String name)
+	{
+		for(var scope : bindingScopes)
+		{
+			var value = scope.resolve(name);
+			if(value != null)
+				return value;
+		}
+		return null;
 	}
 }
