@@ -28,7 +28,7 @@
       - [ ] Text Area (Basically just a multi-line input)
     - [x] Checkbox
     - [x] Scroll
-      - [ ] List
+      - [x] List
     - [-] Dropdown
   - [ ] Extra elements
     - [ ] Slider
