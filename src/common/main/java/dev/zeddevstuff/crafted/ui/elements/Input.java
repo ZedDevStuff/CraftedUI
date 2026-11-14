@@ -228,7 +228,7 @@ public class Input extends CraftedElement
                 canvas.drawTexture(textfieldHighlightedTexture, Rect.posAndSize(layout.x, layout.y, layout.width, layout.height));
             else
                 canvas.drawTexture(textfieldTexture, Rect.posAndSize(layout.x, layout.y, layout.width, layout.height));
-            canvas.beginClip(layout.x + 2, layout.y + 2, layout.width - 4, layout.height - 4);
+
             var textSettings = element.settings.get().withNoWrap();
             String text = element.text.getText();
             int textLeft = layout.x + 4;
@@ -246,13 +246,17 @@ public class Input extends CraftedElement
 
             float textHeight = element.font.get().measureText(text, textSettings.size(), -1).height();
             int textY = layout.y + (int)((layout.height - textHeight + 1) / 2);
+            canvas.beginClip(
+                layout.x - element.getAncestorRenderOffsetX() + 2,
+                layout.y - element.getAncestorRenderOffsetY() + 2,
+                layout.width - 4,
+                layout.height - 4);
             if(text.isEmpty() && !element.state.isFocused())
                 canvas.drawText(element.placeholder.get(), layout.x + 4, textY, element.placeholderSettings, element.placeholderColor.get());
             else
             {
                 canvas.beginTransform();
                 canvas.translate(-element.xOffset, 0);
-
                 int selectionStart = Math.min(element.text.getSelectionStart(), element.text.getSelectionEnd());
                 int selectionEnd = Math.max(element.text.getSelectionStart(), element.text.getSelectionEnd());
                 if(selectionStart != selectionEnd)
@@ -275,6 +279,7 @@ public class Input extends CraftedElement
                     canvas.drawRect(cursorX, cursorY, cursorWidth, cursorHeight, element.textColor.get());
                 }
                 canvas.endTransform();
+
             }
             canvas.endClip();
         }
