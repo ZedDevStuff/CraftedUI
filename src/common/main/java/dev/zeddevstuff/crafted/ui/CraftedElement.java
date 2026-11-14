@@ -792,10 +792,23 @@ public abstract class CraftedElement
 
 	public final void layoutTree(float width, float height)
 	{
-		node.calculateLayout(width, height);
-		layout = new LayoutResult(this);
+		for(int pass = 0; pass < 4; pass++)
+		{
+			node.calculateLayout(width, height);
+			layout = new LayoutResult(this);
+			for(var child : children)
+				child.layoutElement();
+			if(!updateLayoutAfterLayoutTree())
+				break;
+		}
+	}
+	protected boolean updateLayoutAfterLayout() { return false; }
+	private boolean updateLayoutAfterLayoutTree()
+	{
+		boolean changed = false;
 		for(var child : children)
-			child.layoutElement();
+			changed |= child.updateLayoutAfterLayoutTree();
+		return updateLayoutAfterLayout() || changed;
 	}
 	public final void refreshLayoutTree()
 	{

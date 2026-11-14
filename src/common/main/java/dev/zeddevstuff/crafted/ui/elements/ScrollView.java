@@ -26,8 +26,11 @@ public class ScrollView extends Box
 
 	public final Prop<Boolean> horizontalScrollbar = registerProp("horizontalScrollbar", true, Parsers::parseBoolean);
 	public final Prop<Boolean> verticalScrollbar = registerProp("verticalScrollbar", true, Parsers::parseBoolean);
+	public final Prop<Boolean> autoHideScrollbars = registerProp("autoHideScrollbars", true, Parsers::parseBoolean);
 
 	public final Prop<Integer> scrollbarSize = registerProp("scrollbarSize", 6, this::parseInteger);
+	private boolean horizontalScrollbarVisible = true;
+	private boolean verticalScrollbarVisible = true;
 	private boolean draggingHorizontal;
 	private boolean draggingVertical;
 	private float dragStartX;
@@ -41,26 +44,15 @@ public class ScrollView extends Box
 		color.set(ctx.theme.surface());
 		horizontalScrollbar.addListener((prop, oldValue, newValue) -> {
 			if(!newValue)
-			{
-				node.setPadding(YogaEdge.BOTTOM, 0);
 				scrollX.set(0);
-			}
-			else
-			{
-				node.setPadding(YogaEdge.BOTTOM, scrollbarSize.get());
-			}
+			updateScrollbarPadding();
 		});
 		verticalScrollbar.addListener((prop, oldValue, newValue) -> {
 			if(!newValue)
-			{
-				node.setPadding(YogaEdge.RIGHT, 0);
 				scrollY.set(0);
-			}
-			else
-			{
-				node.setPadding(YogaEdge.RIGHT, scrollbarSize.get());
-			}
+			updateScrollbarPadding();
 		});
+		autoHideScrollbars.addListener((prop, oldValue, newValue) -> updateScrollbarPadding());
 		scrollbarSize.addListener((prop, oldValue, newValue) -> updateScrollbarPadding());
 		updateScrollbarPadding();
 	}
@@ -86,8 +78,35 @@ public class ScrollView extends Box
 
 	private void updateScrollbarPadding()
 	{
-		node.setPadding(YogaEdge.BOTTOM, horizontalScrollbar.get() ? scrollbarSize.get() : 0);
-		node.setPadding(YogaEdge.RIGHT, verticalScrollbar.get() ? scrollbarSize.get() : 0);
+		node.setPadding(YogaEdge.BOTTOM, showsHorizontalScrollbar() ? scrollbarSize.get() : 0);
+		node.setPadding(YogaEdge.RIGHT, showsVerticalScrollbar() ? scrollbarSize.get() : 0);
+	}
+
+	private boolean showsHorizontalScrollbar()
+	{
+		return horizontalScrollbar.get() && (!autoHideScrollbars.get() || horizontalScrollbarVisible);
+	}
+
+	private boolean showsVerticalScrollbar()
+	{
+		return verticalScrollbar.get() && (!autoHideScrollbars.get() || verticalScrollbarVisible);
+	}
+
+	@Override
+	protected boolean updateLayoutAfterLayout()
+	{
+		boolean newHorizontalVisibility = horizontalScrollbar.get()
+			&& (!autoHideScrollbars.get() || maxScrollX() > 0);
+		boolean newVerticalVisibility = verticalScrollbar.get()
+			&& (!autoHideScrollbars.get() || maxScrollY() > 0);
+		if(horizontalScrollbarVisible == newHorizontalVisibility
+			&& verticalScrollbarVisible == newVerticalVisibility)
+			return false;
+		horizontalScrollbarVisible = newHorizontalVisibility;
+		verticalScrollbarVisible = newVerticalVisibility;
+		updateScrollbarPadding();
+		clampScroll();
+		return true;
 	}
 
 	private int maxScrollX()
@@ -110,12 +129,12 @@ public class ScrollView extends Box
 
 	private int horizontalTrackWidth()
 	{
-		return getLayout().width - (verticalScrollbar.get() ? scrollbarSize.get() : 0);
+		return getLayout().width - (showsVerticalScrollbar() ? scrollbarSize.get() : 0);
 	}
 
 	private int verticalTrackHeight()
 	{
-		return getLayout().height - (horizontalScrollbar.get() ? scrollbarSize.get() : 0);
+		return getLayout().height - (showsHorizontalScrollbar() ? scrollbarSize.get() : 0);
 	}
 
 	private int horizontalThumbWidth()
@@ -157,7 +176,7 @@ public class ScrollView extends Box
 	private boolean containsHorizontalThumb(float x, float y)
 	{
 		var layout = getLayout();
-		return horizontalScrollbar.get()
+		return showsHorizontalScrollbar()
 			&& x >= horizontalThumbScreenX() && x <= horizontalThumbScreenX() + horizontalThumbWidth()
 			&& y >= layout.y - getAncestorRenderOffsetY() + layout.height - scrollbarSize.get()
 			&& y <= layout.y - getAncestorRenderOffsetY() + layout.height;
@@ -166,7 +185,7 @@ public class ScrollView extends Box
 	private boolean containsVerticalThumb(float x, float y)
 	{
 		var layout = getLayout();
-		return verticalScrollbar.get()
+		return showsVerticalScrollbar()
 			&& x >= layout.x - getAncestorRenderOffsetX() + layout.width - scrollbarSize.get()
 			&& x <= layout.x - getAncestorRenderOffsetX() + layout.width
 			&& y >= verticalThumbScreenY() && y <= verticalThumbScreenY() + verticalThumbHeight();
@@ -336,20 +355,20 @@ public class ScrollView extends Box
 		public void afterRender(ICanvas canvas, ScrollView element)
 		{
 			IRendersType.endClip(canvas, element, element.scrollX.get(), element.scrollY.get());
-			if(element.horizontalScrollbar.get())
+			if(element.showsHorizontalScrollbar())
 			{
 				var layout = element.getLayout();
-				int trackWidth = layout.width - (element.verticalScrollbar.get() ? element.scrollbarSize.get() : 0);
+				int trackWidth = layout.width - (element.showsVerticalScrollbar() ? element.scrollbarSize.get() : 0);
 				int thumbWidth = element.horizontalThumbWidth();
 				int thumbX = element.horizontalThumbX();
 				canvas.drawRect(layout.x, layout.y + layout.height - element.scrollbarSize.get(), trackWidth, element.scrollbarSize.get(), Color.Black);
 				canvas.drawRect(thumbX, layout.y + layout.height - element.scrollbarSize.get(), thumbWidth, element.scrollbarSize.get(), SCROLLBAR_THUMB_SHADOW_COLOR);
 				canvas.drawRect(thumbX, layout.y + layout.height - element.scrollbarSize.get(), thumbWidth - 1, element.scrollbarSize.get() - 1, SCROLLBAR_THUMB_COLOR);
 			}
-			if(element.verticalScrollbar.get())
+			if(element.showsVerticalScrollbar())
 			{
 				var layout = element.getLayout();
-				int trackHeight = layout.height - (element.horizontalScrollbar.get() ? element.scrollbarSize.get() : 0);
+				int trackHeight = layout.height - (element.showsHorizontalScrollbar() ? element.scrollbarSize.get() : 0);
 				int thumbHeight = element.verticalThumbHeight();
 				int thumbY = element.verticalThumbY();
 				canvas.drawRect(layout.x + layout.width - element.scrollbarSize.get(), layout.y, element.scrollbarSize.get(), trackHeight, Color.Black);
@@ -384,19 +403,19 @@ public class ScrollView extends Box
 		public void afterRender(ICanvas canvas, ScrollView element)
 		{
 			IRendersType.endClip(canvas, element, element.scrollX.get(), element.scrollY.get());
-			if(element.horizontalScrollbar.get())
+			if(element.showsHorizontalScrollbar())
 			{
 				var layout = element.getLayout();
-				int trackWidth = layout.width - (element.verticalScrollbar.get() ? element.scrollbarSize.get() : 0);
+				int trackWidth = layout.width - (element.showsVerticalScrollbar() ? element.scrollbarSize.get() : 0);
 				int thumbWidth = element.horizontalThumbWidth();
 				int thumbX = element.horizontalThumbX();
 				canvas.drawRect(layout.x, layout.y + layout.height - element.scrollbarSize.get(), trackWidth, element.scrollbarSize.get(), element.ctx.theme.surfaceVariant());
 				canvas.drawRect(thumbX, layout.y + layout.height - element.scrollbarSize.get(), thumbWidth, element.scrollbarSize.get(), element.ctx.theme.primary());
 			}
-			if(element.verticalScrollbar.get())
+			if(element.showsVerticalScrollbar())
 			{
 				var layout = element.getLayout();
-				int trackHeight = layout.height - (element.horizontalScrollbar.get() ? element.scrollbarSize.get() : 0);
+				int trackHeight = layout.height - (element.showsHorizontalScrollbar() ? element.scrollbarSize.get() : 0);
 				int thumbHeight = element.verticalThumbHeight();
 				int thumbY = element.verticalThumbY();
 				canvas.drawRect(layout.x + layout.width - element.scrollbarSize.get(), layout.y, element.scrollbarSize.get(), trackHeight, element.ctx.theme.surfaceVariant());

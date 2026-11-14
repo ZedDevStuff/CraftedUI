@@ -34,7 +34,9 @@
             <Text color="onBackground" text="value" />
         </List>
         <Either id="either" value="true">
-            <Text color="success">Either: primary</Text>
+            <Box size="auto,200">
+                <Text color="success">Either: primary</Text>
+            </Box>
             <Text color="error">Either: fallback</Text>
         </Either>
         <ScrollView height="200" alignSelf="stretch" horizontalScrollbar="false">
