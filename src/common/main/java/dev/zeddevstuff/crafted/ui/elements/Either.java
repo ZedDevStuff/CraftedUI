@@ -3,6 +3,7 @@ package dev.zeddevstuff.crafted.ui.elements;
 import dev.zeddevstuff.crafted.Crafted;
 import dev.zeddevstuff.crafted.Prop;
 import dev.zeddevstuff.crafted.annotations.DefineElement;
+import dev.zeddevstuff.crafted.annotations.Description;
 import dev.zeddevstuff.crafted.parsing.DocumentBuilder;
 import dev.zeddevstuff.crafted.parsing.ParsedNode;
 import dev.zeddevstuff.crafted.parsing.Parsers;
@@ -15,6 +16,7 @@ import dev.zeddevstuff.crafted.ui.MetaElement;
 import java.util.Map;
 
 @DefineElement("Either")
+@Description("Displays one of the two child elements based on the 'value' property.")
 public class Either extends CraftedElement implements MetaElement
 {
 	public final Prop<Boolean> value = registerProp("value", false, Parsers::parseBoolean);

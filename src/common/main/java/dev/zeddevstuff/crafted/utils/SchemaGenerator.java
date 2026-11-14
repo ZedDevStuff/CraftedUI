@@ -41,7 +41,7 @@ public final class SchemaGenerator
 		for(var element : elements)
 			root.addChild(element);
 
-		return "<?xml version=\"1.0\" encoding=\"utf-8\"?>\n" + root.toXmlString();
+		return root.toXmlString();//"<?xml version=\"1.0\" encoding=\"utf-8\"?>\n" + root.toXmlString();
 	}
 
 	private static void addType(Class<?> elementClass, Map<Class<?>, XmlSchemaNode> types, Set<Class<?>> visiting)

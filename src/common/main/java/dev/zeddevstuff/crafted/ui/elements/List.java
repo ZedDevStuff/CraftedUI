@@ -3,6 +3,7 @@ package dev.zeddevstuff.crafted.ui.elements;
 import dev.zeddevstuff.crafted.Crafted;
 import dev.zeddevstuff.crafted.Prop;
 import dev.zeddevstuff.crafted.annotations.DefineElement;
+import dev.zeddevstuff.crafted.annotations.Description;
 import dev.zeddevstuff.crafted.parsing.DocumentBuilder;
 import dev.zeddevstuff.crafted.parsing.ParsedNode;
 import dev.zeddevstuff.crafted.ui.BindingExtractor;
@@ -15,6 +16,7 @@ import dev.zeddevstuff.crafted.utils.TypedList;
 import java.util.Map;
 
 @DefineElement("List")
+@Description("Displays a list of items using a template for each item.")
 public class List extends ScrollView implements MetaElement
 {
 	public final Prop<TypedList<?>> items = registerProp(TypedList.class, "items", null, this::parseItems);
