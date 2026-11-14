@@ -1,5 +1,7 @@
 package dev.zeddevstuff.crafted.utils;
 
+import org.checkerframework.checker.nullness.qual.NonNull;
+
 import java.util.AbstractList;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -41,6 +43,17 @@ public final class TypedList<T> extends AbstractList<T>
 	}
 
 	@Override
+	public boolean add(T value)
+	{
+		validate(value);
+		var changed = values.add(value);
+		if(changed)
+			for(var listener : listeners)
+				listener.onValuesChanged();
+		return changed;
+	}
+
+	@Override
 	public void add(int index, T value)
 	{
 		validate(value);
@@ -48,6 +61,17 @@ public final class TypedList<T> extends AbstractList<T>
         var copy = new ArrayList<>(listeners);
 		for(var listener : copy)
             listener.onValuesChanged();
+	}
+
+	@Override
+	public boolean addAll(@NonNull Collection<? extends T> c)
+	{
+		var changed = values.addAll(c);
+		var copy = new ArrayList<>(listeners);
+		if(changed)
+			for(var listener : copy)
+				listener.onValuesChanged();
+		return changed;
 	}
 
 	@Override
@@ -61,7 +85,7 @@ public final class TypedList<T> extends AbstractList<T>
         return replaced;
 	}
 
-    @Override
+	@Override
     public boolean remove(Object o) 
     {
         var removed = values.remove(o);
