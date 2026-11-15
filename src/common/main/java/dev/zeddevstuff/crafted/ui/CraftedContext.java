@@ -109,4 +109,13 @@ public class CraftedContext
 		}
 		return null;
 	}
+
+	public Object resolveContextBinding(String name)
+	{
+		var value = resolveBinding(name);
+		if(value != null)
+			return value;
+		var variable = vars.get(name);
+		return variable == null ? null : variable.value;
+	}
 }

@@ -51,9 +51,19 @@ public class Either extends CraftedElement implements MetaElement
 		if(active == next)
 			return;
 		if(active != null)
-			removeChild(active);
+			removeChild(active, false);
 		active = next;
 		addChild(active);
+	}
+
+	@Override
+	public void unbind()
+	{
+		super.unbind();
+		if(first != null)
+			first.unbind();
+		if(second != null && second != first)
+			second.unbind();
 	}
 
 	@Override

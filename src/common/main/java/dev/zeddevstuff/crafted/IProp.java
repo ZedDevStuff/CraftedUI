@@ -7,4 +7,6 @@ public interface IProp<T>
 	T get();
 	void set(T newValue);
 	void setFromString(String str);
+	// void bind
+	// void unbind
 }

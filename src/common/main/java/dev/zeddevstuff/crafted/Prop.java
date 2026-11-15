@@ -9,7 +9,7 @@ import java.util.function.BiFunction;
  * Implementation of {@link IProp} that stores a value and notifies listeners when it changes.
  * @param <T>
  */
-public class Prop<T> implements IProp<T>
+public class Prop<T> implements IObservableProp<T>
 {
 	private final Class<?> type;
 	public final Class<?> getType() { return type; }
@@ -29,6 +29,9 @@ public class Prop<T> implements IProp<T>
         var copy = new ArrayList<>(listeners);
 		for(var listener : copy)
 			listener.onPropChanged(this, oldValue, newValue);
+		var changeCopy = new ArrayList<>(changeListeners);
+		for(var listener : changeCopy)
+			listener.accept(newValue);
 	}
 
 	public void setFromString(String str)
@@ -38,6 +41,7 @@ public class Prop<T> implements IProp<T>
 
 	private final ArrayList<PropChangeListener<T>> listeners = new ArrayList<>();
 
+	private final ArrayList<java.util.function.Consumer<T>> changeListeners = new ArrayList<>();
 	public Prop(Class<?> type, String name, T value)
 	{
 		this.type = type;
@@ -83,6 +87,16 @@ public class Prop<T> implements IProp<T>
 	public void removeListener(PropChangeListener<T> listener) { listeners.remove(listener); }
 
 	@Override
+	public void addChangeListener(java.util.function.Consumer<T> listener)
+	{
+		if(!changeListeners.contains(listener))
+			changeListeners.add(listener);
+	}
+	@Override
+	public void removeChangeListener(java.util.function.Consumer<T> listener)
+	{
+		changeListeners.remove(listener);
+	}
 	public String toString()
 	{
 		return value == null ? "null" : value.toString();

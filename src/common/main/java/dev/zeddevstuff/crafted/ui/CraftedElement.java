@@ -1,6 +1,7 @@
 package dev.zeddevstuff.crafted.ui;
 
 import dev.zeddevstuff.crafted.IProp;
+import dev.zeddevstuff.crafted.IObservableProp;
 import dev.zeddevstuff.crafted.Prop;
 import dev.zeddevstuff.crafted.ProxyProp;
 import dev.zeddevstuff.crafted.annotations.Description;
@@ -53,6 +54,7 @@ public abstract class CraftedElement
 	public LayoutResult getLayout() { return layout; }
 
 	protected final HashMap<String, IProp<?>> props = new HashMap<>();
+	private final HashMap<String, Binding> bindings = new HashMap<>();
 
 	/**
 	 * Registers a property for this element. <br>
@@ -345,7 +347,14 @@ public abstract class CraftedElement
 			var prop = props.get(entry.getKey());
 			if(prop != null)
 			{
-				var boundValue = ctx.resolveBinding(entry.getValue());
+				var attributeValue = entry.getValue();
+				if(attributeValue.startsWith("$bind:"))
+				{
+					bind(entry.getKey(), prop, attributeValue.substring("$bind:".length()));
+					continue;
+				}
+				unbind(entry.getKey());
+				var boundValue = ctx.resolveBinding(attributeValue);
 				if(boundValue != null)
 				{
 					if(boundValue instanceof String) //In what world would i ever want this? This overshadows string props
@@ -362,6 +371,83 @@ public abstract class CraftedElement
 				else
 					prop.setFromString(entry.getValue());
 			}
+		}
+	}
+
+	@SuppressWarnings({"rawtypes", "unchecked"})
+	private void bind(String name, IProp<?> target, String sourceName)
+	{
+		unbind(name);
+		var source = ctx.resolveContextBinding(sourceName);
+		if(!(source instanceof IObservableProp))
+			throw new IllegalArgumentException("Binding source '" + sourceName + "' is not observable.");
+		var sourceProp = (IObservableProp) source;
+		if(target.getType() != Object.class && sourceProp.get() != null && !target.getType().isInstance(sourceProp.get()))
+			throw new IllegalArgumentException("Invalid bound value for prop " + target.getName() + ": " + sourceProp.get());
+		var binding = new Binding(target, sourceProp);
+		bindings.put(name, binding);
+		binding.applySourceValue(sourceProp.get());
+	}
+
+	public void unbind(String name)
+	{
+		var binding = bindings.remove(name);
+		if(binding != null)
+			binding.close();
+	}
+
+	public void unbind()
+	{
+		for(var binding : new ArrayList<>(bindings.values()))
+			binding.close();
+		bindings.clear();
+		for(var child : new ArrayList<>(children))
+			child.unbind();
+	}
+
+	@SuppressWarnings({"rawtypes", "unchecked"})
+	private final class Binding
+	{
+		private final IProp target;
+		private final IObservableProp source;
+		private final Consumer sourceListener;
+		private final Consumer targetListener;
+		private boolean updating;
+
+		private Binding(IProp target, IObservableProp source)
+		{
+			this.target = target;
+			this.source = source;
+			sourceListener = value -> applySourceValue(value);
+			targetListener = value -> {
+				if(!updating)
+					source.set(value);
+			};
+			source.addChangeListener(sourceListener);
+			if(target instanceof IObservableProp observableTarget)
+				observableTarget.addChangeListener(targetListener);
+		}
+
+		private void applySourceValue(Object value)
+		{
+			if(value != null && target.getType() != Object.class && !target.getType().isInstance(value))
+				throw new IllegalArgumentException("Invalid bound value for prop " + target.getName() + ": " + value);
+			updating = true;
+			try
+			{
+				target.set(value);
+			}
+			finally
+			{
+				updating = false;
+			}
+		}
+
+		private void close()
+		{
+			source.removeChangeListener(sourceListener);
+			if(target instanceof IObservableProp observableTarget)
+				observableTarget.removeChangeListener(targetListener);
 		}
 	}
 
@@ -639,11 +725,17 @@ public abstract class CraftedElement
 	}
 	public void removeChild(CraftedElement child)
 	{
+		removeChild(child, true);
+	}
+	protected final void removeChild(CraftedElement child, boolean dispose)
+	{
 		if(child == null)
 			return;
 		if(!children.contains(child))
 			return;
-        ctx.inputHandler.detachElement(child);
+		ctx.inputHandler.detachElement(child);
+		if(dispose)
+			child.unbind();
 		children.remove(child);
 		child.parent = null;
 		node.removeChildAndInvalidate(child.node);
@@ -720,7 +812,7 @@ public abstract class CraftedElement
 			return;
 		detachedParent = parent;
 		detachedIndex = parent.children.indexOf(this);
-		parent.removeChild(this);
+		parent.removeChild(this, false);
 	}
 
 	/**
