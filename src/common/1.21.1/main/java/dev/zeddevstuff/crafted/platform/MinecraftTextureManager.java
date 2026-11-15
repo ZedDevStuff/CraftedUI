@@ -2,23 +2,26 @@ package dev.zeddevstuff.crafted.platform;
 
 import net.minecraft.resources.ResourceLocation;
 
+import java.util.Map;
+
 public class MinecraftTextureManager implements ITextureManager
 {
+	private static final Map<String, MinecraftTexture> textureCache = new java.util.HashMap<>();
 	@Override
 	public ITexture web(String url)
 	{
-		return new MinecraftTexture(url);
+		return textureCache.computeIfAbsent(url, MinecraftTexture::new);
 	}
 
 	@Override
 	public ITexture get(String path)
 	{
-		return new MinecraftTexture(ResourceLocation.parse(path));
+		return textureCache.computeIfAbsent(path, p -> new MinecraftTexture(ResourceLocation.parse(p)));
 	}
 
 	@Override
 	public ITexture get(String namespace, String path)
 	{
-		return new MinecraftTexture(ResourceLocation.fromNamespaceAndPath(namespace, path));
+		return textureCache.computeIfAbsent(namespace + ":" + path, p -> new MinecraftTexture(ResourceLocation.fromNamespaceAndPath(namespace, path)));
 	}
 }

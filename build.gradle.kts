@@ -8,7 +8,7 @@ plugins {
 }
 
 group = "dev.zeddevstuff"
-version = "0.13.1"
+version = "0.14.0"
 
 repositories {
     mavenCentral()
@@ -76,6 +76,19 @@ cloche {
 
         mappings {
             official()
+        }
+
+        dependencies {
+            implementation("com.twelvemonkeys.imageio:imageio-core:3.15.3")
+            implementation("com.twelvemonkeys.imageio:imageio-bmp:3.15.3")
+            implementation("com.twelvemonkeys.imageio:imageio-jpeg:3.15.3")
+            implementation("com.twelvemonkeys.imageio:imageio-tiff:3.15.3")
+            implementation("com.twelvemonkeys.imageio:imageio-webp:3.15.3")
+            include("com.twelvemonkeys.imageio:imageio-core:3.15.3")
+            include("com.twelvemonkeys.imageio:imageio-bmp:3.15.3")
+            include("com.twelvemonkeys.imageio:imageio-jpeg:3.15.3")
+            include("com.twelvemonkeys.imageio:imageio-tiff:3.15.3")
+            include("com.twelvemonkeys.imageio:imageio-webp:3.15.3")
         }
 
         metadata {

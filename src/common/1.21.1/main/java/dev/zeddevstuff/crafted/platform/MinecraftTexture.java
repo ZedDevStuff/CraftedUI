@@ -2,6 +2,7 @@ package dev.zeddevstuff.crafted.platform;
 
 import com.mojang.blaze3d.platform.NativeImage;
 import dev.zeddevstuff.crafted.Crafted;
+import dev.zeddevstuff.crafted.utils.ImageUtils;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.texture.*;
 import net.minecraft.resources.ResourceLocation;
@@ -9,9 +10,12 @@ import net.minecraft.resources.ResourceLocation;
 import java.io.BufferedInputStream;
 import java.net.URI;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.Executor;
+import java.util.concurrent.Executors;
 
-public class MinecraftTexture implements ITexture
+public class MinecraftTexture implements ITexture, AutoCloseable
 {
+	private static final Executor executor = Executors.newCachedThreadPool();
 	private AbstractTexture texture;
 	private ResourceLocation resourceLocation;
 	public ResourceLocation getResourceLocation() { return resourceLocation; }
@@ -30,7 +34,8 @@ public class MinecraftTexture implements ITexture
 	public MinecraftTexture(String url)
 	{
 		this.resourceLocation = null;
-		CompletableFuture.runAsync(() -> downloadFromUrl(url));
+		//CompletableFuture.runAsync(() -> downloadFromUrl(url));
+		executor.execute(() -> downloadFromUrl(url));
 	}
 
 	void fetchData(boolean addExtension)
@@ -78,34 +83,77 @@ public class MinecraftTexture implements ITexture
 		}
 	}
 
-	void downloadFromUrl(String url)
+	CompletableFuture<Void> downloadFromUrl(String url)
 	{
-		try(BufferedInputStream in = new BufferedInputStream(URI.create(url).toURL().openStream()))
-		{
-			var bytes = in.readAllBytes();
-			Crafted.defaultInstance().dispatcher.dispatch(() -> {
-				try
-				{
-					var nativeImage = NativeImage.read(bytes);
-					String textureName = "web_texture_" + url.hashCode();
-					resourceLocation = Minecraft.getInstance().getTextureManager().register(textureName, new DynamicTexture(nativeImage));
-					kind = ITexture.Kind.SIMPLE;
-					width = nativeImage.getWidth();
-					height = nativeImage.getHeight();
-				}
-				catch (Exception e)
+		return ImageUtils.downloadImageAsPng(url)
+			.thenAccept(bytes -> {
+				if (bytes == null)
 				{
 					resourceLocation = MissingTextureAtlasSprite.getLocation();
 					fetchData(false);
-					e.printStackTrace();
+					return;
 				}
+				Crafted.defaultInstance().dispatcher.dispatch(() -> {
+					try
+					{
+						var nativeImage = NativeImage.read(bytes);
+						String textureName = "web_texture_" + url.hashCode();
+						resourceLocation = Minecraft.getInstance().getTextureManager().register(textureName, new DynamicTexture(nativeImage));
+						kind = ITexture.Kind.SIMPLE;
+						width = nativeImage.getWidth();
+						height = nativeImage.getHeight();
+					}
+					catch (Exception e)
+					{
+						resourceLocation = MissingTextureAtlasSprite.getLocation();
+						fetchData(false);
+						e.printStackTrace();
+					}
+				});
+			})
+			.exceptionally(e -> {
+				resourceLocation = MissingTextureAtlasSprite.getLocation();
+				fetchData(false);
+				e.printStackTrace();
+				return null;
 			});
-		}
-		catch (Exception e)
+//		try(BufferedInputStream in = new BufferedInputStream(URI.create(url).toURL().openStream()))
+//		{
+//			var bytes = in.readAllBytes();
+//			Crafted.defaultInstance().dispatcher.dispatch(() -> {
+//				try
+//				{
+//					var finalBytes = ImageUtils.toPng(bytes);
+//					var nativeImage = NativeImage.read(finalBytes);
+//					String textureName = "web_texture_" + url.hashCode();
+//					resourceLocation = Minecraft.getInstance().getTextureManager().register(textureName, new DynamicTexture(nativeImage));
+//					kind = ITexture.Kind.SIMPLE;
+//					width = nativeImage.getWidth();
+//					height = nativeImage.getHeight();
+//				}
+//				catch (Exception e)
+//				{
+//					resourceLocation = MissingTextureAtlasSprite.getLocation();
+//					fetchData(false);
+//					e.printStackTrace();
+//				}
+//			});
+//		}
+//		catch (Exception e)
+//		{
+//			resourceLocation = MissingTextureAtlasSprite.getLocation();
+//			fetchData(false);
+//			e.printStackTrace();
+//		}
+	}
+
+	@Override
+	public void close() throws Exception
+	{
+		if(resourceLocation != null)
 		{
-			resourceLocation = MissingTextureAtlasSprite.getLocation();
-			fetchData(false);
-			e.printStackTrace();
+			var textureManager = Minecraft.getInstance().getTextureManager();
+			textureManager.release(resourceLocation);
 		}
 	}
 }
