@@ -261,32 +261,32 @@ public abstract class CraftedElement
 	public final ProxyProp<StyleSizeLength> maxHeight = registerProp(StyleSizeLength.class, "maxHeight", () -> node.getStyle().getMaxDimension(YogaDimension.HEIGHT), node::setMaxHeight, Parsers::parseStyleSizeLength);
 
 	public final Event<FocusEvent> focusGained = new Event<>(INTERNAL_KEY, FocusEvent.class);
-	public final Prop<IFocusEventHandler> onFocusGained = registerProp(IFocusEventHandler.class, "onFocusGained", this::parseFocusCallback);
+	public final Prop<IFocusEventHandler> onFocusGained = registerProp(IFocusEventHandler.class, "onFocusGained", this::parseFocusHandler);
 	public final Event<FocusEvent> focusLost = new Event<>(INTERNAL_KEY, FocusEvent.class);
-	public final Prop<IFocusEventHandler> onFocusLost = registerProp(IFocusEventHandler.class, "onFocusLost", this::parseFocusCallback);
+	public final Prop<IFocusEventHandler> onFocusLost = registerProp(IFocusEventHandler.class, "onFocusLost", this::parseFocusHandler);
 
 	public final Event<MouseEvent> mouseMove = new Event<>(INTERNAL_KEY, MouseEvent.class);
-	public final Prop<IMouseEventHandler> onMouseMove = registerProp(IMouseEventHandler.class, "onMouseMove", this::parseMouseCallback);
+	public final Prop<IMouseEventHandler> onMouseMove = registerProp(IMouseEventHandler.class, "onMouseMove", this::parseMouseHandler);
 	public final Event<MouseEvent> mouseScroll = new Event<>(INTERNAL_KEY, MouseEvent.class);
-	public final Prop<IMouseEventHandler> onMouseScroll = registerProp(IMouseEventHandler.class, "onMouseScroll", this::parseMouseCallback);
+	public final Prop<IMouseEventHandler> onMouseScroll = registerProp(IMouseEventHandler.class, "onMouseScroll", this::parseMouseHandler);
 	public final Event<MouseEvent> mouseEnter = new Event<>(INTERNAL_KEY, MouseEvent.class);
-	public final Prop<IMouseEventHandler> onMouseEnter = registerProp(IMouseEventHandler.class, "onMouseEnter", this::parseMouseCallback);
+	public final Prop<IMouseEventHandler> onMouseEnter = registerProp(IMouseEventHandler.class, "onMouseEnter", this::parseMouseHandler);
 	public final Event<MouseEvent> mouseExit = new Event<>(INTERNAL_KEY, MouseEvent.class);
-	public final Prop<IMouseEventHandler> onMouseExit = registerProp(IMouseEventHandler.class, "onMouseExit", this::parseMouseCallback);
+	public final Prop<IMouseEventHandler> onMouseExit = registerProp(IMouseEventHandler.class, "onMouseExit", this::parseMouseHandler);
 	public final Event<MouseEvent> mousePress = new Event<>(INTERNAL_KEY, MouseEvent.class);
-	public final Prop<IMouseEventHandler> onMousePress = registerProp(IMouseEventHandler.class, "onMousePress", this::parseMouseCallback);
+	public final Prop<IMouseEventHandler> onMousePress = registerProp(IMouseEventHandler.class, "onMousePress", this::parseMouseHandler);
 	public final Event<MouseEvent> mouseRelease = new Event<>(INTERNAL_KEY, MouseEvent.class);
-	public final Prop<IMouseEventHandler> onMouseRelease = registerProp(IMouseEventHandler.class, "onMouseRelease", this::parseMouseCallback);
+	public final Prop<IMouseEventHandler> onMouseRelease = registerProp(IMouseEventHandler.class, "onMouseRelease", this::parseMouseHandler);
 
 	public final Event<ClickEvent> click = new Event<>(INTERNAL_KEY, ClickEvent.class);
-	public final Prop<IClickEventHandler> onClick = registerProp(IClickEventHandler.class, "onClick", this::parseClickCallback);
+	public final Prop<IClickEventHandler> onClick = registerProp(IClickEventHandler.class, "onClick", this::parseClickHandler);
 
 	public final Event<KeyEvent> keyPress = new Event<>(INTERNAL_KEY, KeyEvent.class);
-	public final Prop<IKeyEventHandler> onKeyPress = registerProp(IKeyEventHandler.class, "onKeyPress", this::parseKeyCallback);
+	public final Prop<IKeyEventHandler> onKeyPress = registerProp(IKeyEventHandler.class, "onKeyPress", this::parseKeyHandler);
 	public final Event<KeyEvent> keyRelease = new Event<>(INTERNAL_KEY, KeyEvent.class);
-	public final Prop<IKeyEventHandler> onKeyRelease = registerProp(IKeyEventHandler.class, "onKeyRelease", this::parseKeyCallback);
+	public final Prop<IKeyEventHandler> onKeyRelease = registerProp(IKeyEventHandler.class, "onKeyRelease", this::parseKeyHandler);
 	public final Event<KeyEvent> keyType = new Event<>(INTERNAL_KEY, KeyEvent.class);
-	public final Prop<IKeyEventHandler> onKeyType = registerProp(IKeyEventHandler.class, "onKeyType", this::parseKeyCallback);
+	public final Prop<IKeyEventHandler> onKeyType = registerProp(IKeyEventHandler.class, "onKeyType", this::parseKeyHandler);
 
 	@Description("The renderer to use for this element.")
 	public final Prop<IRenders> renderer;
@@ -303,40 +303,40 @@ public abstract class CraftedElement
 			markTreeChanged();
 		});
 		onFocusGained.addListener((prop, oldValue, newValue) -> {
-			handleCallbackChange(focusGained, oldValue, newValue);
+			handleHandlerChange(focusGained, oldValue, newValue);
 		});
 		onFocusLost.addListener((prop, oldValue, newValue) -> {
-			handleCallbackChange(focusLost, oldValue, newValue);
+			handleHandlerChange(focusLost, oldValue, newValue);
 		});
 		onMouseMove.addListener((prop, oldValue, newValue) -> {
-			handleCallbackChange(mouseMove, oldValue, newValue);
+			handleHandlerChange(mouseMove, oldValue, newValue);
 		});
 		onMouseScroll.addListener((prop, oldValue, newValue) -> {
-			handleCallbackChange(mouseScroll, oldValue, newValue);
+			handleHandlerChange(mouseScroll, oldValue, newValue);
 		});
 		onMouseEnter.addListener((prop, oldValue, newValue) -> {
-			handleCallbackChange(mouseEnter, oldValue, newValue);
+			handleHandlerChange(mouseEnter, oldValue, newValue);
 		});
 		onMouseExit.addListener((prop, oldValue, newValue) -> {
-			handleCallbackChange(mouseExit, oldValue, newValue);
+			handleHandlerChange(mouseExit, oldValue, newValue);
 		});
 		onMousePress.addListener((prop, oldValue, newValue) -> {
-			handleCallbackChange(mousePress, oldValue, newValue);
+			handleHandlerChange(mousePress, oldValue, newValue);
 		});
 		onMouseRelease.addListener((prop, oldValue, newValue) -> {
-			handleCallbackChange(mouseRelease, oldValue, newValue);
+			handleHandlerChange(mouseRelease, oldValue, newValue);
 		});
 		onClick.addListener((prop, oldValue, newValue) -> {
-			handleCallbackChange(click, oldValue, newValue);
+			handleHandlerChange(click, oldValue, newValue);
 		});
 		onKeyPress.addListener((prop, oldValue, newValue) -> {
-			handleCallbackChange(keyPress, oldValue, newValue);
+			handleHandlerChange(keyPress, oldValue, newValue);
 		});
 		onKeyRelease.addListener((prop, oldValue, newValue) -> {
-			handleCallbackChange(keyRelease, oldValue, newValue);
+			handleHandlerChange(keyRelease, oldValue, newValue);
 		});
 		onKeyType.addListener((prop, oldValue, newValue) -> {
-			handleCallbackChange(keyType, oldValue, newValue);
+			handleHandlerChange(keyType, oldValue, newValue);
 		});
 	}
 	@SuppressWarnings("unchecked")
@@ -451,7 +451,7 @@ public abstract class CraftedElement
 		}
 	}
 
-	<TEvent extends UIEvent, THandler extends Event.IEventListener<TEvent>> void handleCallbackChange(Event<TEvent> event, THandler oldValue, THandler newValue)
+	<TEvent extends UIEvent, THandler extends Event.IEventListener<TEvent>> void handleHandlerChange(Event<TEvent> event, THandler oldValue, THandler newValue)
 	{
 		if(oldValue == newValue)
 			return;
@@ -460,21 +460,21 @@ public abstract class CraftedElement
 		event.addListener(newValue);
 	}
 
-	IFocusEventHandler parseFocusCallback(String name, IFocusEventHandler defaultValue)
+	IFocusEventHandler parseFocusHandler(String name, IFocusEventHandler defaultValue)
 	{
-		return ctx.getCallback(IFocusEventHandler.class, name);
+		return ctx.getHandler(IFocusEventHandler.class, name);
 	}
-	IMouseEventHandler parseMouseCallback(String name, IMouseEventHandler defaultValue)
+	IMouseEventHandler parseMouseHandler(String name, IMouseEventHandler defaultValue)
 	{
-		return ctx.getCallback(IMouseEventHandler.class, name);
+		return ctx.getHandler(IMouseEventHandler.class, name);
 	}
-	IClickEventHandler parseClickCallback(String name, IClickEventHandler defaultValue)
+	IClickEventHandler parseClickHandler(String name, IClickEventHandler defaultValue)
 	{
-		return ctx.getCallback(IClickEventHandler.class, name);
+		return ctx.getHandler(IClickEventHandler.class, name);
 	}
-	IKeyEventHandler parseKeyCallback(String name, IKeyEventHandler defaultValue)
+	IKeyEventHandler parseKeyHandler(String name, IKeyEventHandler defaultValue)
 	{
-		return ctx.getCallback(IKeyEventHandler.class, name);
+		return ctx.getHandler(IKeyEventHandler.class, name);
 	}
 	IRenders getRenderer(String name, IRenders defaultValue)
 	{

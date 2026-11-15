@@ -37,7 +37,7 @@ public class Input extends CraftedElement
 
     private ISubmitEventHandler parseSubmitEventHandler(String s, ISubmitEventHandler iSubmitEventHandler)
     {
-        return ctx.getCallback(ISubmitEventHandler.class, s);
+        return ctx.getHandler(ISubmitEventHandler.class, s);
     }
 
     public final ProxyProp<String> value = registerProp(String.class, "value", text::getText, text::setText, Parsers::parseString);

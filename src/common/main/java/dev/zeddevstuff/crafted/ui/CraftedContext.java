@@ -18,7 +18,7 @@ public class CraftedContext
 {
 	public final Crafted crafted;
 	public final InputHandler inputHandler = new InputHandler();
-	private final HashMap<String, Object> callbacks = new HashMap<>();
+	private final HashMap<String, Object> handlers = new HashMap<>();
 	private final HashMap<String, Typed<?>> vars = new HashMap<>();
 	private final Deque<BindingScope> bindingScopes = new ArrayDeque<>();
 	public ColorTheme theme = ColorTheme.BLUE;
@@ -36,17 +36,17 @@ public class CraftedContext
 		this.crafted = crafted;
 	}
 
-	public <T> void registerCallback(Class<T> type, String name, T callback)
+	public <T> void registerHandler(Class<T> type, String name, T callback)
 	{
-		callbacks.put(name, type.cast(callback));
+		handlers.put(name, type.cast(callback));
 	}
-	public boolean unregisterCallback(String name)
+	public boolean unregisterHandler(String name)
 	{
-		return callbacks.remove(name) != null;
+		return handlers.remove(name) != null;
 	}
-	public <T> T getCallback(Class<T> type, String name)
+	public <T> T getHandler(Class<T> type, String name)
 	{
-		var callback = callbacks.get(name);
+		var callback = handlers.get(name);
 		return callback == null
 			? null
 			: type.cast(callback);

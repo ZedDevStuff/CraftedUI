@@ -16,26 +16,28 @@ import dev.zeddevstuff.crafted.ui.CraftedContext;
 import dev.zeddevstuff.crafted.ui.CraftedElement;
 import dev.zeddevstuff.crafted.ui.elements.CraftedRoot;
 import dev.zeddevstuff.crafted.utils.Lazy;
+import dev.zeddevstuff.crafted.utils.Typed;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.screens.Screen;
 import org.appliedenergistics.yoga.style.StyleSizeLength;
 
-import java.util.function.Function;
 import java.util.function.Predicate;
 
 public class CraftedScreen extends Screen
 {
 	protected final CanvasImpl canvas;
 	protected final CraftedContext context;
-	protected final CraftedRoot rootElement;
-	protected final CraftedRenderer renderer;
+	private final ParsedNode rootElementNode;
+	private CraftedRoot rootElement;
+	private CraftedRenderer renderer;
 
 	public CraftedScreen(CraftedRoot rootElement)
 	{
 		super(TextConverter.toMinecraftText(rootElement.title.get()));
 		this.canvas = new CanvasImpl(Minecraft.getInstance());
 		this.context = rootElement.ctx;
+		this.rootElementNode = null;
 		this.rootElement = rootElement;
 		this.renderer = new CraftedRenderer(rootElement);
 		context.inputHandler.setRootElement(rootElement);
@@ -46,17 +48,23 @@ public class CraftedScreen extends Screen
 		super(TextConverter.toMinecraftText(Parsers.parseText(rootElementNode.attributes().getOrDefault("title", null), IText.literal("Crafted Screen"))));
 		this.canvas = new CanvasImpl(Minecraft.getInstance());
 		this.context = ctx;
-		initContext(ctx);
-		var rootElement = (CraftedRoot) DocumentBuilder.buildTree(ctx, rootElementNode);
+		this.rootElementNode = rootElementNode;
+	}
+	public CraftedScreen(CraftedContext ctx, String xml)
+	{
+		this(ctx, CraftedXmlParser.parse(xml));
+	}
+
+	@Override
+	protected void init()
+	{
+		initContext(context);
+		var rootElement = (CraftedRoot) DocumentBuilder.buildTree(context, rootElementNode);
 		this.rootElement = rootElement;
 		this.renderer = new CraftedRenderer(rootElement);
 		context.inputHandler.setRootElement(rootElement);
 		treeBuilt(rootElement);
 		rootElement.refreshLayoutTree();
-	}
-	public CraftedScreen(CraftedContext ctx, String xml)
-	{
-		this(ctx, CraftedXmlParser.parse(xml));
 	}
 
 	/**
@@ -83,11 +91,12 @@ public class CraftedScreen extends Screen
 //		timer.stop();
 //		guiGraphics.drawString(minecraft.font, "render took " + timer.getElapsedTimeMillis() + " ms", 10, 10, 0xFFFFFFFF);
 	}
-	public Lazy<CraftedElement> $(String id)
+
+	public Lazy<CraftedElement> $el(String id)
 	{
 		return new Lazy<>(() -> rootElement.getElementById(id));
 	}
-	public <T extends CraftedElement> Lazy<T> $(String id, Class<T> type)
+	public <T extends CraftedElement> Lazy<T> $el(String id, Class<T> type)
 	{
 		return new Lazy<>(() -> {
 			var el = rootElement.getElementById(id);
@@ -96,11 +105,11 @@ public class CraftedScreen extends Screen
 			return null;
 		});
 	}
-	public Lazy<CraftedElement> $(Predicate<CraftedElement> predicate)
+	public Lazy<CraftedElement> $el(Predicate<CraftedElement> predicate)
 	{
 		return new Lazy<>(() -> rootElement.findDescendant(predicate));
 	}
-	public <T extends CraftedElement> Lazy<T> $(Predicate<CraftedElement> predicate, Class<T> type)
+	public <T extends CraftedElement> Lazy<T> $el(Predicate<CraftedElement> predicate, Class<T> type)
 	{
 		return new Lazy<>(() -> {
 			var el = rootElement.findDescendant(predicate);
@@ -108,6 +117,28 @@ public class CraftedScreen extends Screen
 				return el.as(type);
 			return null;
 		});
+	}
+
+	public <T> T $var(String name, T value)
+	{
+		context.setVar(name, value);
+		return value;
+	}
+	public <T> T $var(Class<T> type, String name, T value)
+	{
+		context.setVar(name, type, value);
+		return value;
+	}
+	public <T> T $var(String name, Typed<T> value)
+	{
+		context.setVar(name, value);
+		return value.value;
+	}
+
+	public <T> T $handler(Class<T> type, String name, T callback)
+	{
+		context.registerHandler(type, name, callback);
+		return callback;
 	}
 
 	// I'm never finding a use for this

@@ -15,7 +15,6 @@ import dev.zeddevstuff.crafted.ui.elements.CraftedRoot;
 import dev.zeddevstuff.crafted.ui.elements.Either;
 import dev.zeddevstuff.crafted.ui.elements.Input;
 import dev.zeddevstuff.crafted.utils.TypedList;
-import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.gui.screens.TitleScreen;
 import net.minecraft.network.chat.Component;
@@ -42,7 +41,7 @@ public abstract class TitleScreenMixin extends Screen
 		if(ctx == null)
 		{
 			ctx = new CraftedContext();
-			ctx.registerCallback(IClickEventHandler.class, "openGallery", this::crafted$galleryButtonPressed);
+			ctx.registerHandler(IClickEventHandler.class, "openGallery", this::crafted$galleryButtonPressed);
 		}
 		this.addRenderableWidget(new CraftedPortal(
 			Rect.posAndSize(20, this.height - 40, 20, 20),
@@ -58,11 +57,11 @@ public abstract class TitleScreenMixin extends Screen
 	private void crafted$galleryButtonPressed(ClickEvent event)
 	{
 		var ctx = new CraftedContext();
-		ctx.registerCallback(IClickEventHandler.class, "sayHi", e -> System.out.println("Hi!"));
-		ctx.registerCallback(ISubmitEventHandler.class, "printSubmit", e -> {
+		ctx.registerHandler(IClickEventHandler.class, "sayHi", e -> System.out.println("Hi!"));
+		ctx.registerHandler(ISubmitEventHandler.class, "printSubmit", e -> {
 			System.out.println("Submitted value: '" + e.getTargetAs(Input.class).value.get() + "'");
 		});
-		ctx.registerCallback(IClickEventHandler.class, "switchEither", e -> {
+		ctx.registerHandler(IClickEventHandler.class, "switchEither", e -> {
 			var root = e.getTarget().findAncestorOfType(CraftedRoot.class);
 			var either = root.getElementById("either").as(Either.class);
 			either.value.set(e.getTargetAs(Checkbox.class).checked.get());
