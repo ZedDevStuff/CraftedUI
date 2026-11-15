@@ -13,13 +13,16 @@ import dev.zeddevstuff.crafted.platform.IText;
 import dev.zeddevstuff.crafted.platform.TextConverter;
 import dev.zeddevstuff.crafted.rendering.CraftedRenderer;
 import dev.zeddevstuff.crafted.ui.CraftedContext;
+import dev.zeddevstuff.crafted.ui.CraftedElement;
 import dev.zeddevstuff.crafted.ui.elements.CraftedRoot;
+import dev.zeddevstuff.crafted.utils.Lazy;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.screens.Screen;
 import org.appliedenergistics.yoga.style.StyleSizeLength;
 
 import java.util.function.Function;
+import java.util.function.Predicate;
 
 public class CraftedScreen extends Screen
 {
@@ -79,6 +82,32 @@ public class CraftedScreen extends Screen
 		renderer.render(canvas);
 //		timer.stop();
 //		guiGraphics.drawString(minecraft.font, "render took " + timer.getElapsedTimeMillis() + " ms", 10, 10, 0xFFFFFFFF);
+	}
+	public Lazy<CraftedElement> $(String id)
+	{
+		return new Lazy<>(() -> rootElement.getElementById(id));
+	}
+	public <T extends CraftedElement> Lazy<T> $(String id, Class<T> type)
+	{
+		return new Lazy<>(() -> {
+			var el = rootElement.getElementById(id);
+			if(el != null)
+				return el.as(type);
+			return null;
+		});
+	}
+	public Lazy<CraftedElement> $(Predicate<CraftedElement> predicate)
+	{
+		return new Lazy<>(() -> rootElement.findDescendant(predicate));
+	}
+	public <T extends CraftedElement> Lazy<T> $(Predicate<CraftedElement> predicate, Class<T> type)
+	{
+		return new Lazy<>(() -> {
+			var el = rootElement.findDescendant(predicate);
+			if(el != null)
+				return el.as(type);
+			return null;
+		});
 	}
 
 	// I'm never finding a use for this
