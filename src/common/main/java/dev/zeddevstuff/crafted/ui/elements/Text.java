@@ -97,7 +97,7 @@ public class Text extends CraftedElement
 		var wrapWidth = parentWidth > 0 ? Math.min(layoutWidth, parentWidth) : layoutWidth;
 		if(settings.get().wrapWidth() == wrapWidth)
 			return false;
-		settings.set(settings.get().withWrapWidth(wrapWidth));
+		settings.set(settings.get().withWrapWidth(wrapWidth + 1));
 		return true;
 	}
 
