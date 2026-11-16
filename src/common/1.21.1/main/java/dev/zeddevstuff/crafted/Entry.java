@@ -25,11 +25,6 @@ public class Entry
 		));
 		LogUtils.getLogger().info("CraftedUI initialized");
 		All.registerInto(Crafted.defaultInstance());
-		if(Constants.DEV_MODE)
-		{
-			var schema = SchemaGenerator.generateSchema(Crafted.defaultInstance());
-			System.out.println(schema);
-		}
 		gallery = Crafted.defaultInstance().getLoader(Crafted.class).getDocument("/assets/crafted_ui/ui/Gallery.xml").get();
 	}
 }

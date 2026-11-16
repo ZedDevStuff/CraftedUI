@@ -276,8 +276,13 @@ public class ScrollView extends Box
 	{
 		int oldX = scrollX.get();
 		int oldY = scrollY.get();
-		scrollX.set(scrollX.get() - Math.round(event.scrollX * 10));
-		scrollY.set(scrollY.get() - Math.round(event.scrollY * 10));
+		if(ctx.inputHandler.getModifiers().shift())
+			scrollX.set(scrollX.get() - Math.round(event.scrollY * 10));
+		else
+		{
+			scrollX.set(scrollX.get() - Math.round(event.scrollX * 10));
+			scrollY.set(scrollY.get() - Math.round(event.scrollY * 10));
+		}
 		clampScroll();
 		if(oldX != scrollX.get() || oldY != scrollY.get())
 		{

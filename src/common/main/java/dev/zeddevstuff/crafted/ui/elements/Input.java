@@ -42,6 +42,7 @@ public class Input extends CraftedElement
 
     public final ProxyProp<String> value;
     public final Prop<Boolean> allowTabNavigation = registerProp(Boolean.class, "allowTabNavigation", true, Parsers::parseBoolean);
+    public final Prop<Integer> tabSize = registerProp(Integer.class, "tabSize", 4, this::parseTabSize);
     public final Prop<Boolean> allowArrowNavigation = registerProp(Boolean.class, "allowArrowNavigation", true, Parsers::parseBoolean);
     public final Prop<String> placeholder = registerProp(String.class, "placeholder", "", Parsers::parseString);
 
@@ -77,6 +78,11 @@ public class Input extends CraftedElement
         font = registerProp(IFont.class, "font", settings.get()::font, (value) -> settings.set(settings.get().withFont(value)), ctx.crafted::getFontOrDefault);
     }
 
+    private Integer parseTabSize(String value, Integer defaultValue)
+    {
+        return Math.max(1, Parsers.parseInt(value, defaultValue));
+    }
+
     @Override
     public void onCharTyped(KeyEvent event)
     {
@@ -88,7 +94,7 @@ public class Input extends CraftedElement
     public void onKeyPress(KeyEvent event)
     {
         // TODO: Find a way to not be locked to QWERTY layouts
-        if(event.modifiers.control() && (event.keyCode == A || event.keyCode == C || event.keyCode == X || event.keyCode == V))
+        if(event.modifiers.control() && (event.keyCode == A || event.keyCode == C || event.keyCode == X || event.keyCode == V || event.keyCode == Y || event.keyCode == Z))
         {
             if(event.keyCode == A)
                 text.selectAll();
@@ -107,6 +113,10 @@ public class Input extends CraftedElement
             }
             else if(event.keyCode == V)
                 text.insert(ctx.crafted.clipboard.get());
+            else if(event.keyCode == Z)
+                text.undo();
+            else if(event.keyCode == Y)
+                text.redo();
             event.consume();
             return;
         }
@@ -119,9 +129,17 @@ public class Input extends CraftedElement
             return;
         }
 
-        boolean shouldConsume = event.keyCode != TAB || !allowTabNavigation.get();
-		if(event.keyCode == TAB && shouldConsume)
-            text.insert("    ");
+        if(event.keyCode == TAB)
+        {
+            if(allowTabNavigation.get())
+                return;
+            if(event.modifiers.shift())
+                text.removeIndentation(tabSize.get());
+            else
+                text.insert(" ".repeat(tabSize.get()));
+            event.consume();
+            return;
+        }
         if(event.keyCode == ENTER && !event.modifiers.shift())
             ctx.inputHandler.setFocus(null, event);
         else if(event.keyCode == BACKSPACE)
@@ -136,8 +154,7 @@ public class Input extends CraftedElement
             text.moveCursorToStart(event.modifiers.shift());
         else if(event.keyCode == END)
             text.moveCursorToEnd(event.modifiers.shift());
-        if(shouldConsume)
-            event.consume();
+        event.consume();
     }
 
     private boolean canStartDrag = false;

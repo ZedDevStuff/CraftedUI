@@ -1,5 +1,6 @@
 package dev.zeddevstuff.crafted.mixin.dev;
 
+import dev.zeddevstuff.crafted.Crafted;
 import dev.zeddevstuff.crafted.CraftedPortal;
 import dev.zeddevstuff.crafted.CraftedScreen;
 import dev.zeddevstuff.crafted.Entry;
@@ -14,6 +15,7 @@ import dev.zeddevstuff.crafted.ui.elements.Checkbox;
 import dev.zeddevstuff.crafted.ui.elements.CraftedRoot;
 import dev.zeddevstuff.crafted.ui.elements.Either;
 import dev.zeddevstuff.crafted.ui.elements.Input;
+import dev.zeddevstuff.crafted.utils.SchemaGenerator;
 import dev.zeddevstuff.crafted.utils.TypedList;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.gui.screens.TitleScreen;
@@ -47,7 +49,7 @@ public abstract class TitleScreenMixin extends Screen
 			Rect.posAndSize(20, this.height - 40, 20, 20),
 			ctx,
 			"""
-				<Crafted treeRenderer="crafted" title="Portal Test">
+				<Crafted treeRenderer="crafted" title="Gallery Portal">
 					<Button onClick="openGallery" size="20">C</Button>
 				</Crafted>
 				"""));
@@ -57,6 +59,12 @@ public abstract class TitleScreenMixin extends Screen
 	private void crafted$galleryButtonPressed(ClickEvent event)
 	{
 		var ctx = new CraftedContext();
+		ctx.registerHandler(IClickEventHandler.class, "exit", e -> this.minecraft.screen.onClose());
+		ctx.registerHandler(IClickEventHandler.class, "copySchema", e -> {
+			var schema = SchemaGenerator.generateSchema(Crafted.defaultInstance());
+			e.getTarget().ctx.crafted.clipboard.set(schema);
+			System.out.println("Schema copied to clipboard!");
+		});
 		ctx.registerHandler(IClickEventHandler.class, "sayHi", e -> System.out.println("Hi!"));
 		ctx.registerHandler(ISubmitEventHandler.class, "printSubmit", e -> {
 			System.out.println("Submitted value: '" + e.getTargetAs(Input.class).value.get() + "'");

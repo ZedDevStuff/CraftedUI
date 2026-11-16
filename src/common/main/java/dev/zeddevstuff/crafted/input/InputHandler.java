@@ -3,6 +3,10 @@ package dev.zeddevstuff.crafted.input;
 import dev.zeddevstuff.crafted.input.events.*;
 import dev.zeddevstuff.crafted.ui.CraftedElement;
 
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.Set;
+
 public class InputHandler
 {
 	private CraftedElement rootElement = null;
@@ -13,6 +17,11 @@ public class InputHandler
 	public CraftedElement getPressedElement() { return pressedElement; }
 	private CraftedElement focusedElement;
 	public CraftedElement getFocusedElement() { return focusedElement; }
+	private final Set<Integer> pressedKeys = new HashSet<>();
+	private KeyModifiers modifiers = new KeyModifiers(false, false, false);
+	public KeyModifiers getModifiers() { return modifiers; }
+	public boolean isKeyPressed(int keyCode) { return pressedKeys.contains(keyCode); }
+	public Set<Integer> getPressedKeys() { return Collections.unmodifiableSet(pressedKeys); }
 	public boolean isFocusedElementFirst()
 	{
 		var elements = focusableElements();
@@ -333,6 +342,8 @@ public class InputHandler
 	}
 	public void handleKeyPressed(int keyCode, int scanCode, KeyModifiers modifiers)
 	{
+		pressedKeys.add(keyCode);
+		this.modifiers = modifiers;
 		if (rootElement == null)
 			return;
 		if (focusedElement != null)
@@ -375,6 +386,8 @@ public class InputHandler
 	}
 	public void handleKeyReleased(int keyCode, int scanCode, KeyModifiers modifiers)
 	{
+		pressedKeys.remove(keyCode);
+		this.modifiers = modifiers;
 		if(rootElement == null)
 			return;
 		if(focusedElement != null)

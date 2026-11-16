@@ -4,10 +4,34 @@ import dev.zeddevstuff.crafted.platform.IFont;
 import dev.zeddevstuff.crafted.types.Float2;
 
 import javax.annotation.Nonnull;
+import java.util.ArrayDeque;
 import java.util.Objects;
 
 public class TextEditor
 {
+    private record State(String text, int cursorPosition, int selectionStart, int selectionEnd, boolean dirty) {}
+    private enum EditType { INSERT, BACKSPACE, DELETE, REPLACE, EXTERNAL }
+
+    private final ArrayDeque<State> undoHistory = new ArrayDeque<>();
+    private final ArrayDeque<State> redoHistory = new ArrayDeque<>();
+    private static final float EDIT_DEBOUNCE_SECONDS = 0.5f;
+    private int maxHistorySize;
+    private State pendingEdit;
+    private EditType pendingEditType;
+    private float editDebounceTimer;
+
+    public int getMaxHistorySize() { return maxHistorySize; }
+    public void setMaxHistorySize(int maxHistorySize)
+    {
+        if(maxHistorySize < 0)
+            throw new IllegalArgumentException("Max history size cannot be negative");
+        this.maxHistorySize = maxHistorySize;
+        trimHistory(undoHistory);
+        trimHistory(redoHistory);
+        if(maxHistorySize == 0)
+            pendingEdit = null;
+    }
+
     private boolean dirty = false;
     public boolean isDirty() { return dirty; }
     public void clearDirty() { dirty = false; }
@@ -17,8 +41,10 @@ public class TextEditor
     public void setText(@Nonnull String text)
     {
         Objects.requireNonNull(text, "Text cannot be null");
-        if(!Objects.equals(this.text, text))
-            dirty = true;
+        if(Objects.equals(this.text, text))
+            return;
+        beginEdit(EditType.EXTERNAL);
+        dirty = true;
         if(cursorPosition > text.length())
             cursorPosition = text.length();
         if(selectionStart > text.length())
@@ -26,7 +52,83 @@ public class TextEditor
         if(selectionEnd > text.length())
             selectionEnd = text.length();
         this.text = text;
+    }
 
+    public boolean undo()
+    {
+        commitPendingEdit();
+        if(undoHistory.isEmpty())
+            return false;
+        redoHistory.push(captureState());
+        restoreState(undoHistory.pop());
+        return true;
+    }
+
+    public boolean redo()
+    {
+        commitPendingEdit();
+        if(redoHistory.isEmpty())
+            return false;
+        undoHistory.push(captureState());
+        restoreState(redoHistory.pop());
+        return true;
+    }
+
+    private void breakEditGroup()
+    {
+        commitPendingEdit();
+    }
+
+    private void beginEdit(EditType editType)
+    {
+        if(maxHistorySize == 0)
+        {
+            pendingEdit = null;
+            pendingEditType = null;
+            redoHistory.clear();
+            return;
+        }
+        if(pendingEdit == null || pendingEditType != editType || editType == EditType.REPLACE || editType == EditType.EXTERNAL)
+        {
+            commitPendingEdit();
+            pendingEdit = captureState();
+            pendingEditType = editType;
+        }
+        editDebounceTimer = 0;
+        redoHistory.clear();
+    }
+
+    private void commitPendingEdit()
+    {
+        if(pendingEdit == null)
+            return;
+        undoHistory.push(pendingEdit);
+        trimHistory(undoHistory);
+        pendingEdit = null;
+        pendingEditType = null;
+        editDebounceTimer = 0;
+    }
+
+    private void trimHistory(ArrayDeque<State> history)
+    {
+        while(history.size() > maxHistorySize)
+            history.removeLast();
+    }
+
+    private State captureState()
+    {
+        return new State(text, cursorPosition, selectionStart, selectionEnd, dirty);
+    }
+
+    private void restoreState(State state)
+    {
+        text = state.text();
+        cursorPosition = state.cursorPosition();
+        selectionStart = state.selectionStart();
+        selectionEnd = state.selectionEnd();
+        dirty = state.dirty();
+        cursorBlinkTimer = 0;
+        cursorVisible = true;
     }
     private float cursorBlinkTimer;
     private boolean cursorVisible;
@@ -87,13 +189,27 @@ public class TextEditor
 
     public TextEditor(String initialText, boolean multiline)
     {
+        this(initialText, multiline, 100);
+    }
+
+    public TextEditor(String initialText, boolean multiline, int maxHistorySize)
+    {
+        if(maxHistorySize < 0)
+            throw new IllegalArgumentException("Max history size cannot be negative");
         this.text = initialText;
         this.cursorPosition = initialText.length();
         this.multiline = multiline;
+        this.maxHistorySize = maxHistorySize;
     }
 
     public boolean updateBlink(float deltaTime)
     {
+        if(pendingEdit != null)
+        {
+            editDebounceTimer += Math.max(0, deltaTime);
+            if(editDebounceTimer >= EDIT_DEBOUNCE_SECONDS)
+                commitPendingEdit();
+        }
         cursorBlinkTimer += deltaTime;
         if (cursorBlinkTimer >= 0.5f)
         {
@@ -115,6 +231,9 @@ public class TextEditor
             replaceSelection(newText);
             return;
         }
+        if(newText.isEmpty())
+            return;
+        beginEdit(newText.length() == 1 ? EditType.INSERT : EditType.REPLACE);
         text = text.substring(0, cursorPosition) + newText + text.substring(cursorPosition);
         cursorPosition += newText.length();
         cursorBlinkTimer = 0;
@@ -126,10 +245,29 @@ public class TextEditor
         insert(String.valueOf(newChar));
     }
 
+    public void removeIndentation(int maxSpaces)
+    {
+        if(maxSpaces <= 0 || cursorPosition == 0)
+            return;
+        int start = cursorPosition;
+        while(start > 0 && cursorPosition - start < maxSpaces && text.charAt(start - 1) == ' ')
+            start--;
+        if(start == cursorPosition)
+            return;
+        beginEdit(EditType.REPLACE);
+        text = text.substring(0, start) + text.substring(cursorPosition);
+        setCursorPosition(start);
+        selectionStart = selectionEnd = start;
+        dirty = true;
+    }
+
     public void replaceSelection(String newText)
     {
         int start = Math.min(selectionStart, selectionEnd);
         int end = Math.max(selectionStart, selectionEnd);
+        if(start == end && newText.isEmpty())
+            return;
+        beginEdit(EditType.REPLACE);
         text = text.substring(0, start) + newText + text.substring(end);
         setCursorPosition(start + newText.length());
         selectionStart = selectionEnd = cursorPosition;
@@ -138,6 +276,7 @@ public class TextEditor
 
     public void moveCursor(int offset, boolean ctrl, boolean select)
     {
+        breakEditGroup();
         int newPosition = ctrl ? moveCursorByWord(offset) : cursorPosition + offset;
         if (newPosition < 0) newPosition = 0;
         if (newPosition > text.length()) newPosition = text.length();
@@ -192,6 +331,7 @@ public class TextEditor
     }
     public void moveCursorToStart(boolean select)
     {
+        breakEditGroup();
         if (select)
         {
             if (selectionStart == selectionEnd)
@@ -206,6 +346,7 @@ public class TextEditor
     }
     public void moveCursorToEnd(boolean select)
     {
+        breakEditGroup();
         if (select)
         {
             if (selectionStart == selectionEnd)
@@ -221,6 +362,7 @@ public class TextEditor
 
     public void moveCursorVertical(int lineOffset, boolean select)
     {
+        breakEditGroup();
         int currentLineStart = lineStart(cursorPosition);
         int currentColumn = cursorPosition - currentLineStart;
         int targetLineStart = currentLineStart;
@@ -237,11 +379,13 @@ public class TextEditor
 
     public void moveCursorToLineStart(boolean select)
     {
+        breakEditGroup();
         moveCursorTo(lineStart(cursorPosition), select);
     }
 
     public void moveCursorToLineEnd(boolean select)
     {
+        breakEditGroup();
         moveCursorTo(lineEnd(cursorPosition), select);
     }
 
@@ -262,12 +406,14 @@ public class TextEditor
 
     public void moveCursorToPoint(IFont font, Float2 position, float scale)
     {
+        breakEditGroup();
         int newPosition = getCursorPositionAtX(font, position.x(), scale);
         setCursorPosition(newPosition);
         clearSelection();
     }
     public void extendSelectionToPoint(IFont font, Float2 position, float scale)
     {
+        breakEditGroup();
         int newPosition = getCursorPositionAtX(font, position.x(), scale);
         setCursorPosition(newPosition);
         selectionEnd = newPosition;
@@ -275,11 +421,13 @@ public class TextEditor
 
     public void moveCursorToPoint(IFont font, Float2 position, float scale, float lineHeight)
     {
+        breakEditGroup();
         moveCursorTo(pointToPosition(font, position, scale, lineHeight), false);
     }
 
     public void extendSelectionToPoint(IFont font, Float2 position, float scale, float lineHeight)
     {
+        breakEditGroup();
         int newPosition = pointToPosition(font, position, scale, lineHeight);
         setCursorPosition(newPosition);
         selectionEnd = newPosition;
@@ -343,12 +491,14 @@ public class TextEditor
         }
         if (backspace && cursorPosition > 0)
         {
+            beginEdit(EditType.BACKSPACE);
             text = text.substring(0, cursorPosition - 1) + text.substring(cursorPosition);
             setCursorPosition(cursorPosition - 1);
             dirty = true;
         }
         else if (!backspace && cursorPosition < text.length())
         {
+            beginEdit(EditType.DELETE);
             text = text.substring(0, cursorPosition) + text.substring(cursorPosition + 1);
             dirty = true;
         }
