@@ -79,11 +79,14 @@ public class Text extends CraftedElement
 	{
 		if(!textWrap.get())
 			return false;
-		var layoutWidth = getLayout().width;
-		if(layoutWidth <= 0)
+		var cFont = font.get();
+		if(cFont == null)
+			return false;
+		var naturalWidth = cFont.measureText(text.get(), settings.get().size(), -1).width();
+		if(naturalWidth <= 0)
 			return false;
 		var parent = getParent();
-		float parentWidth = parent == null ? layoutWidth : parent.getLayout().width;
+		float parentWidth = parent == null ? naturalWidth : parent.getLayout().width;
 		if(parent != null && (parent.flexDirection.get() == YogaFlexDirection.ROW
 			|| parent.flexDirection.get() == YogaFlexDirection.ROW_REVERSE))
 		{
@@ -94,7 +97,7 @@ public class Text extends CraftedElement
 			var gap = parent.columnGap.get().resolve(parentWidth).unwrapOrDefault(0);
 			parentWidth = Math.max(0f, parentWidth - siblingWidth - gap * Math.max(0, parent.getChildren().size() - 1));
 		}
-		var wrapWidth = parentWidth > 0 ? Math.min(layoutWidth, parentWidth) : layoutWidth;
+		var wrapWidth = parentWidth > 0 ? Math.min(naturalWidth, parentWidth) : naturalWidth;
 		if(settings.get().wrapWidth() == wrapWidth)
 			return false;
 		settings.set(settings.get().withWrapWidth(wrapWidth + 1));
