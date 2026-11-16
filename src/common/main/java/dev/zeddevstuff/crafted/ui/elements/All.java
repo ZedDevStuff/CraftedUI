@@ -12,6 +12,7 @@ public class All
 		Button.register(crafted);
 		Checkbox.register(crafted);
 		Input.register(crafted);
+		TextArea.register(crafted);
 		Image.register(crafted);
 		ScrollView.register(crafted);
 		Dropdown.register(crafted);

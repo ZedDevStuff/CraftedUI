@@ -136,10 +136,9 @@ public class TextEditor
         dirty = true;
     }
 
-    // TODO: Support control for word-wise movement.
     public void moveCursor(int offset, boolean ctrl, boolean select)
     {
-        int newPosition = cursorPosition + offset;
+        int newPosition = ctrl ? moveCursorByWord(offset) : cursorPosition + offset;
         if (newPosition < 0) newPosition = 0;
         if (newPosition > text.length()) newPosition = text.length();
         if (select)
@@ -153,6 +152,43 @@ public class TextEditor
             selectionStart = selectionEnd = newPosition;
         }
         setCursorPosition(newPosition);
+    }
+
+    private int moveCursorByWord(int offset)
+    {
+        if(offset == 0)
+            return cursorPosition;
+        if(offset < 0)
+        {
+            var position = cursorPosition;
+            while(position > 0 && Character.isWhitespace(text.charAt(position - 1)))
+                position--;
+            if(position > 0)
+            {
+                boolean word = isWordCharacter(text.charAt(position - 1));
+                while(position > 0 && isWordCharacter(text.charAt(position - 1)) == word
+                    && !Character.isWhitespace(text.charAt(position - 1)))
+                    position--;
+            }
+            return position;
+        }
+
+        var position = cursorPosition;
+        while(position < text.length() && Character.isWhitespace(text.charAt(position)))
+            position++;
+        if(position < text.length())
+        {
+            boolean word = isWordCharacter(text.charAt(position));
+            while(position < text.length() && isWordCharacter(text.charAt(position)) == word
+                && !Character.isWhitespace(text.charAt(position)))
+                position++;
+        }
+        return position;
+    }
+
+    private boolean isWordCharacter(char character)
+    {
+        return Character.isLetterOrDigit(character) || character == '_';
     }
     public void moveCursorToStart(boolean select)
     {
@@ -183,6 +219,47 @@ public class TextEditor
         setCursorPosition(text.length());
     }
 
+    public void moveCursorVertical(int lineOffset, boolean select)
+    {
+        int currentLineStart = lineStart(cursorPosition);
+        int currentColumn = cursorPosition - currentLineStart;
+        int targetLineStart = currentLineStart;
+        if(lineOffset < 0)
+            targetLineStart = lineStart(Math.max(0, currentLineStart - 1));
+        else if(lineOffset > 0 && currentLineStart < text.length())
+            targetLineStart = lineEnd(currentLineStart) + 1;
+
+        if(targetLineStart == currentLineStart)
+            return;
+        int targetPosition = Math.min(targetLineStart + currentColumn, lineEnd(targetLineStart));
+        moveCursorTo(targetPosition, select);
+    }
+
+    public void moveCursorToLineStart(boolean select)
+    {
+        moveCursorTo(lineStart(cursorPosition), select);
+    }
+
+    public void moveCursorToLineEnd(boolean select)
+    {
+        moveCursorTo(lineEnd(cursorPosition), select);
+    }
+
+    private void moveCursorTo(int position, boolean select)
+    {
+        if(select)
+        {
+            if(selectionStart == selectionEnd)
+                selectionStart = cursorPosition;
+            selectionEnd = position;
+        }
+        else
+        {
+            selectionStart = selectionEnd = position;
+        }
+        setCursorPosition(position);
+    }
+
     public void moveCursorToPoint(IFont font, Float2 position, float scale)
     {
         int newPosition = getCursorPositionAtX(font, position.x(), scale);
@@ -196,20 +273,65 @@ public class TextEditor
         selectionEnd = newPosition;
     }
 
+    public void moveCursorToPoint(IFont font, Float2 position, float scale, float lineHeight)
+    {
+        moveCursorTo(pointToPosition(font, position, scale, lineHeight), false);
+    }
+
+    public void extendSelectionToPoint(IFont font, Float2 position, float scale, float lineHeight)
+    {
+        int newPosition = pointToPosition(font, position, scale, lineHeight);
+        setCursorPosition(newPosition);
+        selectionEnd = newPosition;
+    }
+
+    private int pointToPosition(IFont font, Float2 position, float scale, float lineHeight)
+    {
+        int line = Math.max(0, (int)(position.y() / Math.max(1, lineHeight)));
+        int currentLine = 0;
+        int lineStart = 0;
+        while(currentLine < line && lineStart < text.length())
+        {
+            int newline = text.indexOf('\n', lineStart);
+            if(newline < 0)
+                break;
+            lineStart = newline + 1;
+            currentLine++;
+        }
+        return lineStart + getCursorPositionAtX(font, text.substring(lineStart, lineEnd(lineStart)), position.x(), scale);
+    }
+
     private int getCursorPositionAtX(IFont font, float x, float scale)
     {
-        if (x <= 0 || text.isEmpty())
+        return getCursorPositionAtX(font, text, x, scale);
+    }
+
+    private int getCursorPositionAtX(IFont font, String value, float x, float scale)
+    {
+        if (x <= 0 || value.isEmpty())
             return 0;
 
         float previousWidth = 0;
-        for (int position = 1; position <= text.length(); position++)
+        for (int position = 1; position <= value.length(); position++)
         {
-            float currentWidth = font.measureText(text.substring(0, position), scale, -1).width();
+            float currentWidth = font.measureText(value.substring(0, position), scale, -1).width();
             if (x < (previousWidth + currentWidth) / 2)
                 return position - 1;
             previousWidth = currentWidth;
         }
-        return text.length();
+        return value.length();
+    }
+
+    private int lineStart(int position)
+    {
+        int newline = text.lastIndexOf('\n', Math.max(0, position - 1));
+        return newline < 0 ? 0 : newline + 1;
+    }
+
+    private int lineEnd(int position)
+    {
+        int newline = text.indexOf('\n', position);
+        return newline < 0 ? text.length() : newline;
     }
 
     public void delete(boolean backspace)

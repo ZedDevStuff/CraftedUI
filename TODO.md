@@ -25,7 +25,7 @@
     - [x] Image
     - [x] Button
     - [x] Input
-      - [ ] Text Area (Basically just a multi-line input)
+      - [x] Text Area (Basically just a multi-line input)
     - [x] Checkbox
     - [x] Scroll
       - [x] List

@@ -31,7 +31,7 @@ import static dev.zeddevstuff.crafted.input.ImportantKeys.*;
 public class Input extends CraftedElement
 {
     @Ignore
-    private final TextEditor text = new TextEditor("", false);
+    protected final TextEditor text;
 
     public final Prop<ISubmitEventHandler> onSubmit = registerProp(ISubmitEventHandler.class, "onSubmit", null, this::parseSubmitEventHandler);
 
@@ -40,7 +40,7 @@ public class Input extends CraftedElement
         return ctx.getHandler(ISubmitEventHandler.class, s);
     }
 
-    public final ProxyProp<String> value = registerProp(String.class, "value", text::getText, text::setText, Parsers::parseString);
+    public final ProxyProp<String> value;
     public final Prop<Boolean> allowTabNavigation = registerProp(Boolean.class, "allowTabNavigation", true, Parsers::parseBoolean);
     public final Prop<Boolean> allowArrowNavigation = registerProp(Boolean.class, "allowArrowNavigation", true, Parsers::parseBoolean);
     public final Prop<String> placeholder = registerProp(String.class, "placeholder", "", Parsers::parseString);
@@ -50,7 +50,7 @@ public class Input extends CraftedElement
     public final Prop<Color> selectionColor = registerProp("selectionColor", Color.CornflowerBlue, this::parseColor);
 
     public final Prop<TextSettings> settings = new Prop<>(TextSettings.class, "settings", TextSettings.DEFAULT);
-    private TextSettings placeholderSettings;
+    protected TextSettings placeholderSettings;
     public final ProxyProp<IFont> font;
     public final ProxyProp<Float> fontScale = registerProp(Float.class, "fontScale", settings.get()::size, (value) -> settings.set(settings.get().withSize(value)), Parsers::parseFloat);
     public final ProxyProp<Float> wrapWidth = registerProp(Float.class, "wrapWidth", settings.get()::wrapWidth, (value) -> settings.set(settings.get().withWrapWidth(value)), Parsers::parseFloat);
@@ -62,7 +62,14 @@ public class Input extends CraftedElement
 
     public Input(CraftedContext ctx, Map<String, String> attributes)
     {
+        this(ctx, attributes, false);
+    }
+
+    protected Input(CraftedContext ctx, Map<String, String> attributes, boolean multiline)
+    {
         super(ctx, attributes);
+        text = new TextEditor("", multiline);
+        value = registerProp(String.class, "value", text::getText, text::setText, Parsers::parseString);
         settings.addListener((prop, oldValue, newValue) -> {
             placeholderSettings = newValue.withShadow(false);
         });
@@ -81,7 +88,7 @@ public class Input extends CraftedElement
     public void onKeyPress(KeyEvent event)
     {
         // TODO: Find a way to not be locked to QWERTY layouts
-        if(event.modifiers.control())
+        if(event.modifiers.control() && (event.keyCode == A || event.keyCode == C || event.keyCode == X || event.keyCode == V))
         {
             if(event.keyCode == A)
                 text.selectAll();
@@ -100,8 +107,6 @@ public class Input extends CraftedElement
             }
             else if(event.keyCode == V)
                 text.insert(ctx.crafted.clipboard.get());
-            else
-                return;
             event.consume();
             return;
         }

@@ -19,6 +19,7 @@
         <Text color="onBackground" margin="2">Inputs</Text>
         <Box id="inputs" gap="4" flexDirection="row" flexWrap="wrap" margin="2">
             <Input onSubmit="printSubmit" width="200" height="20" placeholder="Search..." />
+            <TextArea onSubmit="printSubmit" size="200,50"></TextArea>
             <Checkbox size="20,20" />
             <Checkbox renderer="crafted" size="20,20" onClick="switchEither"/>
             <Checkbox renderer="crafted" size="20,20" indeterminate="true" style="primary" />
