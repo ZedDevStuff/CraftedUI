@@ -9,6 +9,7 @@ import dev.zeddevstuff.crafted.input.InteractionState;
 import dev.zeddevstuff.crafted.input.events.*;
 import dev.zeddevstuff.crafted.parsing.Parsers;
 import dev.zeddevstuff.crafted.platform.ICanvas;
+import dev.zeddevstuff.crafted.platform.IText;
 import dev.zeddevstuff.crafted.rendering.IRenders;
 import dev.zeddevstuff.crafted.rendering.IRendersType;
 import dev.zeddevstuff.crafted.types.*;
@@ -123,6 +124,8 @@ public abstract class CraftedElement
 	public final Prop<String> id = registerProp("id", "", Parsers::parseString);
 	@Description("Used by some renderers to determine how to render this element")
 	public final Prop<String> style = registerProp("style", "", Parsers::parseString);
+	@Description("Text shown after hovering this element")
+	public final Prop<IText> tooltip = registerProp(IText.class, "tooltip", null, Parsers::parseText);
 	public final Prop<Integer> zIndex = registerProp("zIndex", 0, Parsers::parseInt);
 	public final ProxyProp<Boolean> disabled = registerProp(Boolean.class, "disabled", state::isDisabled, val -> state.set(INTERNAL_KEY, InteractionState.DISABLED, val), Parsers::parseBoolean);
 

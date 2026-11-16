@@ -34,7 +34,7 @@
     - [ ] Slider
     - [ ] Progress bar
     - [ ] Tabs
-    - [ ] Tooltip
+    - [x] Tooltip
     - [ ] Modal
     - [ ] Menu
     - [ ] Context menu

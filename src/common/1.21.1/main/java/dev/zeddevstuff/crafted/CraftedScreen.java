@@ -86,6 +86,9 @@ public class CraftedScreen extends Screen
 //      timer.start();
 		super.render(guiGraphics, i, i1, v);
 		canvas.setGraphics(guiGraphics);
+		rootElement.updateTooltip(canvas.deltaTime());
+		rootElement.layoutTree(width, height);
+		rootElement.positionTooltip(width, height);
 		rootElement.layoutTree(width, height);
 		renderer.render(canvas);
 //		timer.stop();

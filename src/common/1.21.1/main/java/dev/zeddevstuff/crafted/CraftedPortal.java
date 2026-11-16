@@ -63,6 +63,9 @@ public class CraftedPortal extends AbstractWidget
 	protected void renderWidget(GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTick)
 	{
 		canvas.setGraphics(guiGraphics);
+		rootElement.updateTooltip(canvas.deltaTime());
+		rootElement.layoutTree(width, height);
+		rootElement.positionTooltip(width, height);
 		rootElement.layoutTree(width, height);
 		canvas.beginTransform();
 		canvas.translate(getX(), getY());
