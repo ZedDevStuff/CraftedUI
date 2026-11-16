@@ -14,6 +14,7 @@ import dev.zeddevstuff.crafted.types.Color;
 import dev.zeddevstuff.crafted.types.TextSettings;
 import dev.zeddevstuff.crafted.ui.CraftedContext;
 import dev.zeddevstuff.crafted.ui.CraftedElement;
+import org.appliedenergistics.yoga.YogaFlexDirection;
 import org.appliedenergistics.yoga.YogaNodeType;
 import org.appliedenergistics.yoga.style.StyleSizeLength;
 
@@ -35,6 +36,7 @@ public class Text extends CraftedElement
 	public final ProxyProp<IFont> font;
 	public final ProxyProp<Float> fontScale = registerProp(Float.class, "fontScale", settings.get()::size, (value) -> settings.set(settings.get().withSize(value)), Parsers::parseFloat);
 	public final ProxyProp<Float> wrapWidth = registerProp(Float.class, "wrapWidth", settings.get()::wrapWidth, (value) -> settings.set(settings.get().withWrapWidth(value)), Parsers::parseFloat);
+	public final Prop<Boolean> textWrap = registerProp(Boolean.class, "textWrap", true, Parsers::parseBoolean);
 	public final ProxyProp<Boolean> shadow = registerProp(Boolean.class, "shadow", settings.get()::shadow, (value) -> settings.set(settings.get().withShadow(value)), Parsers::parseBoolean);
 	public final ProxyProp<Color> shadowColor = registerProp(Color.class, "shadowColor", settings.get()::shadowColor, (value) -> settings.set(settings.get().withShadowColor(value)), this::parseColor);
 
@@ -50,17 +52,13 @@ public class Text extends CraftedElement
 			var cFont = font.get();
 			if(cFont == null)
 				return;
-			var size = cFont.measureText(newValue, settings.get().size(), settings.get().wrapWidth());
-			this.width.set(StyleSizeLength.points(size.width() - 0));
-			this.height.set(StyleSizeLength.points(Math.max(size.height() - 0, 0)));
+			refreshLayout();
 		});
 		settings.addListener((prop, oldValue, newValue) -> {
-			var cFont = font.get();
-			if(cFont == null)
-				return;
-			var size = cFont.measureText(text.get(), newValue.size(), newValue.wrapWidth());
-			this.width.set(StyleSizeLength.points(size.width()));
-			this.height.set(StyleSizeLength.points(size.height()));
+			refreshLayout();
+		});
+		textWrap.addListener((prop, oldValue, newValue) -> {
+			refreshLayout();
 		});
 	}
 
@@ -71,8 +69,36 @@ public class Text extends CraftedElement
 		if(cFont == null)
 			return;
 		var size = cFont.measureText(text.get(), settings.get().size(), settings.get().wrapWidth());
-		this.width.set(StyleSizeLength.points(size.width()));
+		var layoutWidth = textWrap.get() && settings.get().shouldWrap() ? settings.get().wrapWidth() : size.width();
+		this.width.set(StyleSizeLength.points(layoutWidth));
 		this.height.set(StyleSizeLength.points(size.height()));
+	}
+
+	@Override
+	protected boolean updateLayoutAfterLayout()
+	{
+		if(!textWrap.get())
+			return false;
+		var layoutWidth = getLayout().width;
+		if(layoutWidth <= 0)
+			return false;
+		var parent = getParent();
+		float parentWidth = parent == null ? layoutWidth : parent.getLayout().width;
+		if(parent != null && (parent.flexDirection.get() == YogaFlexDirection.ROW
+			|| parent.flexDirection.get() == YogaFlexDirection.ROW_REVERSE))
+		{
+			var siblingWidth = 0f;
+			for(var sibling : parent.getChildren())
+				if(sibling != this)
+					siblingWidth += sibling.getLayout().width;
+			var gap = parent.columnGap.get().resolve(parentWidth).unwrapOrDefault(0);
+			parentWidth = Math.max(0f, parentWidth - siblingWidth - gap * Math.max(0, parent.getChildren().size() - 1));
+		}
+		var wrapWidth = parentWidth > 0 ? Math.min(layoutWidth, parentWidth) : layoutWidth;
+		if(settings.get().wrapWidth() == wrapWidth)
+			return false;
+		settings.set(settings.get().withWrapWidth(wrapWidth));
+		return true;
 	}
 
 	public static class Renderer implements IRendersType<Text>
