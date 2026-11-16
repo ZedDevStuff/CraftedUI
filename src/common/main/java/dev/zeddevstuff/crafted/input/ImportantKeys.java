@@ -33,6 +33,8 @@ public class ImportantKeys
 		C = isSdl ? 99 : 67;
 		V = isSdl ? 118 : 86;
 		X = isSdl ? 120 : 88;
+		Y = isSdl ? 121 : 89;
+		Z = isSdl ? 122 : 90;
 	}
 
 	public static int ESCAPE;
@@ -59,4 +61,6 @@ public class ImportantKeys
 	public static int C;
 	public static int V;
 	public static int X;
+	public static int Y;
+	public static int Z;
 }
