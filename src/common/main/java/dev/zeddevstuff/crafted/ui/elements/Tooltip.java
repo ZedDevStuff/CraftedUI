@@ -3,6 +3,7 @@ package dev.zeddevstuff.crafted.ui.elements;
 import dev.zeddevstuff.crafted.platform.IText;
 import dev.zeddevstuff.crafted.types.StyleLength4;
 import dev.zeddevstuff.crafted.ui.CraftedContext;
+import dev.zeddevstuff.crafted.ui.CraftedElement;
 import org.appliedenergistics.yoga.YogaPositionType;
 import org.appliedenergistics.yoga.style.StyleLength;
 import org.appliedenergistics.yoga.style.StyleSizeLength;
@@ -18,7 +19,6 @@ public class Tooltip extends Box
 		super(ctx, Map.of());
 		positionType.set(YogaPositionType.ABSOLUTE);
 		zIndex.set(Integer.MAX_VALUE);
-		width.set(StyleSizeLength.points(220));
 		padding.set(new StyleLength4(
 			StyleLength.points(4), StyleLength.points(4), StyleLength.points(4), StyleLength.points(4)));
 		color.set(ctx.theme.surfaceVariant());
@@ -33,5 +33,15 @@ public class Tooltip extends Box
 	void setText(IText value)
 	{
 		text.text.set(value);
+	}
+	// TODO: Do something with this.
+	void setContent(CraftedElement content)
+	{
+		if(content == text)
+			return;
+		if(children.contains(content))
+			return;
+		removeChild(text);
+		addChild(content);
 	}
 }
