@@ -40,7 +40,7 @@
         <List items="testOptions" extractor="optionExtractor" width="100">
             <Text color="onBackground" text="value" />
         </List>
-        <Either id="either" value="true">
+        <Either id="either" value="false">
             <Box size="auto,200">
                 <Text color="success">Either: primary</Text>
             </Box>

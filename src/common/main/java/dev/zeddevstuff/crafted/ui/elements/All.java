@@ -18,5 +18,6 @@ public class All
 		Dropdown.register(crafted);
 		List.register(crafted);
 		Either.register(crafted);
+		Tabs.register(crafted);
 	}
 }

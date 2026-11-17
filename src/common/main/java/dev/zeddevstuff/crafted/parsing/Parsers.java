@@ -251,6 +251,19 @@ public class Parsers
 			return defaultValue;
 		}
 	}
+	public static YogaPhysicalEdge parseYogaPhysicalEdge(String s, YogaPhysicalEdge yogaPhysicalEdge)
+	{
+		if(s == null)
+			return yogaPhysicalEdge;
+		try
+		{
+			return YogaPhysicalEdge.valueOf(s.toUpperCase(Locale.ROOT));
+		}
+		catch (IllegalArgumentException e)
+		{
+			return yogaPhysicalEdge;
+		}
+	}
 	public static YogaJustify parseYogaJustify(String value, YogaJustify defaultValue)
 	{
 		if (value == null)

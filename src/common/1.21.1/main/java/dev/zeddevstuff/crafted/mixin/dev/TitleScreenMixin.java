@@ -63,11 +63,11 @@ public abstract class TitleScreenMixin extends Screen
 		ctx.registerHandler(IClickEventHandler.class, "copySchema", e -> {
 			var schema = SchemaGenerator.generateSchema(Crafted.defaultInstance());
 			e.getTarget().ctx.crafted.clipboard.set(schema);
-			System.out.println("Schema copied to clipboard!");
+			ctx.crafted.logger.info("Schema copied to clipboard!");
 		});
-		ctx.registerHandler(IClickEventHandler.class, "sayHi", e -> System.out.println("Hi!"));
+		ctx.registerHandler(IClickEventHandler.class, "sayHi", e -> ctx.crafted.logger.info("Hi!"));
 		ctx.registerHandler(ISubmitEventHandler.class, "printSubmit", e -> {
-			System.out.println("Submitted value: '" + e.getTargetAs(Input.class).value.get() + "'");
+			ctx.crafted.logger.info("Submitted value: '" + e.getTargetAs(Input.class).value.get() + "'");
 		});
 		ctx.registerHandler(IClickEventHandler.class, "switchEither", e -> {
 			var root = e.getTarget().findAncestorOfType(CraftedRoot.class);

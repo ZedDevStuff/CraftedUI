@@ -19,6 +19,8 @@ public class Crafted
 		Crafted.instance = instance;
 	}
 
+	private final ILogger.IFactory loggerFactory;
+	public final ILogger logger;
 	public final ILocalization localization;
 	public final IFont defaultFont;
 	public final IDispatcher dispatcher;
@@ -30,8 +32,10 @@ public class Crafted
 	private final Map<String, IFont> fonts = new java.util.HashMap<>();
 	private final Map<Class<?>, DocumentLoader> loaders = new java.util.HashMap<>();
 
-	public Crafted(ILocalization localization, IFont defaultFont, IDispatcher dispatcher, ITextureManager textures, IClipboard clipboard)
+	public Crafted(ILogger.IFactory loggerFactory, ILocalization localization, IFont defaultFont, IDispatcher dispatcher, ITextureManager textures, IClipboard clipboard)
 	{
+		this.loggerFactory = loggerFactory;
+		this.logger = loggerFactory.create("Crafted");
 		this.localization = localization;
 		this.defaultFont = defaultFont;
 		this.dispatcher = dispatcher;
@@ -47,6 +51,11 @@ public class Crafted
 		if(instance == null)
 			throw new RuntimeException("Either forgot to initialize crafted in the versioned entrypoint or called defaultInstance() too early");
 		return instance;
+	}
+
+	public ILogger getLogger(String name)
+	{
+		return loggerFactory.create(name);
 	}
 
 	public DocumentLoader getLoader(Class<?> sourceClass)

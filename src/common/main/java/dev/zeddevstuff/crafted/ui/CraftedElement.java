@@ -678,11 +678,15 @@ public abstract class CraftedElement
 			return;
 		newParent.addChild(this);
 	}
+	protected boolean acceptsChild(CraftedElement child) { return true; }
+
 	public void addChild(CraftedElement child)
 	{
 		if(child == null)
 			return;
 		if(children.contains(child))
+			return;
+		if(!acceptsChild(child))
 			return;
 		if(child == this)
 			throw new IllegalArgumentException("Cannot add self as child.");
@@ -710,6 +714,8 @@ public abstract class CraftedElement
 		if(child == null)
 			return;
 		if(children.contains(child))
+			return;
+		if(!acceptsChild(child))
 			return;
 		if(child == this)
 			throw new IllegalArgumentException("Cannot add self as child.");
