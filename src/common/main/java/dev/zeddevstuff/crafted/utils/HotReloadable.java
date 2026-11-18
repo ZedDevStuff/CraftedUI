@@ -17,6 +17,7 @@ public class HotReloadable<T> implements AutoCloseable
 	private final Function<Path, T> parser;
 	private final List<Consumer<T>> onReload = Collections.synchronizedList(new ArrayList<>());
 	private T value;
+	private T backupValue;
 	public T getValue() { return value; }
 	private void setValue(T value)
 	{
@@ -28,12 +29,13 @@ public class HotReloadable<T> implements AutoCloseable
 		}
 	}
 
-	public HotReloadable(@Nonnull Path file, Function<Path, T> parser)
+	public HotReloadable(@Nonnull Path file, Function<Path, T> parser, @Nonnull T backupValue)
 	{
 		if(Files.notExists(file))
 			throw new IllegalArgumentException("File does not exist: " + file);
 		this.file = file;
 		this.parser = parser;
+		this.backupValue = backupValue;
 		try
 		{
 			setValue(parser.apply(file));
@@ -41,6 +43,7 @@ public class HotReloadable<T> implements AutoCloseable
 		}
 		catch(Exception e)
 		{
+			setValue(backupValue);
 			throw new RuntimeException("Failed to load file: " + file, e);
 		}
 	}
@@ -167,7 +170,7 @@ public class HotReloadable<T> implements AutoCloseable
 		}
 	}
 
-	public static HotReloadable<String> text(Path file)
+	public static HotReloadable<String> text(Path file, String backupValue)
 	{
 		return new HotReloadable<>(file, path -> {
 			try
@@ -178,7 +181,21 @@ public class HotReloadable<T> implements AutoCloseable
 			{
 				throw new RuntimeException("Failed to read file: " + path, e);
 			}
-		});
+		}, backupValue);
+	}
+	public static <T> HotReloadable<T> parsesStringInto(Path file, Function<String, T> parser, T backupValue)
+	{
+		return new HotReloadable<>(file, path -> {
+			try
+			{
+				String content = new String(Files.readAllBytes(path));
+				return parser.apply(content);
+			}
+			catch(Exception e)
+			{
+				throw new RuntimeException("Failed to read file: " + path, e);
+			}
+		}, backupValue);
 	}
 
 	@Override

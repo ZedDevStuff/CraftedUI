@@ -3,10 +3,10 @@ package dev.zeddevstuff.crafted.mixin.dev;
 import dev.zeddevstuff.crafted.Crafted;
 import dev.zeddevstuff.crafted.CraftedPortal;
 import dev.zeddevstuff.crafted.CraftedScreen;
-import dev.zeddevstuff.crafted.Entry;
 import dev.zeddevstuff.crafted.input.events.ClickEvent;
 import dev.zeddevstuff.crafted.input.events.IClickEventHandler;
 import dev.zeddevstuff.crafted.input.events.ISubmitEventHandler;
+import dev.zeddevstuff.crafted.parsing.CraftedXmlParser;
 import dev.zeddevstuff.crafted.types.Rect;
 import dev.zeddevstuff.crafted.ui.BindingExtractor;
 import dev.zeddevstuff.crafted.ui.BindingScope;
@@ -27,7 +27,6 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
-import java.io.IOException;
 import java.nio.file.Path;
 import java.util.List;
 
@@ -81,7 +80,7 @@ public abstract class TitleScreenMixin extends Screen
 		ctx.setVar("testOptions", new TypedList<>(String.class, List.of("Option 1", "Option 2", "Option 3")));
 		ctx.setVar("optionExtractor", BindingExtractor.class,
 			value -> new BindingScope(java.util.Map.of("value", value)));
-		var screen = new CraftedScreen(ctx, HotReloadable.text(gallery));
+		var screen = new CraftedScreen(ctx, HotReloadable.parsesStringInto(gallery, CraftedXmlParser::parse, Crafted.defaultInstance().getLoader(Crafted.class).getDocument("/assets/crafted_ui/ui/Gallery.xml").get()));
 		minecraft.setScreen(screen);
 	}
 }

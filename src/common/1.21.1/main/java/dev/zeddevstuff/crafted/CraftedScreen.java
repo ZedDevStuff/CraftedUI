@@ -29,7 +29,7 @@ public class CraftedScreen extends Screen
 {
 	protected final CanvasImpl canvas;
 	protected final CraftedContext context;
-	private HotReloadable<String> hotReloadable;
+	private HotReloadable<ParsedNode> hotReloadable;
 	private final ParsedNode rootElementNode;
 	private CraftedRoot rootElement;
 	private CraftedRenderer renderer;
@@ -56,14 +56,14 @@ public class CraftedScreen extends Screen
 	{
 		this(ctx, CraftedXmlParser.parse(xml));
 	}
-	public CraftedScreen(CraftedContext ctx, HotReloadable<String> hotReloadable)
+	public CraftedScreen(CraftedContext ctx, HotReloadable<ParsedNode> hotReloadable)
 	{
 		this(ctx, hotReloadable.getValue());
 		this.hotReloadable = hotReloadable;
 		hotReloadable.addListener((newValue) -> {
 			try
 			{
-				var newRoot = DocumentBuilder.buildTree(ctx, CraftedXmlParser.parse(newValue));
+				var newRoot = DocumentBuilder.buildTree(ctx, newValue);
 				this.rootElement = newRoot.as(CraftedRoot.class);
 				this.renderer = new CraftedRenderer(rootElement);
 				context.inputHandler.setRootElement(rootElement);
