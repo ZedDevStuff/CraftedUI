@@ -15,6 +15,7 @@ import dev.zeddevstuff.crafted.ui.elements.Checkbox;
 import dev.zeddevstuff.crafted.ui.elements.CraftedRoot;
 import dev.zeddevstuff.crafted.ui.elements.Either;
 import dev.zeddevstuff.crafted.ui.elements.Input;
+import dev.zeddevstuff.crafted.utils.HotReloadable;
 import dev.zeddevstuff.crafted.utils.SchemaGenerator;
 import dev.zeddevstuff.crafted.utils.TypedList;
 import net.minecraft.client.gui.screens.Screen;
@@ -26,6 +27,8 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
+import java.io.IOException;
+import java.nio.file.Path;
 import java.util.List;
 
 @Mixin(TitleScreen.class)
@@ -58,6 +61,7 @@ public abstract class TitleScreenMixin extends Screen
 	@Unique
 	private void crafted$galleryButtonPressed(ClickEvent event)
 	{
+		Path gallery = Path.of(System.getProperty("user.dir"), "..", "src", "common", "main", "resources", "assets", "crafted_ui", "ui", "Gallery.xml");
 		var ctx = new CraftedContext();
 		ctx.registerHandler(IClickEventHandler.class, "exit", e -> this.minecraft.screen.onClose());
 		ctx.registerHandler(IClickEventHandler.class, "copySchema", e -> {
@@ -77,7 +81,7 @@ public abstract class TitleScreenMixin extends Screen
 		ctx.setVar("testOptions", new TypedList<>(String.class, List.of("Option 1", "Option 2", "Option 3")));
 		ctx.setVar("optionExtractor", BindingExtractor.class,
 			value -> new BindingScope(java.util.Map.of("value", value)));
-		var screen = new CraftedScreen(ctx, Entry.gallery);
+		var screen = new CraftedScreen(ctx, HotReloadable.text(gallery));
 		minecraft.setScreen(screen);
 	}
 }

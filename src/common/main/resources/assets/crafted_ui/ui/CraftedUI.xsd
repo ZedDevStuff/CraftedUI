@@ -101,27 +101,6 @@
       </xs:extension>
     </xs:complexContent>
   </xs:complexType>
-  <xs:complexType name="Checkbox">
-    <xs:complexContent>
-      <xs:extension base="CraftedElement">
-        <xs:attribute name="checked">
-          <xs:annotation>
-            <xs:documentation>Whether the checkbox is checked or not. Can be null for an indeterminate state</xs:documentation>
-          </xs:annotation>
-        </xs:attribute>
-        <xs:attribute name="indeterminate">
-          <xs:annotation>
-            <xs:documentation>Whether the checkbox supports an indeterminate state. Checked will allow null if this is true</xs:documentation>
-          </xs:annotation>
-        </xs:attribute>
-      </xs:extension>
-    </xs:complexContent>
-  </xs:complexType>
-  <xs:complexType name="Button">
-    <xs:complexContent>
-      <xs:extension base="CraftedElement" />
-    </xs:complexContent>
-  </xs:complexType>
   <xs:complexType name="Either">
     <xs:complexContent>
       <xs:extension base="CraftedElement">
@@ -129,42 +108,9 @@
       </xs:extension>
     </xs:complexContent>
   </xs:complexType>
-  <xs:complexType name="Box">
+  <xs:complexType name="Button">
     <xs:complexContent>
-      <xs:extension base="CraftedElement">
-        <xs:attribute name="color">
-          <xs:annotation>
-            <xs:documentation>Background color of the box</xs:documentation>
-          </xs:annotation>
-        </xs:attribute>
-      </xs:extension>
-    </xs:complexContent>
-  </xs:complexType>
-  <xs:complexType name="ScrollView">
-    <xs:complexContent>
-      <xs:extension base="Box">
-        <xs:attribute name="scrollX" />
-        <xs:attribute name="scrollY" />
-        <xs:attribute name="horizontalScrollbar" />
-        <xs:attribute name="verticalScrollbar" />
-        <xs:attribute name="autoHideScrollbars" />
-        <xs:attribute name="scrollbarSize" />
-      </xs:extension>
-    </xs:complexContent>
-  </xs:complexType>
-  <xs:complexType name="Text">
-    <xs:complexContent>
-      <xs:extension base="CraftedElement">
-        <xs:attribute name="text" />
-        <xs:attribute name="settings" />
-        <xs:attribute name="font" />
-        <xs:attribute name="fontScale" />
-        <xs:attribute name="wrapWidth" />
-        <xs:attribute name="textWrap" />
-        <xs:attribute name="shadow" />
-        <xs:attribute name="shadowColor" />
-        <xs:attribute name="color" />
-      </xs:extension>
+      <xs:extension base="CraftedElement" />
     </xs:complexContent>
   </xs:complexType>
   <xs:complexType name="Input">
@@ -195,12 +141,18 @@
       </xs:extension>
     </xs:complexContent>
   </xs:complexType>
-  <xs:complexType name="List">
+  <xs:complexType name="Text">
     <xs:complexContent>
-      <xs:extension base="ScrollView">
-        <xs:attribute name="items" />
-        <xs:attribute name="extractor" />
-        <xs:attribute name="bindingPrefix" />
+      <xs:extension base="CraftedElement">
+        <xs:attribute name="text" />
+        <xs:attribute name="settings" />
+        <xs:attribute name="font" />
+        <xs:attribute name="fontScale" />
+        <xs:attribute name="wrapWidth" />
+        <xs:attribute name="textWrap" />
+        <xs:attribute name="shadow" />
+        <xs:attribute name="shadowColor" />
+        <xs:attribute name="color" />
       </xs:extension>
     </xs:complexContent>
   </xs:complexType>
@@ -217,6 +169,72 @@
       </xs:extension>
     </xs:complexContent>
   </xs:complexType>
+  <xs:complexType name="Box">
+    <xs:complexContent>
+      <xs:extension base="CraftedElement">
+        <xs:attribute name="color">
+          <xs:annotation>
+            <xs:documentation>Background color of the box</xs:documentation>
+          </xs:annotation>
+        </xs:attribute>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:complexType name="ScrollView">
+    <xs:complexContent>
+      <xs:extension base="Box">
+        <xs:attribute name="scrollX" />
+        <xs:attribute name="scrollY" />
+        <xs:attribute name="horizontalScrollbar" />
+        <xs:attribute name="verticalScrollbar" />
+        <xs:attribute name="autoHideScrollbars" />
+        <xs:attribute name="scrollbarSize" />
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:complexType name="Tabs">
+    <xs:complexContent>
+      <xs:extension base="CraftedElement">
+        <xs:attribute name="currentTabIndex" />
+        <xs:attribute name="tabBarPosition" />
+        <xs:attribute name="tabBarHeight" />
+        <xs:attribute name="minTabWidth" />
+        <xs:attribute name="maxTabWidth" />
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:complexType name="Checkbox">
+    <xs:complexContent>
+      <xs:extension base="CraftedElement">
+        <xs:attribute name="checked">
+          <xs:annotation>
+            <xs:documentation>Whether the checkbox is checked or not. Can be null for an indeterminate state</xs:documentation>
+          </xs:annotation>
+        </xs:attribute>
+        <xs:attribute name="indeterminate">
+          <xs:annotation>
+            <xs:documentation>Whether the checkbox supports an indeterminate state. Checked will allow null if this is true</xs:documentation>
+          </xs:annotation>
+        </xs:attribute>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:complexType name="List">
+    <xs:complexContent>
+      <xs:extension base="ScrollView">
+        <xs:attribute name="items" />
+        <xs:attribute name="extractor" />
+        <xs:attribute name="bindingPrefix" />
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:complexType name="Tab">
+    <xs:complexContent>
+      <xs:extension base="ScrollView">
+        <xs:attribute name="title" />
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
   <xs:complexType name="Dropdown">
     <xs:complexContent>
       <xs:extension base="CraftedElement">
@@ -227,14 +245,9 @@
       </xs:extension>
     </xs:complexContent>
   </xs:complexType>
-  <xs:element name="Checkbox" type="Checkbox">
+  <xs:element name="Either" type="Either">
     <xs:annotation>
-      <xs:documentation>Checkbox element, can be checked or unchecked</xs:documentation>
-    </xs:annotation>
-  </xs:element>
-  <xs:element name="Crafted" type="CraftedRoot">
-    <xs:annotation>
-      <xs:documentation>Root element of a Crafted document. All other elements must be children of this element</xs:documentation>
+      <xs:documentation>Displays one of the two child elements based on the &apos;value&apos; property.</xs:documentation>
     </xs:annotation>
   </xs:element>
   <xs:element name="Button" type="Button">
@@ -242,20 +255,14 @@
       <xs:documentation>A simple button element</xs:documentation>
     </xs:annotation>
   </xs:element>
-  <xs:element name="Either" type="Either">
-    <xs:annotation>
-      <xs:documentation>Displays one of the two child elements based on the &apos;value&apos; property.</xs:documentation>
-    </xs:annotation>
-  </xs:element>
-  <xs:element name="ScrollView" type="ScrollView" />
-  <xs:element name="Text" type="Text">
-    <xs:annotation>
-      <xs:documentation>Displays text on the screen</xs:documentation>
-    </xs:annotation>
-  </xs:element>
   <xs:element name="Input" type="Input">
     <xs:annotation>
       <xs:documentation>A text input field that allows users to enter and edit text.</xs:documentation>
+    </xs:annotation>
+  </xs:element>
+  <xs:element name="Crafted" type="CraftedRoot">
+    <xs:annotation>
+      <xs:documentation>Root element of a Crafted document. All other elements must be children of this element</xs:documentation>
     </xs:annotation>
   </xs:element>
   <xs:element name="Image" type="Image">
@@ -263,19 +270,40 @@
       <xs:documentation>Displays a texture or sprite on the screen</xs:documentation>
     </xs:annotation>
   </xs:element>
-  <xs:element name="List" type="List">
+  <xs:element name="Text" type="Text">
     <xs:annotation>
-      <xs:documentation>Displays a list of items using a template for each item.</xs:documentation>
-    </xs:annotation>
-  </xs:element>
-  <xs:element name="Box" type="Box">
-    <xs:annotation>
-      <xs:documentation>A basic box element, used for backgrounds and other simple UI elements</xs:documentation>
+      <xs:documentation>Displays text on the screen</xs:documentation>
     </xs:annotation>
   </xs:element>
   <xs:element name="TextArea" type="TextArea">
     <xs:annotation>
       <xs:documentation>A multiline text input field that allows users to enter and edit text.</xs:documentation>
+    </xs:annotation>
+  </xs:element>
+  <xs:element name="ScrollView" type="ScrollView" />
+  <xs:element name="Tabs" type="Tabs">
+    <xs:annotation>
+      <xs:documentation>A tabbed container element</xs:documentation>
+    </xs:annotation>
+  </xs:element>
+  <xs:element name="Checkbox" type="Checkbox">
+    <xs:annotation>
+      <xs:documentation>Checkbox element, can be checked or unchecked</xs:documentation>
+    </xs:annotation>
+  </xs:element>
+  <xs:element name="List" type="List">
+    <xs:annotation>
+      <xs:documentation>Displays a list of items using a template for each item.</xs:documentation>
+    </xs:annotation>
+  </xs:element>
+  <xs:element name="Tab" type="Tab">
+    <xs:annotation>
+      <xs:documentation>A tab in a Tabs element</xs:documentation>
+    </xs:annotation>
+  </xs:element>
+  <xs:element name="Box" type="Box">
+    <xs:annotation>
+      <xs:documentation>A basic box element, used for backgrounds and other simple UI elements</xs:documentation>
     </xs:annotation>
   </xs:element>
   <xs:element name="Dropdown" type="Dropdown" />

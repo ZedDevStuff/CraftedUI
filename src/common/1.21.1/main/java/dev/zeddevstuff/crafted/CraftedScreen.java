@@ -15,6 +15,7 @@ import dev.zeddevstuff.crafted.rendering.CraftedRenderer;
 import dev.zeddevstuff.crafted.ui.CraftedContext;
 import dev.zeddevstuff.crafted.ui.CraftedElement;
 import dev.zeddevstuff.crafted.ui.elements.CraftedRoot;
+import dev.zeddevstuff.crafted.utils.HotReloadable;
 import dev.zeddevstuff.crafted.utils.Lazy;
 import dev.zeddevstuff.crafted.utils.Typed;
 import net.minecraft.client.Minecraft;
@@ -28,6 +29,7 @@ public class CraftedScreen extends Screen
 {
 	protected final CanvasImpl canvas;
 	protected final CraftedContext context;
+	private HotReloadable<String> hotReloadable;
 	private final ParsedNode rootElementNode;
 	private CraftedRoot rootElement;
 	private CraftedRenderer renderer;
@@ -53,6 +55,25 @@ public class CraftedScreen extends Screen
 	public CraftedScreen(CraftedContext ctx, String xml)
 	{
 		this(ctx, CraftedXmlParser.parse(xml));
+	}
+	public CraftedScreen(CraftedContext ctx, HotReloadable<String> hotReloadable)
+	{
+		this(ctx, hotReloadable.getValue());
+		this.hotReloadable = hotReloadable;
+		hotReloadable.addListener((newValue) -> {
+			try
+			{
+				var newRoot = DocumentBuilder.buildTree(ctx, CraftedXmlParser.parse(newValue));
+				this.rootElement = newRoot.as(CraftedRoot.class);
+				this.renderer = new CraftedRenderer(rootElement);
+				context.inputHandler.setRootElement(rootElement);
+				rootElement.refreshLayoutTree();
+			}
+			catch(Exception e)
+			{
+				ctx.crafted.logger.error("Failed to hot reload '" + hotReloadable.file + "'", e);
+			}
+		});
 	}
 
 	@Override
