@@ -10,7 +10,7 @@
             </Box>
             <Text color="onBackground" marginLeft="8" fontScale="1.5">Crafted UI Gallery</Text>
         </Box>
-        <Tabs size="100%, 50%" tabBarPosition="bottom">
+        <Tabs size="100%, 50%" tabBarPosition="top">
             <Tab title="Tab 1">
                 <Text>Hi</Text>
             </Tab>

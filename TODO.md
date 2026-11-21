@@ -33,7 +33,7 @@
   - [ ] Extra elements
     - [ ] Slider
     - [ ] Progress bar
-    - [ ] Tabs
+    - [x] Tabs
     - [x] Tooltip
     - [ ] Modal
     - [ ] Menu
