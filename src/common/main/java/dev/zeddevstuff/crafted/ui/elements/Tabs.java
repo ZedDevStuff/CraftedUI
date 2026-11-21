@@ -16,6 +16,7 @@ import dev.zeddevstuff.crafted.platform.ICanvas;
 import dev.zeddevstuff.crafted.platform.IText;
 import dev.zeddevstuff.crafted.platform.ITexture;
 import dev.zeddevstuff.crafted.rendering.IRendersType;
+import dev.zeddevstuff.crafted.types.Color;
 import dev.zeddevstuff.crafted.types.Rect;
 import dev.zeddevstuff.crafted.ui.CraftedContext;
 import dev.zeddevstuff.crafted.ui.CraftedElement;
@@ -271,17 +272,16 @@ public class Tabs extends CraftedElement implements MetaElement
 		crafted.elements.registerElement(Tabs.class, "Tabs", Tabs::new);
 		crafted.elements.registerElement(Tab.class, "Tab", Tab::new);
 		crafted.renderers.registerRenderer(Tabs.class, "default", new DefaultTabsRenderer());
-//		crafted.renderers.registerRenderer(Tabs.class, "crafted", new CraftedTabsRenderer());
+		crafted.renderers.registerRenderer(Tabs.class, "crafted", new CraftedTabsRenderer());
 	}
 
 	public static class DefaultTabsRenderer implements IRendersType<Tabs>
 	{
+		private static final int UNSELECTED_TEXT_OFFSET = 4;
 		@Override
 		public Class<?> getElementType() { return Tabs.class; }
 
 		private final ITexture tab, tabDisabled, tabFocused, tabDisabledFocused;
-
-		private static final int UNSELECTED_TEXT_OFFSET = 4;
 
 		public DefaultTabsRenderer()
 		{
@@ -383,6 +383,102 @@ public class Tabs extends CraftedElement implements MetaElement
 					}
 					canvas.disableBlend();
 				}
+				drawCenteredText(canvas, element, tab, rect.x, rect.y, rect.width, rect.height, selected);
+			}
+		}
+
+		private void drawCenteredText(ICanvas canvas, Tabs element, Tab tab, int x, int y, int width, int height, boolean selected)
+		{
+			var settings = element.ctx.crafted.defaultTextSettings;
+			var textSize = settings.font().measureText(tab.title.get(), settings.size(), -1);
+			int textX = (int)(x + (width - textSize.width()) / 2);
+			int textY = (int)(y + (height - textSize.height()) / 2);
+			if(!selected)
+				textY += UNSELECTED_TEXT_OFFSET;
+			canvas.drawText(tab.title.get(), textX, textY, settings, element.ctx.theme.onSurface());
+		}
+
+		private void drawVerticalCenteredText(ICanvas canvas, Tabs element, Tab tab, TabRect rect, boolean isLeft, boolean selected)
+		{
+			var settings = element.ctx.crafted.defaultTextSettings;
+			var textSize = settings.font().measureText(tab.title.get(), settings.size(), -1);
+			float offset = selected ? 0 : (isLeft ? UNSELECTED_TEXT_OFFSET : -UNSELECTED_TEXT_OFFSET);
+			canvas.beginTransform();
+			canvas.translate(rect.x + rect.width / 2f, rect.y + rect.height / 2f);
+			canvas.rotate(isLeft ? -90 : 90);
+			canvas.translate(-textSize.width() / 2f, -textSize.height() / 2f + offset);
+			canvas.drawText(tab.title.get(), 0, 0, settings, element.ctx.theme.onSurface());
+			canvas.endTransform();
+		}
+	}
+	// TODO: Design a better look
+	public static class CraftedTabsRenderer implements IRendersType<Tabs>
+	{
+		private static final int UNSELECTED_TEXT_OFFSET = 0;
+
+		@Override
+		public Class<?> getElementType() { return Tabs.class; }
+
+		@Override
+		public void render(ICanvas canvas, Tabs element)
+		{
+			var layout = element.getLayout();
+			canvas.beginTransform();
+			canvas.translate(layout.x, layout.y);
+			switch (element.tabBarPosition.get())
+			{
+				case LEFT, RIGHT -> renderVertical(canvas, element, element.tabBarPosition.get() == YogaPhysicalEdge.LEFT);
+				case TOP, BOTTOM -> renderHorizontal(canvas, element);
+			}
+			canvas.endTransform();
+		}
+
+		private void renderVertical(ICanvas canvas, Tabs element, boolean isLeft)
+		{
+			for(var rect : element.tabRects())
+			{
+				var tab = element.getTab(rect.index);
+				if(tab == null)
+					continue;
+				boolean selected = rect.index == element.currentTabIndex.get();
+				boolean hovered = tab == element.hoveredTab;
+				Color color = selected
+					? (hovered || element.state.isFocused() ? element.ctx.theme.primary() : Color.Gray)
+					: (hovered ? Color.LightGray : Color.Gray);
+
+				canvas.enableBlend();
+				canvas.drawRect(rect.x, rect.y, rect.width, rect.height, color);
+				canvas.disableBlend();
+
+				drawVerticalCenteredText(canvas, element, tab, rect, isLeft, selected);
+			}
+		}
+
+		private void renderHorizontal(ICanvas canvas, Tabs element)
+		{
+			for(var rect : element.tabRects())
+			{
+				var tab = element.getTab(rect.index);
+				if(tab == null)
+					continue;
+				boolean selected = rect.index == element.currentTabIndex.get();
+				boolean hovered = tab == element.hoveredTab;
+				canvas.enableBlend();
+				if(selected)
+				{
+					if(hovered || element.state.isFocused())
+						canvas.drawRect(rect.x, rect.y, rect.width, rect.height, element.ctx.theme.primary());
+					else
+						canvas.drawRect(rect.x, rect.y, rect.width, rect.height, Color.Gray);
+				}
+				else
+				{
+					if(hovered)
+						canvas.drawRect(rect.x, rect.y, rect.width, rect.height, Color.LightGray);
+					else
+						canvas.drawRect(rect.x, rect.y, rect.width, rect.height, Color.Gray);
+				}
+				canvas.disableBlend();
 				drawCenteredText(canvas, element, tab, rect.x, rect.y, rect.width, rect.height, selected);
 			}
 		}
