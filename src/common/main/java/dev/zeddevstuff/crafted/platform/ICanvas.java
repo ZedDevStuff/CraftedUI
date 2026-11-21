@@ -35,5 +35,8 @@ public interface ICanvas
 	boolean clipContains(int x, int y);
 	void endClip();
 
+	void enableBlend();
+	void disableBlend();
+
 	float deltaTime();
 }

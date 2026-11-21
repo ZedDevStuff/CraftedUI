@@ -10,7 +10,7 @@
             </Box>
             <Text color="onBackground" marginLeft="8" fontScale="1.5">Crafted UI Gallery</Text>
         </Box>
-        <Tabs size="100%, 50%">
+        <Tabs size="100%, 50%" tabBarPosition="bottom">
             <Tab title="Tab 1">
                 <Text>Hi</Text>
             </Tab>
@@ -33,7 +33,7 @@
         <Text color="onBackground" margin="2">Inputs</Text>
         <Box id="inputs" gap="4" flexDirection="row" flexWrap="wrap" margin="2">
             <Input onSubmit="printSubmit" width="200" height="20" placeholder="Search..." />
-            <TextArea onSubmit="printSubmit" allowTabNavigation="false" size="200,60"></TextArea>
+            <TextArea onSubmit="printSubmit" allowTabNavigation="false" size="200,60" />
             <Checkbox size="20,20" />
             <Checkbox renderer="crafted" size="20,20" onClick="switchEither"/>
             <Checkbox renderer="crafted" size="20,20" indeterminate="true" style="primary" />

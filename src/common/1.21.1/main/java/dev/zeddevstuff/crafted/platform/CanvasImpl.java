@@ -1,5 +1,7 @@
 package dev.zeddevstuff.crafted.platform;
 
+import com.mojang.blaze3d.systems.RenderSystem;
+import com.mojang.math.Axis;
 import dev.zeddevstuff.crafted.types.Color;
 import dev.zeddevstuff.crafted.types.Rect;
 import dev.zeddevstuff.crafted.types.TextSettings;
@@ -129,7 +131,7 @@ public class CanvasImpl implements ICanvas
 	@Override
 	public void rotate(float angle)
 	{
-		graphics.pose().mulPose(new Matrix4f().rotate(new AxisAngle4f(angle, 0, 0, 1)));
+		graphics.pose().mulPose(Axis.ZP.rotationDegrees(angle));
 	}
 	@Override
 	public void scale(float x, float y)
@@ -156,6 +158,18 @@ public class CanvasImpl implements ICanvas
 	public void endClip()
 	{
 		graphics.disableScissor();
+	}
+
+	@Override
+	public void enableBlend()
+	{
+		RenderSystem.enableBlend();
+	}
+
+	@Override
+	public void disableBlend()
+	{
+		RenderSystem.disableBlend();
 	}
 
 	@Override
