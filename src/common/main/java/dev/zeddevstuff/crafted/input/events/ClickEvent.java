@@ -19,6 +19,25 @@ public class ClickEvent extends UIEvent
         this.button = button;
     }
 
+    public float localX()
+    {
+        return localX(0);
+    }
+    public float localX(float extraOffset)
+    {
+        var element = getCurrentTarget() != null ? getCurrentTarget() : getTarget();
+        return element.toLocalX(x) + extraOffset;
+    }
+    public float localY()
+    {
+        return localY(0);
+    }
+    public float localY(float extraOffset)
+    {
+        var element = getCurrentTarget() != null ? getCurrentTarget() : getTarget();
+        return element.toLocalY(y) + extraOffset;
+    }
+
     public enum Source
     {
         MOUSE,
