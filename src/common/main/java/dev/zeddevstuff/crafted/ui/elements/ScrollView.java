@@ -227,18 +227,6 @@ public class ScrollView extends Box
 	}
 
 	@Override
-	protected float transformChildInputX(float x)
-	{
-		return x + scrollX.get();
-	}
-
-	@Override
-	protected float transformChildInputY(float y)
-	{
-		return y + scrollY.get();
-	}
-
-	@Override
 	protected int getRenderOffsetX() { return scrollX.get(); }
 
 	@Override

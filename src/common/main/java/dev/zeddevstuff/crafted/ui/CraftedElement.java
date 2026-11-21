@@ -510,8 +510,22 @@ public abstract class CraftedElement
 	protected int getRenderOffsetX() { return 0; }
 	protected int getRenderOffsetY() { return 0; }
 	public void scrollIntoView(CraftedElement element) {}
-	protected float transformChildInputX(float x) { return x; }
-	protected float transformChildInputY(float y) { return y; }
+
+	protected float transformChildInputX(float x) { return x + getRenderOffsetX(); }
+	protected float transformChildInputY(float y) { return y + getRenderOffsetY(); }
+
+	public float toLocalX(float screenX)
+	{
+		if(parent == null)
+			return screenX - layout.x;
+		return parent.transformChildInputX(parent.toLocalX(screenX) + parent.layout.x) - layout.x;
+	}
+	public float toLocalY(float screenY)
+	{
+		if(parent == null)
+			return screenY - layout.y;
+		return parent.transformChildInputY(parent.toLocalY(screenY) + parent.layout.y) - layout.y;
+	}
 
 	// Thank you Wulferis for the base method. It's been butchered a bit though. Probably won't recognize it anymore lol
 	public CraftedElement findTopmostAt(float x, float y)

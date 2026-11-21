@@ -48,6 +48,25 @@ public class MouseEvent extends UIEvent
 		return new MouseEvent(Type.EXIT, target, x, y, null, 0, 0);
 	}
 
+	public float localX()
+	{
+		return localX(0);
+	}
+	public float localX(float extraOffset)
+	{
+		var element = getCurrentTarget() != null ? getCurrentTarget() : getTarget();
+		return element.toLocalX(x) + extraOffset;
+	}
+	public float localY()
+	{
+		return localY(0);
+	}
+	public float localY(float extraOffset)
+	{
+		var element = getCurrentTarget() != null ? getCurrentTarget() : getTarget();
+		return element.toLocalY(y) + extraOffset;
+	}
+
 	public enum Type
 	{
 		MOVE,

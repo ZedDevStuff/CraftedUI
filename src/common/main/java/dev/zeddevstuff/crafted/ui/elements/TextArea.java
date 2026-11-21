@@ -449,8 +449,8 @@ public class TextArea extends Input
         }
         canStartDrag = true;
         int position = positionAt(this, lines,
-            event.x - getLayout().x + getAncestorRenderOffsetX() - 4 + scrollX.get(),
-            event.y - getLayout().y + getAncestorRenderOffsetY() - 4 + scrollY.get());
+            event.localX(-4 + scrollX.get()),
+            event.localY(-4 + scrollY.get()));
         text.setCursorPosition(position);
         text.clearSelection();
         text.setSelectionStart(text.getCursorPosition());
@@ -523,8 +523,8 @@ public class TextArea extends Input
         if(isDragging && font.get() != null)
         {
             int position = positionAt(this, lines,
-                event.x - getLayout().x + getAncestorRenderOffsetX() - 4 + scrollX.get(),
-                event.y - getLayout().y + getAncestorRenderOffsetY() - 4 + scrollY.get());
+                event.localX(-4 + scrollX.get()),
+                event.localY(-4 + scrollY.get()));
             text.setCursorPosition(position);
             text.setSelectionEnd(position);
             event.consume();
