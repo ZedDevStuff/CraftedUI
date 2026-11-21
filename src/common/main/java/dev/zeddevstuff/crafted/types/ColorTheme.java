@@ -2,6 +2,7 @@ package dev.zeddevstuff.crafted.types;
 
 import dev.zeddevstuff.crafted.utils.ColorUtils;
 
+import java.util.Locale;
 import java.util.Objects;
 
 public record ColorTheme(
@@ -42,32 +43,37 @@ public record ColorTheme(
 
 	public Color getColorByName(String name)
 	{
-		return switch(name)
+		return switch(name.toLowerCase(Locale.ROOT))
 		{
 			case "primary" -> primary;
-			case "onPrimary" -> onPrimary;
-			case "primaryContainer" -> primaryContainer;
-			case "onPrimaryContainer" -> onPrimaryContainer;
+			case "onprimary" -> onPrimary;
+			case "primarycontainer" -> primaryContainer;
+			case "onprimarycontainer" -> onPrimaryContainer;
 			case "secondary" -> secondary;
-			case "onSecondary" -> onSecondary;
+			case "onsecondary" -> onSecondary;
 			case "background" -> background;
-			case "onBackground" -> onBackground;
+			case "onbackground" -> onBackground;
 			case "surface" -> surface;
-			case "onSurface" -> onSurface;
-			case "surfaceVariant" -> surfaceVariant;
+			case "onsurface" -> onSurface;
+			case "surfacevariant" -> surfaceVariant;
 			case "outline" -> outline;
 			case "disabled" -> disabled;
 			case "scrim" -> scrim;
 			case "error" -> error;
-			case "onError" -> onError;
+			case "onerror" -> onError;
 			case "warning" -> warning;
-            case "onWarning" -> onWarning;
+            case "onwarning" -> onWarning;
 			case "success" -> success;
-            case "onSuccess" -> onSuccess;
+            case "onsuccess" -> onSuccess;
             case "info" -> info;
-            case "onInfo" -> onInfo;
+            case "oninfo" -> onInfo;
 			default -> null;
 		};
+	}
+	public Color getColorByNameOrDefault(String name, Color defaultColor)
+	{
+		var color = getColorByName(name);
+		return color != null ? color : defaultColor;
 	}
 
     public static ColorTheme fromSeed(Color seed, boolean dark)

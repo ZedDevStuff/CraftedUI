@@ -140,58 +140,12 @@ public class Checkbox extends CraftedElement
 		public void render(ICanvas canvas, Checkbox element)
 		{
 			var theme = element.ctx.theme;
-			Color borderColor, backgroundColor;
-			switch (element.style.get())
-			{
-				case "secondary" -> {
-					borderColor = element.state.isDisabled()
-						? theme.disabled()
-						: element.state.isHoveredOrFocused()
-							? ColorUtils.bestContrast(theme.onSecondary(), Color.White, Color.Black)
-							: theme.onSecondary();
-					backgroundColor = theme.secondary();
-				}
-				case "error" -> {
-					borderColor = element.state.isDisabled()
-						? theme.disabled()
-						: element.state.isHoveredOrFocused()
-							? ColorUtils.bestContrast(theme.onError(), Color.White, Color.Black)
-							: theme.onError();
-					backgroundColor = theme.error();
-				}
-				case "warning" -> {
-					borderColor = element.state.isDisabled()
-						? theme.disabled()
-						: element.state.isHoveredOrFocused()
-							? ColorUtils.bestContrast(theme.onWarning(), Color.White, Color.Black)
-							: theme.onWarning();
-					backgroundColor = theme.warning();
-				}
-				case "success" -> {
-					borderColor = element.state.isDisabled()
-						? theme.disabled()
-						: element.state.isHoveredOrFocused()
-							? ColorUtils.bestContrast(theme.onSuccess(), Color.White, Color.Black)
-							: theme.onSuccess();
-					backgroundColor = theme.success();
-				}
-                case "info" -> {
-                    borderColor = element.state.isDisabled()
-                        ? theme.disabled()
-                        : element.state.isHoveredOrFocused()
-                            ? ColorUtils.bestContrast(theme.onInfo(), Color.White, Color.Black)
-                            : theme.onInfo();
-                    backgroundColor = theme.info();
-                }
-				default -> {
-					borderColor = element.state.isDisabled()
-						? theme.disabled()
-						: element.state.isHoveredOrFocused()
-							? ColorUtils.bestContrast(theme.onPrimary(), Color.White, Color.Black)
-							: theme.onPrimary();
-					backgroundColor = theme.primary();
-				}
-			}
+			Color backgroundColor = theme.getColorByNameOrDefault(element.style.get(), theme.primary());
+			Color borderColor = element.state.isDisabled()
+				? theme.disabled()
+				: element.state.isHoveredOrFocused()
+					? ColorUtils.bestContrast(theme.getColorByNameOrDefault("on"+element.style.get(), theme.onPrimary()), Color.White, Color.Black)
+					: theme.getColorByNameOrDefault("on"+element.style.get(), theme.onPrimary());
 			var layout = element.getLayout();
 			canvas.drawRect(layout.x, layout.y, layout.width, layout.height, borderColor);
 			canvas.drawRect(layout.x + 1, layout.y + 1, layout.width - 2, layout.height - 2, backgroundColor);

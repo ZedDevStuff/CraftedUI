@@ -145,64 +145,12 @@ public class Button extends CraftedElement
 		public void render(ICanvas canvas, Button element)
 		{
 			var theme = element.ctx.theme;
-			Color borderColor, backgroundColor, elevationColor;
-			switch (element.style.get())
-			{
-				case "secondary" -> {
-					borderColor = element.state.isDisabled()
-						? theme.disabled()
-						: element.state.isHoveredOrFocused()
-							? ColorUtils.bestContrast(theme.onSecondary(), Color.White, Color.Black)
-							: theme.onSecondary();
-					backgroundColor = theme.secondary();
-					elevationColor = ColorUtils.adjustLightness(theme.secondary(), -0.15f);
-				}
-				case "error" -> {
-					borderColor = element.state.isDisabled()
-						? theme.disabled()
-						: element.state.isHoveredOrFocused()
-							? ColorUtils.bestContrast(theme.onError(), Color.White, Color.Black)
-							: theme.onError();
-					backgroundColor = theme.error();
-					elevationColor = ColorUtils.adjustLightness(theme.error(), -0.15f);
-				}
-				case "warning" -> {
-					borderColor = element.state.isDisabled()
-						? theme.disabled()
-						: element.state.isHoveredOrFocused()
-							? ColorUtils.bestContrast(theme.onWarning(), Color.White, Color.Black)
-							: theme.onWarning();
-					backgroundColor = theme.warning();
-					elevationColor = ColorUtils.adjustLightness(theme.warning(), -0.15f);
-				}
-				case "success" -> {
-					borderColor = element.state.isDisabled()
-						? theme.disabled()
-						: element.state.isHoveredOrFocused()
-							? ColorUtils.bestContrast(theme.onSuccess(), Color.White, Color.Black)
-							: theme.onSuccess();
-					backgroundColor = theme.success();
-					elevationColor = ColorUtils.adjustLightness(theme.success(), -0.15f);
-				}
-				case "info" -> {
-					borderColor = element.state.isDisabled()
-						? theme.disabled()
-						: element.state.isHoveredOrFocused()
-							? ColorUtils.bestContrast(theme.onInfo(), Color.White, Color.Black)
-							: theme.onInfo();
-					backgroundColor = theme.info();
-					elevationColor = ColorUtils.adjustLightness(theme.info(), -0.15f);
-				}
-				default -> {
-					borderColor = element.state.isDisabled()
-						? theme.disabled()
-						: element.state.isHoveredOrFocused()
-							? ColorUtils.bestContrast(theme.onPrimary(), Color.White, Color.Black)
-							: theme.onPrimary();
-					backgroundColor = theme.primary();
-					elevationColor = ColorUtils.adjustLightness(theme.primary(), -0.15f);
-				}
-			}
+			Color backgroundColor = theme.getColorByNameOrDefault(element.style.get(), theme.primary());
+			Color borderColor = element.state.isDisabled()
+				? theme.disabled()
+				: element.state.isHoveredOrFocused()
+					? ColorUtils.bestContrast(theme.getColorByNameOrDefault("on"+element.style.get(), theme.onPrimary()), Color.White, Color.Black)
+					: theme.getColorByNameOrDefault("on"+element.style.get(), theme.onPrimary());
 			var layout = element.getLayout();
 			int y = layout.y;
 			int height = layout.height;
@@ -211,7 +159,7 @@ public class Button extends CraftedElement
 			canvas.drawRect(layout.x, y, layout.width, height, borderColor);
 			canvas.drawRect(layout.x + 1, y + 1, layout.width - 2, height - 2, backgroundColor);
 			if(!element.state.isActive())
-				canvas.drawRect(layout.x + 1, elevationY, layout.width - 2, elevationHeight, elevationColor);
+				canvas.drawRect(layout.x + 1, elevationY, layout.width - 2, elevationHeight, ColorUtils.adjustLightness(backgroundColor, -0.15f));
 		}
 	}
 }

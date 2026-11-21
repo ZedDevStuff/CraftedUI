@@ -185,6 +185,7 @@ public class Dropdown extends CraftedElement
 			canvas.drawText(label, centeredX, centeredY, element.ctx.crafted.defaultTextSettings, Color.White);
 		}
 	}
+	// TODO: Give more flair to this, looks too bland IMO
 	public static class CraftedRenderer implements IRendersType<Dropdown>
 	{
 		@Override
@@ -199,64 +200,13 @@ public class Dropdown extends CraftedElement
 			int centeredX = (int) (layout.x + (layout.width - textSize.width()) / 2);
 			int centeredY = (int) (layout.y + (layout.height - textSize.height()) / 2);
 			var theme = element.ctx.theme;
-			Color borderColor, backgroundColor, textColor;
-			switch (element.style.get())
-			{
-				case "secondary" -> {
-					borderColor = element.state.isDisabled()
-						? theme.disabled()
-						: element.state.isHoveredOrFocused()
-							? ColorUtils.bestContrast(theme.onSecondary(), Color.White, Color.Black)
-							: theme.onSecondary();
-					backgroundColor = theme.secondary();
-					textColor = theme.onSecondary();
-				}
-				case "error" -> {
-					borderColor = element.state.isDisabled()
-						? theme.disabled()
-						: element.state.isHoveredOrFocused()
-							? ColorUtils.bestContrast(theme.onError(), Color.White, Color.Black)
-							: theme.onError();
-					backgroundColor = theme.error();
-					textColor = theme.onError();
-				}
-				case "warning" -> {
-					borderColor = element.state.isDisabled()
-						? theme.disabled()
-						: element.state.isHoveredOrFocused()
-							? ColorUtils.bestContrast(theme.onWarning(), Color.White, Color.Black)
-							: theme.onWarning();
-					backgroundColor = theme.warning();
-					textColor = theme.onWarning();
-				}
-				case "success" -> {
-					borderColor = element.state.isDisabled()
-						? theme.disabled()
-						: element.state.isHoveredOrFocused()
-							? ColorUtils.bestContrast(theme.onSuccess(), Color.White, Color.Black)
-							: theme.onSuccess();
-					backgroundColor = theme.success();
-					textColor = theme.onSuccess();
-				}
-				case "info" -> {
-					borderColor = element.state.isDisabled()
-						? theme.disabled()
-						: element.state.isHoveredOrFocused()
-							? ColorUtils.bestContrast(theme.onInfo(), Color.White, Color.Black)
-							: theme.onInfo();
-					backgroundColor = theme.info();
-					textColor = theme.onInfo();
-				}
-				default -> {
-					borderColor = element.state.isDisabled()
-						? theme.disabled()
-						: element.state.isHoveredOrFocused()
-							? ColorUtils.bestContrast(theme.onPrimary(), Color.White, Color.Black)
-							: theme.onPrimary();
-					backgroundColor = theme.primary();
-					textColor = theme.onPrimary();
-				}
-			}
+			Color backgroundColor = theme.getColorByNameOrDefault(element.style.get(), theme.primary());
+			Color borderColor = element.state.isDisabled()
+				? theme.disabled()
+				: (element.state.isFocused() || element.state.isHovered())
+					? ColorUtils.bestContrast(theme.getColorByNameOrDefault("on"+element.style.get(), theme.onPrimary()), Color.White, Color.Black)
+					: theme.getColorByNameOrDefault("on"+element.style.get(), theme.onPrimary());
+			Color textColor = element.ctx.theme.getColorByNameOrDefault("on"+element.style.get(), theme.onPrimary());
 			canvas.drawRect(layout.x, layout.y, layout.width, layout.height, borderColor);
 			canvas.drawRect(layout.x + 1, layout.y + 1, layout.width - 2, layout.height - 2, backgroundColor);
 			canvas.drawText(label, centeredX, centeredY, element.ctx.crafted.defaultTextSettings, textColor);
