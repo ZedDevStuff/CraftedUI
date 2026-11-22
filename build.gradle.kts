@@ -146,7 +146,7 @@ tasks.named("publishMods").configure {
 
 publishMods {
     //dryRun.set(true)
-    // TODO: Read changelog from file
+    // TODO: Read changelog from file. Also support overrides
     changelog = ""
     type = BETA
     cloche.targets.forEach {
@@ -172,7 +172,7 @@ publishMods {
             }
         }
         modrinth("modrinth-${it.loaderName}-${it.minecraftVersion.get()}") {
-            projectId = "1823906"
+            projectId = "uxXQaVR9"
             accessToken = envProps.getProperty("MODRINTH_TOKEN")
             minecraftVersions.add(it.minecraftVersion.get())
             file.set(it.finalJar.get().archiveFile)
