@@ -305,6 +305,7 @@ public class Tabs extends CraftedElement implements MetaElement
 			canvas.endTransform();
 		}
 
+		@SuppressWarnings("SuspiciousNameCombination")
 		private void renderVertical(ICanvas canvas, Tabs element, boolean isLeft)
 		{
 			for(var rect : element.tabRects())
@@ -326,7 +327,6 @@ public class Tabs extends CraftedElement implements MetaElement
 				canvas.drawTexture(texture, Rect.posAndSize(0, 0, rect.height, rect.width));
 				canvas.disableBlend();
 				canvas.endTransform();
-
 				drawVerticalCenteredText(canvas, element, tab, rect, isLeft, selected);
 			}
 		}

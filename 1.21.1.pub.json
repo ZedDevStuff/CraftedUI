@@ -1,0 +1,10 @@
+{
+    "publishTo": "modrinth",
+    "modrinthProjectId": "uxXQaVR9",
+    "mainFiles": {
+        "Common": "./build/intermediate-libs/Crafted-${version}.jar",
+        "NeoForge": "./build/libs/Crafted-${version}-neoforge-1.21.1.jar",
+        "Fabric": "./build/libs/Crafted-${version}-fabric-1.21.1.jar"
+    },
+    //"changelog": "./Changelogs/${version}.md"
+}
