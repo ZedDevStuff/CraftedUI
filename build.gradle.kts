@@ -1,10 +1,13 @@
 import earth.terrarium.cloche.api.target.FabricTarget
+import earth.terrarium.cloche.api.target.NeoforgeTarget
 import org.gradle.kotlin.dsl.withType
+import java.util.Properties
 
 plugins {
     //id("earth.terrarium.cloche") version "0.18.11-dust.20"
     id("earth.terrarium.cloche") version "0.19.13"
     id("maven-publish")
+    id("me.modmuss50.mod-publish-plugin") version "2.2.1"
 }
 
 group = "dev.zeddevstuff"
@@ -109,6 +112,82 @@ cloche {
                 groupId = project.group.toString()
                 artifactId = rootProject.name
                 version = project.version.toString()
+            }
+        }
+    }
+}
+
+cloche.targets.forEach {
+    tasks.register<Jar>("${it.loaderName}${it.minecraftVersion.get().replace(":", "").replace(".", "")}JavadocJar") {
+        group = "build"
+        description = "Assembles a Javadoc JAR for the $name target."
+        archiveBaseName.set("${rootProject.name}-$version-${it.loaderName}-${it.minecraftVersion.get()}")
+        archiveVersion.set("")
+        archiveClassifier.set("javadoc")
+        from(tasks.named<Javadoc>("${it.loaderName}${it.minecraftVersion.get().replace(":", "").replace(".", "")}Javadoc").get().destinationDir)
+    }
+}
+
+val envFile = rootProject.file(".env")
+val envProps = Properties()
+if (envFile.exists()) {
+    envFile.inputStream().use { envProps.load(it) }
+}
+
+val javadocJarsTask = tasks.register("javadocJars") {
+    group = "build"
+    description = "Assembles Javadoc JARs for all targets."
+    dependsOn(cloche.targets.map { tasks.named<Jar>("${it.loaderName}${it.minecraftVersion.get().replace(":", "").replace(".", "")}JavadocJar") })
+}
+
+tasks.named("publishMods").configure {
+    dependsOn(tasks.named("javadocJars"))
+}
+
+publishMods {
+    //dryRun.set(true)
+    // TODO: Read changelog from file
+    changelog = ""
+    type = BETA
+    cloche.targets.forEach {
+        curseforge("curseforge-${it.loaderName}-${it.minecraftVersion.get()}") {
+            projectId = "1823906"
+            accessToken = envProps.getProperty("CURSEFORGE_TOKEN")
+            changelogType = "markdown"
+            minecraftVersions.add(it.minecraftVersion.get())
+            file.set(it.finalJar.get().archiveFile)
+            val javadocJar = tasks.named<Jar>("${it.loaderName}${it.minecraftVersion.get().replace(".", "")}JavadocJar")
+            if(javadocJar.isPresent) {
+                additionalFiles.from(javadocJar.get().archiveFile)
+            }
+            client = true
+            server = false
+            if(it is FabricTarget) {
+                modLoaders.add("fabric")
+                requires {
+                    slug = "fabric-api"
+                }
+            } else if(it is NeoforgeTarget) {
+                modLoaders.add("neoforge")
+            }
+        }
+        modrinth("modrinth-${it.loaderName}-${it.minecraftVersion.get()}") {
+            projectId = "1823906"
+            accessToken = envProps.getProperty("MODRINTH_TOKEN")
+            minecraftVersions.add(it.minecraftVersion.get())
+            file.set(it.finalJar.get().archiveFile)
+            val javadocJar = tasks.named<Jar>("${it.loaderName}${it.minecraftVersion.get().replace(".", "")}JavadocJar")
+            if(javadocJar.isPresent) {
+                additionalFiles.from(javadocJar.get().archiveFile)
+            }
+            environment.set(CLIENT_ONLY)
+            if(it is FabricTarget) {
+                modLoaders.add("fabric")
+                requires {
+                    slug = "fabric-api"
+                }
+            } else if(it is NeoforgeTarget) {
+                modLoaders.add("neoforge")
             }
         }
     }
