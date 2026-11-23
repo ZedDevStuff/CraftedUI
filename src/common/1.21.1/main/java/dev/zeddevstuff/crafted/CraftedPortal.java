@@ -7,6 +7,7 @@ import dev.zeddevstuff.crafted.input.events.KeyEvent;
 import dev.zeddevstuff.crafted.parsing.CraftedXmlParser;
 import dev.zeddevstuff.crafted.parsing.DocumentBuilder;
 import dev.zeddevstuff.crafted.parsing.ParsedNode;
+import dev.zeddevstuff.crafted.platform.CanvasImpl;
 import dev.zeddevstuff.crafted.platform.TextConverter;
 import dev.zeddevstuff.crafted.rendering.CraftedRenderer;
 import dev.zeddevstuff.crafted.types.Rect;
