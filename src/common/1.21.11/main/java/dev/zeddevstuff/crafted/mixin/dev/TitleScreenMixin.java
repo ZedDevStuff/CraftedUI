@@ -1,0 +1,86 @@
+package dev.zeddevstuff.crafted.mixin.dev;
+
+import dev.zeddevstuff.crafted.Crafted;
+import dev.zeddevstuff.crafted.CraftedPortal;
+import dev.zeddevstuff.crafted.CraftedScreen;
+import dev.zeddevstuff.crafted.input.events.ClickEvent;
+import dev.zeddevstuff.crafted.input.events.IClickEventHandler;
+import dev.zeddevstuff.crafted.input.events.ISubmitEventHandler;
+import dev.zeddevstuff.crafted.parsing.CraftedXmlParser;
+import dev.zeddevstuff.crafted.types.Rect;
+import dev.zeddevstuff.crafted.ui.BindingExtractor;
+import dev.zeddevstuff.crafted.ui.BindingScope;
+import dev.zeddevstuff.crafted.ui.CraftedContext;
+import dev.zeddevstuff.crafted.ui.elements.Checkbox;
+import dev.zeddevstuff.crafted.ui.elements.CraftedRoot;
+import dev.zeddevstuff.crafted.ui.elements.Either;
+import dev.zeddevstuff.crafted.ui.elements.Input;
+import dev.zeddevstuff.crafted.utils.HotReloadable;
+import dev.zeddevstuff.crafted.utils.SchemaGenerator;
+import dev.zeddevstuff.crafted.utils.TypedList;
+import net.minecraft.client.gui.screens.Screen;
+import net.minecraft.client.gui.screens.TitleScreen;
+import net.minecraft.network.chat.Component;
+import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.Unique;
+import org.spongepowered.asm.mixin.injection.At;
+import org.spongepowered.asm.mixin.injection.Inject;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
+
+import java.nio.file.Path;
+import java.util.List;
+
+@Mixin(TitleScreen.class)
+public abstract class TitleScreenMixin extends Screen
+{
+	private CraftedContext ctx;
+	protected TitleScreenMixin(Component component)
+	{
+		super(component);
+	}
+
+	@Inject(method = "init", at = @At("TAIL"))
+	public void init(CallbackInfo ci)
+	{
+		if(ctx == null)
+		{
+			ctx = new CraftedContext();
+			ctx.registerHandler(IClickEventHandler.class, "openGallery", this::crafted$galleryButtonPressed);
+		}
+		this.addRenderableWidget(new CraftedPortal(
+			Rect.posAndSize(20, this.height - 40, 20, 20),
+			ctx,
+			"""
+				<Crafted treeRenderer="crafted" title="Gallery Portal">
+					<Button onClick="openGallery" size="20">C</Button>
+				</Crafted>
+				"""));
+	}
+
+	@Unique
+	private void crafted$galleryButtonPressed(ClickEvent event)
+	{
+		Path gallery = Path.of(System.getProperty("user.dir"), "..", "src", "common", "main", "resources", "assets", "crafted_ui", "ui", "Gallery.xml");
+		var ctx = new CraftedContext();
+		ctx.registerHandler(IClickEventHandler.class, "exit", e -> this.minecraft.screen.onClose());
+		ctx.registerHandler(IClickEventHandler.class, "copySchema", e -> {
+			var schema = SchemaGenerator.generateSchema(Crafted.defaultInstance());
+			e.getTarget().ctx.crafted.clipboard.set(schema);
+			ctx.crafted.logger.info("Schema copied to clipboard!");
+		});
+		ctx.registerHandler(IClickEventHandler.class, "sayHi", e -> ctx.crafted.logger.info("Hi!"));
+		ctx.registerHandler(ISubmitEventHandler.class, "printSubmit", e -> {
+			ctx.crafted.logger.info("Submitted value: '" + e.getTargetAs(Input.class).value.get() + "'");
+		});
+		ctx.registerHandler(IClickEventHandler.class, "switchEither", e -> {
+			var root = e.getTarget().findAncestorOfType(CraftedRoot.class);
+			var either = root.getElementById("either").as(Either.class);
+			either.value.set(e.getTargetAs(Checkbox.class).checked.get());
+		});
+		ctx.setVar("testOptions", new TypedList<>(String.class, List.of("Option 1", "Option 2", "Option 3")));
+		ctx.setVar("optionExtractor", BindingExtractor.class,
+			value -> new BindingScope(java.util.Map.of("value", value)));
+		var screen = new CraftedScreen(ctx, HotReloadable.parsesStringInto(gallery, CraftedXmlParser::parse, Crafted.defaultInstance().getLoader(Crafted.class).getDocument("/assets/crafted_ui/ui/Gallery.xml").get()));
+		minecraft.setScreen(screen);
+	}
+}

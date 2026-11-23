@@ -7,7 +7,6 @@ import dev.zeddevstuff.crafted.input.events.KeyEvent;
 import dev.zeddevstuff.crafted.parsing.CraftedXmlParser;
 import dev.zeddevstuff.crafted.parsing.DocumentBuilder;
 import dev.zeddevstuff.crafted.parsing.ParsedNode;
-import dev.zeddevstuff.crafted.platform.CanvasImpl;
 import dev.zeddevstuff.crafted.platform.TextConverter;
 import dev.zeddevstuff.crafted.rendering.CraftedRenderer;
 import dev.zeddevstuff.crafted.types.Rect;
@@ -20,8 +19,10 @@ import net.minecraft.client.gui.components.AbstractWidget;
 import net.minecraft.client.gui.narration.NarrationElementOutput;
 import net.minecraft.client.gui.navigation.FocusNavigationEvent;
 import org.appliedenergistics.yoga.style.StyleSizeLength;
-import org.checkerframework.checker.nullness.qual.Nullable;
+import org.checkerframework.checker.nullness.qual.NonNull;
 
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 import java.util.function.Function;
 
 
@@ -136,7 +137,7 @@ public class CraftedPortal extends AbstractWidget
 
 	private boolean wasJustFocused = false;
 	@Override
-	public @Nullable ComponentPath nextFocusPath(FocusNavigationEvent focusNavigationEvent)
+	public @Nullable ComponentPath nextFocusPath(@Nonnull FocusNavigationEvent focusNavigationEvent)
 	{
 		ComponentPath path = super.nextFocusPath(focusNavigationEvent);
 		if(focusNavigationEvent instanceof FocusNavigationEvent.TabNavigation tabNav)
@@ -172,7 +173,7 @@ public class CraftedPortal extends AbstractWidget
 	}
 
 	@Override
-	protected void updateWidgetNarration(NarrationElementOutput narrationElementOutput)
+	protected void updateWidgetNarration(@NonNull NarrationElementOutput narrationElementOutput)
 	{
 	}
 }

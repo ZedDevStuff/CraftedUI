@@ -1,0 +1,177 @@
+package dev.zeddevstuff.crafted;
+
+import dev.zeddevstuff.crafted.input.ImportantKeys;
+import dev.zeddevstuff.crafted.input.KeyModifiers;
+import dev.zeddevstuff.crafted.input.MouseButton;
+import dev.zeddevstuff.crafted.input.events.KeyEvent;
+import dev.zeddevstuff.crafted.parsing.CraftedXmlParser;
+import dev.zeddevstuff.crafted.parsing.DocumentBuilder;
+import dev.zeddevstuff.crafted.parsing.ParsedNode;
+import dev.zeddevstuff.crafted.platform.CanvasImpl;
+import dev.zeddevstuff.crafted.platform.TextConverter;
+import dev.zeddevstuff.crafted.rendering.CraftedRenderer;
+import dev.zeddevstuff.crafted.types.Rect;
+import dev.zeddevstuff.crafted.ui.CraftedContext;
+import dev.zeddevstuff.crafted.ui.elements.CraftedRoot;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.ComponentPath;
+import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.components.AbstractWidget;
+import net.minecraft.client.gui.narration.NarrationElementOutput;
+import net.minecraft.client.gui.navigation.FocusNavigationEvent;
+import org.appliedenergistics.yoga.style.StyleSizeLength;
+import org.jspecify.annotations.NonNull;
+
+import javax.annotation.Nonnull;
+import java.util.function.Function;
+
+
+/**
+ * A widget that renders a Crafted UI tree.
+ */
+public class CraftedPortal extends AbstractWidget
+{
+	protected final CanvasImpl canvas;
+	protected final CraftedContext context;
+	protected final CraftedRoot rootElement;
+	protected final CraftedRenderer renderer;
+	public CraftedPortal(Rect rect, CraftedRoot rootElement)
+	{
+		super((int)rect.minX(), (int)rect.minY(), (int)rect.width(), (int)rect.height(), TextConverter.toMinecraftText(rootElement.title.get()));
+		this.canvas = new CanvasImpl(Minecraft.getInstance());
+		this.context = rootElement.ctx;
+		this.rootElement = rootElement;
+		this.renderer = new CraftedRenderer(rootElement);
+		context.inputHandler.setRootElement(rootElement);
+		rootElement.width.set(StyleSizeLength.points(rect.width()));
+		rootElement.height.set(StyleSizeLength.points(rect.height()));
+		rootElement.refreshLayoutTree();
+	}
+	public CraftedPortal(Rect rect, CraftedContext ctx, Function<CraftedContext, CraftedRoot> rootElementFactory)
+	{
+		this(rect, rootElementFactory.apply(ctx));
+	}
+	public CraftedPortal(Rect rect, CraftedContext ctx, ParsedNode rootElementNode)
+	{
+		this(rect, ctx, (context) -> (CraftedRoot) DocumentBuilder.buildTree(ctx, rootElementNode));
+	}
+	public CraftedPortal(Rect rect, CraftedContext ctx, String xml)
+	{
+		this(rect, ctx, CraftedXmlParser.parse(xml));
+	}
+
+	@Override
+	protected void renderWidget(@Nonnull GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTick)
+	{
+		canvas.setGraphics(guiGraphics);
+		rootElement.updateTooltip(canvas.deltaTime());
+		rootElement.layoutTree(width, height);
+		rootElement.positionTooltip(width, height);
+		rootElement.layoutTree(width, height);
+		canvas.beginTransform();
+		canvas.translate(getX(), getY());
+		renderer.render(canvas);
+		canvas.endTransform();
+	}
+
+
+	public void handleMouseMoved(double mouseX, double mouseY)
+	{
+		if(rootElement.contains((float) mouseX - getX(), (float) mouseY - getY()))
+			context.inputHandler.handleMouseMoved((float) mouseX - getX(), (float) mouseY - getY());
+		else
+			context.inputHandler.handleMouseMoved(Float.MAX_VALUE, Float.MAX_VALUE);
+	}
+
+	public void handleMouseScrolled(double mouseX, double mouseY, double scrollX, double scrollY)
+	{
+		if(rootElement.contains((float) mouseX - getX(), (float) mouseY - getY()))
+			context.inputHandler.handleMouseScrolled((float)mouseX, (float)mouseY, (float)scrollX, (float)scrollY);
+	}
+
+	public void handleMouseClicked(double mouseX, double mouseY, int button)
+	{
+		if(rootElement.contains((float) mouseX - getX(), (float) mouseY - getY()))
+			context.inputHandler.handleMousePressed((float) mouseX - getX(), (float) mouseY - getY(), MouseButton.fromCode(button));
+		else
+			context.inputHandler.handleMousePressed(Float.MAX_VALUE, Float.MAX_VALUE, MouseButton.fromCode(button));
+	}
+
+	public void handleMouseReleased(double mouseX, double mouseY, int button)
+	{
+		if(rootElement.contains((float) mouseX - getX(), (float) mouseY - getY()))
+			context.inputHandler.handleMouseReleased((float) mouseX - getX(), (float) mouseY - getY(), MouseButton.fromCode(button));
+		else
+			context.inputHandler.handleMouseReleased(Float.MAX_VALUE, Float.MAX_VALUE, MouseButton.fromCode(button));
+	}
+
+
+	public void handleCharTyped(char c, int modifiers)
+	{
+		if(isFocused())
+			context.inputHandler.handleCharTyped(c, KeyModifiers.fromFlags(modifiers));
+	}
+
+	public void handleKeyPressed(int keyCode, int scanCode, int modifiers)
+	{
+		// Not sure how to handle this
+		if(!isFocused())
+			return;
+		if(keyCode == ImportantKeys.ESCAPE)
+		{
+			if(context.inputHandler.getFocusedElement() != null)
+				context.inputHandler.setFocus(null, KeyEvent.press(context.inputHandler.getFocusedElement(), keyCode, scanCode, (char) 0, KeyModifiers.fromFlags(modifiers)));
+		}
+		if(!wasJustFocused)
+			context.inputHandler.handleKeyPressed(keyCode, scanCode, KeyModifiers.fromFlags(modifiers));
+		wasJustFocused = false;
+	}
+
+
+	public void handleKeyReleased(int keyCode, int scanCode, int modifiers)
+	{
+		context.inputHandler.handleKeyReleased(keyCode, scanCode, KeyModifiers.fromFlags(modifiers));
+	}
+
+	private boolean wasJustFocused = false;
+	@Override
+	public @Nonnull ComponentPath nextFocusPath(@Nonnull FocusNavigationEvent focusNavigationEvent)
+	{
+		ComponentPath path = super.nextFocusPath(focusNavigationEvent);
+		if(focusNavigationEvent instanceof FocusNavigationEvent.TabNavigation tabNav)
+			if(tabNav.forward())
+			{
+				if(!isFocused())
+				{
+					wasJustFocused = true;
+					context.inputHandler.focusFirstElement();
+				}
+				if(!context.inputHandler.isFocusedElementLast())
+					path = ComponentPath.path(this);
+				else if(isFocused())
+					context.inputHandler.setFocus(null, KeyEvent.press(null, ImportantKeys.TAB, 0, (char) 0, KeyModifiers.fromFlags(0)));
+			}
+			else
+			{
+				if(!isFocused())
+				{
+					wasJustFocused = true;
+					context.inputHandler.focusLastElement();
+				}
+				if(context.inputHandler.isFocusedElementLast() && !context.inputHandler.isFocusedElementFirst())
+					path = ComponentPath.path(this);
+				else if(isFocused())
+					context.inputHandler.setFocus(null, KeyEvent.press(null, ImportantKeys.TAB, 0, (char) 0, KeyModifiers.fromFlags(0)));
+			}
+		else if(focusNavigationEvent instanceof FocusNavigationEvent.ArrowNavigation arrowNav)
+		{
+			// TODO: Handle arrow navigation
+		}
+		return path;
+	}
+
+	@Override
+	protected void updateWidgetNarration(@NonNull NarrationElementOutput narrationElementOutput)
+	{
+	}
+}

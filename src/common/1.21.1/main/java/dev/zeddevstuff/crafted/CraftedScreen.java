@@ -238,4 +238,10 @@ public class CraftedScreen extends Screen
 	public boolean shouldCloseOnEsc() { return false; }
 
 	// endregion Input Handling
+	@Override
+	public void onClose()
+	{
+		hotReloadable.close();
+		super.onClose();
+	}
 }

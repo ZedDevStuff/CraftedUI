@@ -1,7 +1,6 @@
 package dev.zeddevstuff.crafted.utils;
 
-import org.checkerframework.checker.nullness.qual.NonNull;
-
+import javax.annotation.Nonnull;
 import java.util.AbstractList;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -64,7 +63,7 @@ public final class TypedList<T> extends AbstractList<T>
 	}
 
 	@Override
-	public boolean addAll(@NonNull Collection<? extends T> c)
+	public boolean addAll(@Nonnull Collection<? extends T> c)
 	{
 		var changed = values.addAll(c);
 		var copy = new ArrayList<>(listeners);

@@ -1,6 +1,5 @@
 package dev.zeddevstuff.crafted;
 
-import dev.zeddevstuff.crafted.parsing.ParsedNode;
 import dev.zeddevstuff.crafted.platform.*;
 import dev.zeddevstuff.crafted.ui.elements.All;
 import net.minecraft.client.Minecraft;

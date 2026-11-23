@@ -11,7 +11,7 @@ plugins {
 }
 
 group = "dev.zeddevstuff"
-version = "0.23.0"
+version = "0.24.0"
 
 repositories {
     mavenCentral()
@@ -36,10 +36,36 @@ cloche {
         issues = "https://github.com/ZedDevStuff/CraftedUI/issues"
         icon = "icon.png"
     }
+    common {}
 
-    common {
+// region 1.21.11
+    val common12111 = common("common:1.21.11") {
+        accessWideners.from("src/common/1.21.11/main/crafted_ui.accesswidener")
     }
+    neoforge("neoforge:1.21.11") {
+        loaderVersion = "21.11.48"
 
+        mixins.from("crafted_ui.mixins.json", "crafted_ui.neoforge.mixins.json")
+
+        dependsOn(common12111)
+    }
+    fabric("fabric:1.21.11") {
+        includedClient()
+
+        dependencies {
+            fabricApi("0.141.6")
+        }
+
+        mixins.from("crafted_ui.mixins.json", "crafted_ui.fabric.mixins.json")
+
+        metadata {
+            dependency("fabric-api", "0.141.6")
+        }
+
+        dependsOn(common12111)
+    }
+// endregion
+// region 1.21.1
     val common1211 = common("common:1.21.1") {
         accessWideners.from("src/common/1.21.1/main/crafted_ui.accesswidener")
     }
@@ -65,7 +91,7 @@ cloche {
 
         dependsOn(common1211)
     }
-
+// endregion
     targets.withType<FabricTarget>().configureEach {
         loaderVersion = "0.18.4"
 
