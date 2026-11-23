@@ -166,15 +166,28 @@ val javadocJarsTask = tasks.register("javadocJars") {
     dependsOn(cloche.targets.map { tasks.named<Jar>("${it.loaderName}${it.minecraftVersion.get().replace(":", "").replace(".", "")}JavadocJar") })
 }
 
-tasks.named("publishMods").configure {
-    dependsOn(tasks.named("javadocJars"))
-}
-
 publishMods {
     //dryRun.set(true)
     // TODO: Read changelog from file. Also support overrides
     changelog = ""
     type = BETA
+
+    github("github") {
+        accessToken = envProps.getProperty("GITHUB_TOKEN")
+        repository = "ZedDevStuff/CraftedUI"
+        commitish = "main"
+        tagName = "v$version"
+        allowEmptyFiles = true
+
+        val jars = cloche.targets.map {
+            it.finalJar.get().archiveFile.get().asFile
+        }.toMutableList()
+        jars += cloche.targets.map {
+            tasks.named<Jar>("${it.loaderName}${it.minecraftVersion.get().replace(":", "").replace(".", "")}JavadocJar").get().archiveFile.get().asFile
+        }
+        additionalFiles.from(jars)
+    }
+
     cloche.targets.forEach {
         curseforge("curseforge-${it.loaderName}-${it.minecraftVersion.get()}") {
             projectId = "1823906"
@@ -217,4 +230,14 @@ publishMods {
             }
         }
     }
+}
+
+tasks.named("publishGithub").configure {
+    cloche.targets.forEach {
+        dependsOn(tasks.named("${it.loaderName}${it.minecraftVersion.get().replace(":", "").replace(".", "")}IncludeJar"))
+    }
+    dependsOn(tasks.named("javadocJars"))
+}
+tasks.named("publishMods").configure {
+    dependsOn(tasks.named("javadocJars"))
 }
