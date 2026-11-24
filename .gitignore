@@ -44,3 +44,7 @@ run/
 
 ### Essential stuff ###
 .env
+
+### Random stuff ###
+
+localonly/
