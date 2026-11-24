@@ -6,7 +6,7 @@ import dev.zeddevstuff.crafted.annotations.DefineElement;
 import dev.zeddevstuff.crafted.annotations.Description;
 import dev.zeddevstuff.crafted.parsing.Parsers;
 import dev.zeddevstuff.crafted.platform.IText;
-import dev.zeddevstuff.crafted.ui.CraftedContext;
+import dev.zeddevstuff.crafted.ui.UIContext;
 import dev.zeddevstuff.crafted.ui.CraftedElement;
 import org.appliedenergistics.yoga.style.StyleLength;
 
@@ -30,7 +30,7 @@ public class CraftedRoot extends CraftedElement
 	@Description("The renderer to use for elements in the tree")
 	public final Prop<String> treeRenderer = registerProp("treeRenderer", "default", Parsers::parseString);
 
-	public CraftedRoot(CraftedContext ctx, Map<String, String> attributes)
+	public CraftedRoot(UIContext ctx, Map<String, String> attributes)
 	{
 		super(ctx, attributes);
 		tooltipElement = createTooltip(ctx);
@@ -40,7 +40,7 @@ public class CraftedRoot extends CraftedElement
 		});
 	}
 
-	protected Tooltip createTooltip(CraftedContext ctx)
+	protected Tooltip createTooltip(UIContext ctx)
 	{
 		return new Tooltip(ctx);
 	}

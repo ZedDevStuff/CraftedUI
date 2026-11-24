@@ -24,7 +24,7 @@ public class ElementRegistry
 	{
 		return classToTag.get(elementClass);
 	}
-	public CraftedElement createElement(CraftedContext ctx, String tag, Map<String, String> attributes)
+	public CraftedElement createElement(UIContext ctx, String tag, Map<String, String> attributes)
 	{
 		var factory = getElementFactory(tag);
 		if (factory == null)
@@ -36,6 +36,6 @@ public class ElementRegistry
 
 	public interface ElementFactory
 	{
-		CraftedElement create(CraftedContext ctx, Map<String, String> attributes);
+		CraftedElement create(UIContext ctx, Map<String, String> attributes);
 	}
 }

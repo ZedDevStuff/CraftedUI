@@ -9,7 +9,7 @@ import net.minecraft.client.gui.navigation.ScreenRectangle;
 import net.minecraft.client.renderer.RenderPipelines;
 import net.minecraft.network.chat.Component;
 
-public class CanvasImpl implements ICanvas
+public class MinecraftCanvas implements ICanvas
 {
 	private final Minecraft minecraft;
 	private GuiGraphics graphics;
@@ -18,7 +18,7 @@ public class CanvasImpl implements ICanvas
 		this.graphics = graphics;
 	}
 
-	public CanvasImpl(Minecraft minecraft)
+	public MinecraftCanvas(Minecraft minecraft)
 	{
 		this.minecraft = minecraft;
 	}

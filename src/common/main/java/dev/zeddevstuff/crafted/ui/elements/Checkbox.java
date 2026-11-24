@@ -12,7 +12,7 @@ import dev.zeddevstuff.crafted.platform.ITextureManager;
 import dev.zeddevstuff.crafted.rendering.IRendersType;
 import dev.zeddevstuff.crafted.types.Color;
 import dev.zeddevstuff.crafted.types.Rect;
-import dev.zeddevstuff.crafted.ui.CraftedContext;
+import dev.zeddevstuff.crafted.ui.UIContext;
 import dev.zeddevstuff.crafted.ui.CraftedElement;
 import dev.zeddevstuff.crafted.utils.ColorUtils;
 
@@ -26,7 +26,7 @@ public class Checkbox extends CraftedElement
 	public final Prop<Boolean> checked = registerProp(Boolean.class, "checked", false, this::parseBoolean);
 	@Description("Whether the checkbox supports an indeterminate state. Checked will allow null if this is true")
 	public final Prop<Boolean> indeterminate = registerProp(Boolean.class, "indeterminate", false, Parsers::parseBoolean);
-	public Checkbox(CraftedContext ctx, Map<String, String> attributes)
+	public Checkbox(UIContext ctx, Map<String, String> attributes)
 	{
 		super(ctx, attributes);
 		indeterminate.addListener((prop, oldValue, newValue) -> {

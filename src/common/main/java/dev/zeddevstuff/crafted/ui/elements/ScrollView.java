@@ -8,7 +8,7 @@ import dev.zeddevstuff.crafted.parsing.Parsers;
 import dev.zeddevstuff.crafted.platform.ICanvas;
 import dev.zeddevstuff.crafted.rendering.IRendersType;
 import dev.zeddevstuff.crafted.types.Color;
-import dev.zeddevstuff.crafted.ui.CraftedContext;
+import dev.zeddevstuff.crafted.ui.UIContext;
 import dev.zeddevstuff.crafted.ui.CraftedElement;
 import org.appliedenergistics.yoga.YogaEdge;
 import org.appliedenergistics.yoga.YogaOverflow;
@@ -38,7 +38,7 @@ public class ScrollView extends Box
 	private int dragStartScrollX;
 	private int dragStartScrollY;
 
-	public ScrollView(CraftedContext ctx, Map<String, String> attributes)
+	public ScrollView(UIContext ctx, Map<String, String> attributes)
 	{
 		super(ctx, attributes);
 		color.set(ctx.theme.surface());

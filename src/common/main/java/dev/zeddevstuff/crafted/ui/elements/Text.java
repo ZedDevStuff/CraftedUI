@@ -12,7 +12,7 @@ import dev.zeddevstuff.crafted.platform.IText;
 import dev.zeddevstuff.crafted.rendering.IRendersType;
 import dev.zeddevstuff.crafted.types.Color;
 import dev.zeddevstuff.crafted.types.TextSettings;
-import dev.zeddevstuff.crafted.ui.CraftedContext;
+import dev.zeddevstuff.crafted.ui.UIContext;
 import dev.zeddevstuff.crafted.ui.CraftedElement;
 import org.appliedenergistics.yoga.YogaFlexDirection;
 import org.appliedenergistics.yoga.YogaNodeType;
@@ -42,7 +42,7 @@ public class Text extends CraftedElement
 
 	public final Prop<Color> color = registerProp("color", Color.White, this::parseColor);
 
-	public Text(CraftedContext ctx, Map<String, String> attributes)
+	public Text(UIContext ctx, Map<String, String> attributes)
 	{
 		super(ctx, attributes);
 		settings.set(ctx.crafted.defaultTextSettings);

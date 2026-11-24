@@ -5,7 +5,6 @@ import dev.zeddevstuff.crafted.Prop;
 import dev.zeddevstuff.crafted.annotations.DefineElement;
 import dev.zeddevstuff.crafted.annotations.Description;
 import dev.zeddevstuff.crafted.input.MouseButton;
-import dev.zeddevstuff.crafted.input.events.FocusEvent;
 import dev.zeddevstuff.crafted.input.events.KeyEvent;
 import dev.zeddevstuff.crafted.input.events.MouseEvent;
 import dev.zeddevstuff.crafted.platform.ICanvas;
@@ -13,10 +12,8 @@ import dev.zeddevstuff.crafted.platform.ITexture;
 import dev.zeddevstuff.crafted.platform.ITextureManager;
 import dev.zeddevstuff.crafted.rendering.IRendersType;
 import dev.zeddevstuff.crafted.types.Color;
-import dev.zeddevstuff.crafted.types.Float2;
 import dev.zeddevstuff.crafted.types.Rect;
-import dev.zeddevstuff.crafted.ui.CraftedContext;
-import dev.zeddevstuff.crafted.utils.TextEditor;
+import dev.zeddevstuff.crafted.ui.UIContext;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -49,7 +46,7 @@ public class TextArea extends Input
 
     private record VisualLine(int start, int end) {}
 
-    public TextArea(CraftedContext ctx, Map<String, String> attributes)
+    public TextArea(UIContext ctx, Map<String, String> attributes)
     {
         super(ctx, attributes, true);
     }

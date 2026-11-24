@@ -18,7 +18,7 @@ import dev.zeddevstuff.crafted.types.Color;
 import dev.zeddevstuff.crafted.types.Float2;
 import dev.zeddevstuff.crafted.types.Rect;
 import dev.zeddevstuff.crafted.types.TextSettings;
-import dev.zeddevstuff.crafted.ui.CraftedContext;
+import dev.zeddevstuff.crafted.ui.UIContext;
 import dev.zeddevstuff.crafted.ui.CraftedElement;
 import dev.zeddevstuff.crafted.utils.TextEditor;
 
@@ -61,12 +61,12 @@ public class Input extends CraftedElement
     private float xOffset = 0;
 
 
-    public Input(CraftedContext ctx, Map<String, String> attributes)
+    public Input(UIContext ctx, Map<String, String> attributes)
     {
         this(ctx, attributes, false);
     }
 
-    protected Input(CraftedContext ctx, Map<String, String> attributes, boolean multiline)
+    protected Input(UIContext ctx, Map<String, String> attributes, boolean multiline)
     {
         super(ctx, attributes);
         text = new TextEditor("", multiline);

@@ -2,11 +2,10 @@ package dev.zeddevstuff.crafted.ui.elements;
 
 import dev.zeddevstuff.crafted.platform.IText;
 import dev.zeddevstuff.crafted.types.StyleLength4;
-import dev.zeddevstuff.crafted.ui.CraftedContext;
+import dev.zeddevstuff.crafted.ui.UIContext;
 import dev.zeddevstuff.crafted.ui.CraftedElement;
 import org.appliedenergistics.yoga.YogaPositionType;
 import org.appliedenergistics.yoga.style.StyleLength;
-import org.appliedenergistics.yoga.style.StyleSizeLength;
 
 import java.util.Map;
 
@@ -14,7 +13,7 @@ public class Tooltip extends Box
 {
 	private final Text text;
 
-	public Tooltip(CraftedContext ctx)
+	public Tooltip(UIContext ctx)
 	{
 		super(ctx, Map.of());
 		positionType.set(YogaPositionType.ABSOLUTE);

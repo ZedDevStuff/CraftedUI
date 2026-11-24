@@ -6,11 +6,11 @@ import dev.zeddevstuff.crafted.CraftedScreen;
 import dev.zeddevstuff.crafted.input.events.ClickEvent;
 import dev.zeddevstuff.crafted.input.events.IClickEventHandler;
 import dev.zeddevstuff.crafted.input.events.ISubmitEventHandler;
-import dev.zeddevstuff.crafted.parsing.CraftedXmlParser;
+import dev.zeddevstuff.crafted.parsing.XmlParser;
 import dev.zeddevstuff.crafted.types.Rect;
 import dev.zeddevstuff.crafted.ui.BindingExtractor;
 import dev.zeddevstuff.crafted.ui.BindingScope;
-import dev.zeddevstuff.crafted.ui.CraftedContext;
+import dev.zeddevstuff.crafted.ui.UIContext;
 import dev.zeddevstuff.crafted.ui.elements.Checkbox;
 import dev.zeddevstuff.crafted.ui.elements.CraftedRoot;
 import dev.zeddevstuff.crafted.ui.elements.Either;
@@ -33,7 +33,7 @@ import java.util.List;
 @Mixin(TitleScreen.class)
 public abstract class TitleScreenMixin extends Screen
 {
-	private CraftedContext ctx;
+	private UIContext ctx;
 	protected TitleScreenMixin(Component component)
 	{
 		super(component);
@@ -44,7 +44,7 @@ public abstract class TitleScreenMixin extends Screen
 	{
 		if(ctx == null)
 		{
-			ctx = new CraftedContext();
+			ctx = new UIContext();
 			ctx.registerHandler(IClickEventHandler.class, "openGallery", this::crafted$galleryButtonPressed);
 		}
 		this.addRenderableWidget(new CraftedPortal(
@@ -61,7 +61,7 @@ public abstract class TitleScreenMixin extends Screen
 	private void crafted$galleryButtonPressed(ClickEvent event)
 	{
 		Path gallery = Path.of(System.getProperty("user.dir"), "..", "src", "common", "main", "resources", "assets", "crafted_ui", "ui", "Gallery.xml");
-		var ctx = new CraftedContext();
+		var ctx = new UIContext();
 		ctx.registerHandler(IClickEventHandler.class, "exit", e -> this.minecraft.screen.onClose());
 		ctx.registerHandler(IClickEventHandler.class, "copySchema", e -> {
 			var schema = SchemaGenerator.generateSchema(Crafted.defaultInstance());
@@ -80,7 +80,7 @@ public abstract class TitleScreenMixin extends Screen
 		ctx.setVar("testOptions", new TypedList<>(String.class, List.of("Option 1", "Option 2", "Option 3")));
 		ctx.setVar("optionExtractor", BindingExtractor.class,
 			value -> new BindingScope(java.util.Map.of("value", value)));
-		var screen = new CraftedScreen(ctx, HotReloadable.parsesStringInto(gallery, CraftedXmlParser::parse, Crafted.defaultInstance().getLoader(Crafted.class).getDocument("/assets/crafted_ui/ui/Gallery.xml").get()));
+		var screen = new CraftedScreen(ctx, HotReloadable.parsesStringInto(gallery, XmlParser::parse, Crafted.defaultInstance().getLoader(Crafted.class).getDocument("/assets/crafted_ui/ui/Gallery.xml").get()));
 		minecraft.setScreen(screen);
 	}
 }

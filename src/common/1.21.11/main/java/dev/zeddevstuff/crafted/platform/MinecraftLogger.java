@@ -1,10 +1,10 @@
 package dev.zeddevstuff.crafted.platform;
 
-public class Slf4jLogger implements ILogger
+public class MinecraftLogger implements ILogger
 {
 	private final org.slf4j.Logger logger;
 
-	public Slf4jLogger(String name)
+	public MinecraftLogger(String name)
 	{
 		this.logger = org.slf4j.LoggerFactory.getLogger(name);
 	}

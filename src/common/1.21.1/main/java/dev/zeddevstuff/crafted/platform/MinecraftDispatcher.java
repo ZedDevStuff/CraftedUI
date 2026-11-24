@@ -2,7 +2,7 @@ package dev.zeddevstuff.crafted.platform;
 
 import net.minecraft.client.Minecraft;
 
-public class MainThreadDispatcher implements IDispatcher
+public class MinecraftDispatcher implements IDispatcher
 {
 	@Override
 	public void dispatch(Runnable runnable)

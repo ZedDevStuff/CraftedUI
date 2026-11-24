@@ -4,12 +4,12 @@ import dev.zeddevstuff.crafted.Crafted;
 import dev.zeddevstuff.crafted.Prop;
 import dev.zeddevstuff.crafted.annotations.DefineElement;
 import dev.zeddevstuff.crafted.annotations.Description;
-import dev.zeddevstuff.crafted.parsing.DocumentBuilder;
+import dev.zeddevstuff.crafted.parsing.UIDocumentBuilder;
 import dev.zeddevstuff.crafted.parsing.ParsedNode;
 import dev.zeddevstuff.crafted.parsing.Parsers;
 import dev.zeddevstuff.crafted.rendering.IRendersType;
 import dev.zeddevstuff.crafted.platform.ICanvas;
-import dev.zeddevstuff.crafted.ui.CraftedContext;
+import dev.zeddevstuff.crafted.ui.UIContext;
 import dev.zeddevstuff.crafted.ui.CraftedElement;
 import dev.zeddevstuff.crafted.ui.MetaElement;
 
@@ -26,7 +26,7 @@ public class Either extends CraftedElement implements MetaElement
 	private CraftedElement second;
 	private CraftedElement active;
 
-	public Either(CraftedContext ctx, Map<String, String> attributes)
+	public Either(UIContext ctx, Map<String, String> attributes)
 	{
 		super(ctx, attributes);
 		value.addListener((prop, oldValue, newValue) -> updateActive());
@@ -38,8 +38,8 @@ public class Either extends CraftedElement implements MetaElement
 		if(templateNodes.length != 2)
 			throw new IllegalArgumentException("Either requires exactly two child templates.");
 		this.templateNodes = templateNodes.clone();
-		first = DocumentBuilder.buildTree(ctx, templateNodes[0]);
-		second = DocumentBuilder.buildTree(ctx, templateNodes[1]);
+		first = UIDocumentBuilder.buildTree(ctx, templateNodes[0]);
+		second = UIDocumentBuilder.buildTree(ctx, templateNodes[1]);
 		updateActive();
 	}
 

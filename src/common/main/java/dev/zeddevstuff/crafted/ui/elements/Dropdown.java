@@ -10,7 +10,7 @@ import dev.zeddevstuff.crafted.platform.ICanvas;
 import dev.zeddevstuff.crafted.rendering.IRenders;
 import dev.zeddevstuff.crafted.rendering.IRendersType;
 import dev.zeddevstuff.crafted.types.Color;
-import dev.zeddevstuff.crafted.ui.CraftedContext;
+import dev.zeddevstuff.crafted.ui.UIContext;
 import dev.zeddevstuff.crafted.ui.CraftedElement;
 import dev.zeddevstuff.crafted.utils.ColorUtils;
 import dev.zeddevstuff.crafted.utils.TypedList;
@@ -37,7 +37,7 @@ public class Dropdown extends CraftedElement
 
 	private boolean isOpen = false;
 
-	public Dropdown(CraftedContext ctx, Map<String, String> attributes)
+	public Dropdown(UIContext ctx, Map<String, String> attributes)
 	{
 		super(ctx, attributes);
 		popup = new ScrollView(ctx, Map.of());

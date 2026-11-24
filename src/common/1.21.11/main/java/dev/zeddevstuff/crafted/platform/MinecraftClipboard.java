@@ -3,7 +3,7 @@ package dev.zeddevstuff.crafted.platform;
 import net.minecraft.client.KeyboardHandler;
 import net.minecraft.client.Minecraft;
 
-public class Clipboard implements IClipboard
+public class MinecraftClipboard implements IClipboard
 {
 	private final KeyboardHandler keyboardHandler = Minecraft.getInstance().keyboardHandler;
 

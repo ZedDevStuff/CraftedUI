@@ -9,12 +9,12 @@ class CraftedEntrypoint
 	static void init()
 	{
 		Crafted.setDefaultInstance(new Crafted(
-			Slf4jLogger::new,
+			MinecraftLogger::new,
 			new MinecraftLocalization(),
 			new MinecraftFont("minecraft", Minecraft.getInstance().font),
-			new MainThreadDispatcher(),
+			new MinecraftDispatcher(),
 			new MinecraftTextureManager(),
-			new Clipboard()
+			new MinecraftClipboard()
 		));
 		Crafted.defaultInstance().logger.info("CraftedUI initialized");
 		All.registerInto(Crafted.defaultInstance());

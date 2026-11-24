@@ -4,15 +4,15 @@ import dev.zeddevstuff.crafted.input.ImportantKeys;
 import dev.zeddevstuff.crafted.input.KeyModifiers;
 import dev.zeddevstuff.crafted.input.MouseButton;
 import dev.zeddevstuff.crafted.input.events.KeyEvent;
-import dev.zeddevstuff.crafted.parsing.CraftedXmlParser;
-import dev.zeddevstuff.crafted.parsing.DocumentBuilder;
+import dev.zeddevstuff.crafted.parsing.XmlParser;
+import dev.zeddevstuff.crafted.parsing.UIDocumentBuilder;
 import dev.zeddevstuff.crafted.parsing.ParsedNode;
 import dev.zeddevstuff.crafted.parsing.Parsers;
-import dev.zeddevstuff.crafted.platform.CanvasImpl;
+import dev.zeddevstuff.crafted.platform.MinecraftCanvas;
 import dev.zeddevstuff.crafted.platform.IText;
 import dev.zeddevstuff.crafted.platform.TextConverter;
 import dev.zeddevstuff.crafted.rendering.CraftedRenderer;
-import dev.zeddevstuff.crafted.ui.CraftedContext;
+import dev.zeddevstuff.crafted.ui.UIContext;
 import dev.zeddevstuff.crafted.ui.CraftedElement;
 import dev.zeddevstuff.crafted.ui.elements.CraftedRoot;
 import dev.zeddevstuff.crafted.utils.HotReloadable;
@@ -30,8 +30,8 @@ import java.util.function.Predicate;
 
 public class CraftedScreen extends Screen
 {
-	protected final CanvasImpl canvas;
-	protected final CraftedContext context;
+	protected final MinecraftCanvas canvas;
+	protected final UIContext context;
 	private HotReloadable<ParsedNode> hotReloadable;
 	private final ParsedNode rootElementNode;
 	private CraftedRoot rootElement;
@@ -40,7 +40,7 @@ public class CraftedScreen extends Screen
 	public CraftedScreen(CraftedRoot rootElement)
 	{
 		super(TextConverter.toMinecraftText(rootElement.title.get()));
-		this.canvas = new CanvasImpl(Minecraft.getInstance());
+		this.canvas = new MinecraftCanvas(Minecraft.getInstance());
 		this.context = rootElement.ctx;
 		this.rootElementNode = null;
 		this.rootElement = rootElement;
@@ -48,25 +48,25 @@ public class CraftedScreen extends Screen
 		context.inputHandler.setRootElement(rootElement);
 		rootElement.refreshLayoutTree();
 	}
-	public CraftedScreen(CraftedContext ctx, ParsedNode rootElementNode)
+	public CraftedScreen(UIContext ctx, ParsedNode rootElementNode)
 	{
 		super(TextConverter.toMinecraftText(Parsers.parseText(rootElementNode.attributes().getOrDefault("title", null), IText.literal("Crafted Screen"))));
-		this.canvas = new CanvasImpl(Minecraft.getInstance());
+		this.canvas = new MinecraftCanvas(Minecraft.getInstance());
 		this.context = ctx;
 		this.rootElementNode = rootElementNode;
 	}
-	public CraftedScreen(CraftedContext ctx, String xml)
+	public CraftedScreen(UIContext ctx, String xml)
 	{
-		this(ctx, CraftedXmlParser.parse(xml));
+		this(ctx, XmlParser.parse(xml));
 	}
-	public CraftedScreen(CraftedContext ctx, HotReloadable<ParsedNode> hotReloadable)
+	public CraftedScreen(UIContext ctx, HotReloadable<ParsedNode> hotReloadable)
 	{
 		this(ctx, hotReloadable.getValue());
 		this.hotReloadable = hotReloadable;
 		hotReloadable.addListener((newValue) -> {
 			try
 			{
-				var newRoot = DocumentBuilder.buildTree(ctx, newValue);
+				var newRoot = UIDocumentBuilder.buildTree(ctx, newValue);
 				this.rootElement = newRoot.as(CraftedRoot.class);
 				this.renderer = new CraftedRenderer(rootElement);
 				context.inputHandler.setRootElement(rootElement);
@@ -83,7 +83,7 @@ public class CraftedScreen extends Screen
 	protected void init()
 	{
 		initContext(context);
-		var rootElement = (CraftedRoot) DocumentBuilder.buildTree(context, rootElementNode);
+		var rootElement = (CraftedRoot) UIDocumentBuilder.buildTree(context, rootElementNode);
 		this.rootElement = rootElement;
 		this.renderer = new CraftedRenderer(rootElement);
 		context.inputHandler.setRootElement(rootElement);
@@ -92,10 +92,10 @@ public class CraftedScreen extends Screen
 	}
 
 	/**
-	 * Override this method to initialize the {@link CraftedContext} before the tree is built. <br>
+	 * Override this method to initialize the {@link UIContext} before the tree is built. <br>
 	 * This is useful for registering callbacks and other context-related things.
 	 */
-	public void initContext(CraftedContext ctx) {}
+	public void initContext(UIContext ctx) {}
 	/**
 	 * Override this method to do something after the tree is built. <br>
 	 * This is mostly used for finding and storing references to elements for later use.

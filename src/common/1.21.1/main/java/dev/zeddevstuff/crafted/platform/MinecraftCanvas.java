@@ -8,10 +8,8 @@ import dev.zeddevstuff.crafted.types.TextSettings;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.network.chat.Component;
-import org.joml.AxisAngle4f;
-import org.joml.Matrix4f;
 
-public class CanvasImpl implements ICanvas
+public class MinecraftCanvas implements ICanvas
 {
 	private final Minecraft minecraft;
 	private GuiGraphics graphics;
@@ -20,7 +18,7 @@ public class CanvasImpl implements ICanvas
 		this.graphics = graphics;
 	}
 
-	public CanvasImpl(Minecraft minecraft)
+	public MinecraftCanvas(Minecraft minecraft)
 	{
 		this.minecraft = minecraft;
 	}

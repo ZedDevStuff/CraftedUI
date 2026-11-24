@@ -7,7 +7,7 @@ import dev.zeddevstuff.crafted.annotations.Description;
 import dev.zeddevstuff.crafted.platform.ICanvas;
 import dev.zeddevstuff.crafted.rendering.IRendersType;
 import dev.zeddevstuff.crafted.types.Color;
-import dev.zeddevstuff.crafted.ui.CraftedContext;
+import dev.zeddevstuff.crafted.ui.UIContext;
 import dev.zeddevstuff.crafted.ui.CraftedElement;
 import org.appliedenergistics.yoga.YogaOverflow;
 
@@ -26,7 +26,7 @@ public class Box extends CraftedElement
 	@Description("Background color of the box")
 	public final Prop<Color> color = registerProp("color", Color.Transparent, this::parseColor);
 
-	public Box(CraftedContext ctx, Map<String, String> attributes)
+	public Box(UIContext ctx, Map<String, String> attributes)
 	{
 		super(ctx, attributes);
 	}

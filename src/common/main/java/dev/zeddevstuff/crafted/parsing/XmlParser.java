@@ -8,7 +8,7 @@ import javax.xml.parsers.ParserConfigurationException;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 
-public class CraftedXmlParser
+public class XmlParser
 {
 	static final DocumentBuilderFactory factory;
 	static

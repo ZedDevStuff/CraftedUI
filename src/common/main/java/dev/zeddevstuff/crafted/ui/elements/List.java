@@ -4,13 +4,9 @@ import dev.zeddevstuff.crafted.Crafted;
 import dev.zeddevstuff.crafted.Prop;
 import dev.zeddevstuff.crafted.annotations.DefineElement;
 import dev.zeddevstuff.crafted.annotations.Description;
-import dev.zeddevstuff.crafted.parsing.DocumentBuilder;
+import dev.zeddevstuff.crafted.parsing.UIDocumentBuilder;
 import dev.zeddevstuff.crafted.parsing.ParsedNode;
-import dev.zeddevstuff.crafted.ui.BindingExtractor;
-import dev.zeddevstuff.crafted.ui.BindingScope;
-import dev.zeddevstuff.crafted.ui.CraftedContext;
-import dev.zeddevstuff.crafted.ui.CraftedElement;
-import dev.zeddevstuff.crafted.ui.MetaElement;
+import dev.zeddevstuff.crafted.ui.*;
 import dev.zeddevstuff.crafted.utils.TypedList;
 
 import java.util.Map;
@@ -27,7 +23,7 @@ public class List extends ScrollView implements MetaElement
 	private TypedList<?> observedItems;
 	private final TypedList.IValuesChangeListener<Object> itemsChangeListener = this::itemsChanged;
 
-	public List(CraftedContext ctx, Map<String, String> attributes)
+	public List(UIContext ctx, Map<String, String> attributes)
 	{
 		super(ctx, attributes);
 		items.addListener((prop, oldValue, newValue) -> {
@@ -108,7 +104,7 @@ public class List extends ScrollView implements MetaElement
 			ctx.pushBindingScope(scope);
 			try
 			{
-				addChild(DocumentBuilder.buildTree(ctx, templateNode));
+				addChild(UIDocumentBuilder.buildTree(ctx, templateNode));
 			}
 			finally
 			{

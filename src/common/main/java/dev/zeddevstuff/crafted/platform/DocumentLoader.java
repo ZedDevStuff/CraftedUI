@@ -1,6 +1,6 @@
 package dev.zeddevstuff.crafted.platform;
 
-import dev.zeddevstuff.crafted.parsing.CraftedXmlParser;
+import dev.zeddevstuff.crafted.parsing.XmlParser;
 import dev.zeddevstuff.crafted.parsing.ParsedNode;
 import dev.zeddevstuff.crafted.utils.Lazy;
 
@@ -36,7 +36,7 @@ public class DocumentLoader
 		try(var stream = resource.openStream())
 		{
 			String xml = new String(stream.readAllBytes(), StandardCharsets.UTF_8);
-			return CraftedXmlParser.parse(xml);
+			return XmlParser.parse(xml);
 		}
 		catch (IOException e)
 		{

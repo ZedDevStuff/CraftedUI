@@ -14,7 +14,7 @@ import java.util.Deque;
  * Context class holding useful data and methods. <br>
  * This is usually tied to a specific screen or UI instance.
  */
-public class CraftedContext
+public class UIContext
 {
 	public final Crafted crafted;
 	public final InputHandler inputHandler = new InputHandler();
@@ -27,11 +27,11 @@ public class CraftedContext
 	 */
 	public String currentRenderer = "default";
 
-	public CraftedContext()
+	public UIContext()
 	{
 		this(Crafted.defaultInstance());
 	}
-	public CraftedContext(Crafted crafted)
+	public UIContext(Crafted crafted)
 	{
 		this.crafted = crafted;
 	}

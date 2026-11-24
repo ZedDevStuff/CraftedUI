@@ -15,7 +15,7 @@ import dev.zeddevstuff.crafted.platform.ITextureManager;
 import dev.zeddevstuff.crafted.rendering.IRendersType;
 import dev.zeddevstuff.crafted.types.Color;
 import dev.zeddevstuff.crafted.types.Rect;
-import dev.zeddevstuff.crafted.ui.CraftedContext;
+import dev.zeddevstuff.crafted.ui.UIContext;
 import dev.zeddevstuff.crafted.ui.CraftedElement;
 import dev.zeddevstuff.crafted.utils.ColorUtils;
 import org.appliedenergistics.yoga.YogaAlign;
@@ -31,7 +31,7 @@ import java.util.Map;
 @Description("A simple button element")
 public class Button extends CraftedElement
 {
-	public Button(CraftedContext ctx, Map<String, String> attributes)
+	public Button(UIContext ctx, Map<String, String> attributes)
 	{
 		super(ctx, attributes);
 		if(attributes.containsKey("text"))

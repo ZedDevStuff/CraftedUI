@@ -9,7 +9,7 @@ import dev.zeddevstuff.crafted.input.MouseButton;
 import dev.zeddevstuff.crafted.input.events.ClickEvent;
 import dev.zeddevstuff.crafted.input.events.KeyEvent;
 import dev.zeddevstuff.crafted.input.events.MouseEvent;
-import dev.zeddevstuff.crafted.parsing.DocumentBuilder;
+import dev.zeddevstuff.crafted.parsing.UIDocumentBuilder;
 import dev.zeddevstuff.crafted.parsing.ParsedNode;
 import dev.zeddevstuff.crafted.parsing.Parsers;
 import dev.zeddevstuff.crafted.platform.ICanvas;
@@ -18,7 +18,7 @@ import dev.zeddevstuff.crafted.platform.ITexture;
 import dev.zeddevstuff.crafted.rendering.IRendersType;
 import dev.zeddevstuff.crafted.types.Color;
 import dev.zeddevstuff.crafted.types.Rect;
-import dev.zeddevstuff.crafted.ui.CraftedContext;
+import dev.zeddevstuff.crafted.ui.UIContext;
 import dev.zeddevstuff.crafted.ui.CraftedElement;
 import dev.zeddevstuff.crafted.ui.MetaElement;
 import org.appliedenergistics.yoga.YogaEdge;
@@ -50,7 +50,7 @@ public class Tabs extends CraftedElement implements MetaElement
 		return tabs.get(index);
 	}
 
-	public Tabs(CraftedContext ctx, Map<String, String> attributes)
+	public Tabs(UIContext ctx, Map<String, String> attributes)
 	{
 		super(ctx, attributes);
 		tabBarHeight.addListener((prop, oldValue, newValue) -> {
@@ -83,7 +83,7 @@ public class Tabs extends CraftedElement implements MetaElement
 	{
 		for(var node : templateNodes)
 		{
-			var child = DocumentBuilder.buildTree(ctx, node);
+			var child = UIDocumentBuilder.buildTree(ctx, node);
 			if(child instanceof Tab tab)
 				tabs.add(tab);
 			else
@@ -516,7 +516,7 @@ public class Tabs extends CraftedElement implements MetaElement
 
 		public final Prop<IText> title = registerProp(IText.class, "title", IText.literal("Tab"), Parsers::parseText);
 
-		public Tab(CraftedContext ctx, Map<String, String> attributes)
+		public Tab(UIContext ctx, Map<String, String> attributes)
 		{
 			super(ctx, attributes);
 		}

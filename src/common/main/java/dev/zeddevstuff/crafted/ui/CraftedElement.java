@@ -31,7 +31,7 @@ public abstract class CraftedElement
 {
 	// Just a hack. Don't think about it too much.
 	private final static Object INTERNAL_KEY = new Object();
-	public final CraftedContext ctx;
+	public final UIContext ctx;
 	protected final YogaNode node = new YogaNode();
 
 	protected CraftedElement parent;
@@ -294,7 +294,7 @@ public abstract class CraftedElement
 	@Description("The renderer to use for this element.")
 	public final Prop<IRenders> renderer;
 
-	public CraftedElement(CraftedContext ctx, Map<String, String> attributes)
+	public CraftedElement(UIContext ctx, Map<String, String> attributes)
 	{
 		this.ctx = ctx;
 		if(!(this instanceof CraftedRoot))

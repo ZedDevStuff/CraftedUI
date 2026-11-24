@@ -4,14 +4,14 @@ import dev.zeddevstuff.crafted.input.ImportantKeys;
 import dev.zeddevstuff.crafted.input.KeyModifiers;
 import dev.zeddevstuff.crafted.input.MouseButton;
 import dev.zeddevstuff.crafted.input.events.KeyEvent;
-import dev.zeddevstuff.crafted.parsing.CraftedXmlParser;
-import dev.zeddevstuff.crafted.parsing.DocumentBuilder;
+import dev.zeddevstuff.crafted.parsing.XmlParser;
+import dev.zeddevstuff.crafted.parsing.UIDocumentBuilder;
 import dev.zeddevstuff.crafted.parsing.ParsedNode;
-import dev.zeddevstuff.crafted.platform.CanvasImpl;
+import dev.zeddevstuff.crafted.platform.MinecraftCanvas;
 import dev.zeddevstuff.crafted.platform.TextConverter;
 import dev.zeddevstuff.crafted.rendering.CraftedRenderer;
 import dev.zeddevstuff.crafted.types.Rect;
-import dev.zeddevstuff.crafted.ui.CraftedContext;
+import dev.zeddevstuff.crafted.ui.UIContext;
 import dev.zeddevstuff.crafted.ui.elements.CraftedRoot;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.ComponentPath;
@@ -31,14 +31,14 @@ import java.util.function.Function;
  */
 public class CraftedPortal extends AbstractWidget
 {
-	protected final CanvasImpl canvas;
-	protected final CraftedContext context;
+	protected final MinecraftCanvas canvas;
+	protected final UIContext context;
 	protected final CraftedRoot rootElement;
 	protected final CraftedRenderer renderer;
 	public CraftedPortal(Rect rect, CraftedRoot rootElement)
 	{
 		super((int)rect.minX(), (int)rect.minY(), (int)rect.width(), (int)rect.height(), TextConverter.toMinecraftText(rootElement.title.get()));
-		this.canvas = new CanvasImpl(Minecraft.getInstance());
+		this.canvas = new MinecraftCanvas(Minecraft.getInstance());
 		this.context = rootElement.ctx;
 		this.rootElement = rootElement;
 		this.renderer = new CraftedRenderer(rootElement);
@@ -47,17 +47,17 @@ public class CraftedPortal extends AbstractWidget
 		rootElement.height.set(StyleSizeLength.points(rect.height()));
 		rootElement.refreshLayoutTree();
 	}
-	public CraftedPortal(Rect rect, CraftedContext ctx, Function<CraftedContext, CraftedRoot> rootElementFactory)
+	public CraftedPortal(Rect rect, UIContext ctx, Function<UIContext, CraftedRoot> rootElementFactory)
 	{
 		this(rect, rootElementFactory.apply(ctx));
 	}
-	public CraftedPortal(Rect rect, CraftedContext ctx, ParsedNode rootElementNode)
+	public CraftedPortal(Rect rect, UIContext ctx, ParsedNode rootElementNode)
 	{
-		this(rect, ctx, (context) -> (CraftedRoot) DocumentBuilder.buildTree(ctx, rootElementNode));
+		this(rect, ctx, (context) -> (CraftedRoot) UIDocumentBuilder.buildTree(ctx, rootElementNode));
 	}
-	public CraftedPortal(Rect rect, CraftedContext ctx, String xml)
+	public CraftedPortal(Rect rect, UIContext ctx, String xml)
 	{
-		this(rect, ctx, CraftedXmlParser.parse(xml));
+		this(rect, ctx, XmlParser.parse(xml));
 	}
 
 	@Override

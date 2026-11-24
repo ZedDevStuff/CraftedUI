@@ -8,7 +8,7 @@ import dev.zeddevstuff.crafted.platform.ICanvas;
 import dev.zeddevstuff.crafted.platform.ITexture;
 import dev.zeddevstuff.crafted.rendering.IRendersType;
 import dev.zeddevstuff.crafted.types.Rect;
-import dev.zeddevstuff.crafted.ui.CraftedContext;
+import dev.zeddevstuff.crafted.ui.UIContext;
 import dev.zeddevstuff.crafted.ui.CraftedElement;
 
 import java.util.Map;
@@ -19,7 +19,7 @@ public class Image extends CraftedElement
 {
 	public final Prop<ITexture> src = registerProp(ITexture.class, "src", null, this::parseTexture);
 
-	public Image(CraftedContext ctx, Map<String, String> attributes)
+	public Image(UIContext ctx, Map<String, String> attributes)
 	{
 		super(ctx, attributes);
 	}

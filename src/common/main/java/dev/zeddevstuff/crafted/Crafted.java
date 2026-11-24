@@ -1,13 +1,11 @@
 package dev.zeddevstuff.crafted;
 
-import dev.zeddevstuff.crafted.parsing.ParsedNode;
 import dev.zeddevstuff.crafted.platform.*;
 import dev.zeddevstuff.crafted.rendering.RendererRegistry;
 import dev.zeddevstuff.crafted.types.TextSettings;
-import dev.zeddevstuff.crafted.ui.CraftedContext;
+import dev.zeddevstuff.crafted.ui.UIContext;
 import dev.zeddevstuff.crafted.ui.CraftedElement;
 import dev.zeddevstuff.crafted.ui.ElementRegistry;
-import dev.zeddevstuff.crafted.utils.Lazy;
 
 import java.util.Map;
 
@@ -65,7 +63,7 @@ public class Crafted
 		return loaders.get(sourceClass);
 	}
 
-	public CraftedElement createElement(CraftedContext ctx, String tag, Map<String, String> attributes)
+	public CraftedElement createElement(UIContext ctx, String tag, Map<String, String> attributes)
 	{
 		return elements.createElement(ctx, tag, attributes);
 	}
