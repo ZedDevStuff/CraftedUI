@@ -176,7 +176,6 @@ publishMods {
         accessToken = envProps.getProperty("GITHUB_TOKEN")
         repository = "ZedDevStuff/CraftedUI"
         commitish = "main"
-        tagName = "v$version"
         allowEmptyFiles = true
 
         val jars = cloche.targets.map {
@@ -215,10 +214,10 @@ publishMods {
             accessToken = envProps.getProperty("MODRINTH_TOKEN")
             minecraftVersions.add(it.minecraftVersion.get())
             file.set(it.finalJar.get().archiveFile)
-            val javadocJar = tasks.named<Jar>("${it.loaderName}${it.minecraftVersion.get().replace(".", "")}JavadocJar")
-            if(javadocJar.isPresent) {
-                additionalFiles.from(javadocJar.get().archiveFile)
-            }
+//            val javadocJar = tasks.named<Jar>("${it.loaderName}${it.minecraftVersion.get().replace(".", "")}JavadocJar")
+//            if(javadocJar.isPresent) {
+//                additionalFiles.from(javadocJar.get().archiveFile)
+//            }
             environment.set(CLIENT_ONLY)
             if(it is FabricTarget) {
                 modLoaders.add("fabric")
