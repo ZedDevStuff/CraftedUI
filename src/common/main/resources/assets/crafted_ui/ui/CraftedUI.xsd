@@ -101,10 +101,35 @@
       </xs:extension>
     </xs:complexContent>
   </xs:complexType>
-  <xs:complexType name="Either">
+  <xs:complexType name="Box">
     <xs:complexContent>
       <xs:extension base="CraftedElement">
-        <xs:attribute name="value" />
+        <xs:attribute name="color">
+          <xs:annotation>
+            <xs:documentation>Background color of the box</xs:documentation>
+          </xs:annotation>
+        </xs:attribute>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:complexType name="ScrollView">
+    <xs:complexContent>
+      <xs:extension base="Box">
+        <xs:attribute name="scrollX" />
+        <xs:attribute name="scrollY" />
+        <xs:attribute name="horizontalScrollbar" />
+        <xs:attribute name="verticalScrollbar" />
+        <xs:attribute name="autoHideScrollbars" />
+        <xs:attribute name="scrollbarSize" />
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:complexType name="List">
+    <xs:complexContent>
+      <xs:extension base="ScrollView">
+        <xs:attribute name="items" />
+        <xs:attribute name="extractor" />
+        <xs:attribute name="bindingPrefix" />
       </xs:extension>
     </xs:complexContent>
   </xs:complexType>
@@ -134,28 +159,6 @@
       </xs:extension>
     </xs:complexContent>
   </xs:complexType>
-  <xs:complexType name="Image">
-    <xs:complexContent>
-      <xs:extension base="CraftedElement">
-        <xs:attribute name="src" />
-      </xs:extension>
-    </xs:complexContent>
-  </xs:complexType>
-  <xs:complexType name="Text">
-    <xs:complexContent>
-      <xs:extension base="CraftedElement">
-        <xs:attribute name="text" />
-        <xs:attribute name="settings" />
-        <xs:attribute name="font" />
-        <xs:attribute name="fontScale" />
-        <xs:attribute name="wrapWidth" />
-        <xs:attribute name="textWrap" />
-        <xs:attribute name="shadow" />
-        <xs:attribute name="shadowColor" />
-        <xs:attribute name="color" />
-      </xs:extension>
-    </xs:complexContent>
-  </xs:complexType>
   <xs:complexType name="TextArea">
     <xs:complexContent>
       <xs:extension base="Input">
@@ -169,37 +172,34 @@
       </xs:extension>
     </xs:complexContent>
   </xs:complexType>
-  <xs:complexType name="Box">
+  <xs:complexType name="Dropdown">
     <xs:complexContent>
       <xs:extension base="CraftedElement">
-        <xs:attribute name="color">
-          <xs:annotation>
-            <xs:documentation>Background color of the box</xs:documentation>
-          </xs:annotation>
-        </xs:attribute>
+        <xs:attribute name="options" />
+        <xs:attribute name="labelProvider" />
+        <xs:attribute name="selectedValue" />
+        <xs:attribute name="valueType" />
       </xs:extension>
     </xs:complexContent>
   </xs:complexType>
-  <xs:complexType name="ScrollView">
+  <xs:complexType name="Conditional">
     <xs:complexContent>
-      <xs:extension base="Box">
-        <xs:attribute name="scrollX" />
-        <xs:attribute name="scrollY" />
-        <xs:attribute name="horizontalScrollbar" />
-        <xs:attribute name="verticalScrollbar" />
-        <xs:attribute name="autoHideScrollbars" />
-        <xs:attribute name="scrollbarSize" />
+      <xs:extension base="CraftedElement">
+        <xs:attribute name="expanded" />
       </xs:extension>
     </xs:complexContent>
   </xs:complexType>
-  <xs:complexType name="Tabs">
+  <xs:complexType name="Image">
     <xs:complexContent>
       <xs:extension base="CraftedElement">
-        <xs:attribute name="currentTabIndex" />
-        <xs:attribute name="tabBarPosition" />
-        <xs:attribute name="tabBarHeight" />
-        <xs:attribute name="minTabWidth" />
-        <xs:attribute name="maxTabWidth" />
+        <xs:attribute name="src" />
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:complexType name="Tab">
+    <xs:complexContent>
+      <xs:extension base="ScrollView">
+        <xs:attribute name="title" />
       </xs:extension>
     </xs:complexContent>
   </xs:complexType>
@@ -219,35 +219,42 @@
       </xs:extension>
     </xs:complexContent>
   </xs:complexType>
-  <xs:complexType name="List">
-    <xs:complexContent>
-      <xs:extension base="ScrollView">
-        <xs:attribute name="items" />
-        <xs:attribute name="extractor" />
-        <xs:attribute name="bindingPrefix" />
-      </xs:extension>
-    </xs:complexContent>
-  </xs:complexType>
-  <xs:complexType name="Tab">
-    <xs:complexContent>
-      <xs:extension base="ScrollView">
-        <xs:attribute name="title" />
-      </xs:extension>
-    </xs:complexContent>
-  </xs:complexType>
-  <xs:complexType name="Dropdown">
+  <xs:complexType name="Either">
     <xs:complexContent>
       <xs:extension base="CraftedElement">
-        <xs:attribute name="options" />
-        <xs:attribute name="labelProvider" />
-        <xs:attribute name="selectedValue" />
-        <xs:attribute name="valueType" />
+        <xs:attribute name="value" />
       </xs:extension>
     </xs:complexContent>
   </xs:complexType>
-  <xs:element name="Either" type="Either">
+  <xs:complexType name="Text">
+    <xs:complexContent>
+      <xs:extension base="CraftedElement">
+        <xs:attribute name="text" />
+        <xs:attribute name="settings" />
+        <xs:attribute name="font" />
+        <xs:attribute name="fontScale" />
+        <xs:attribute name="wrapWidth" />
+        <xs:attribute name="textWrap" />
+        <xs:attribute name="shadow" />
+        <xs:attribute name="shadowColor" />
+        <xs:attribute name="color" />
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:complexType name="Tabs">
+    <xs:complexContent>
+      <xs:extension base="CraftedElement">
+        <xs:attribute name="currentTabIndex" />
+        <xs:attribute name="tabBarPosition" />
+        <xs:attribute name="tabBarHeight" />
+        <xs:attribute name="minTabWidth" />
+        <xs:attribute name="maxTabWidth" />
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:element name="List" type="List">
     <xs:annotation>
-      <xs:documentation>Displays one of the two child elements based on the &apos;value&apos; property.</xs:documentation>
+      <xs:documentation>Displays a list of items using a template for each item.</xs:documentation>
     </xs:annotation>
   </xs:element>
   <xs:element name="Button" type="Button">
@@ -255,14 +262,20 @@
       <xs:documentation>A simple button element</xs:documentation>
     </xs:annotation>
   </xs:element>
+  <xs:element name="TextArea" type="TextArea">
+    <xs:annotation>
+      <xs:documentation>A multiline text input field that allows users to enter and edit text.</xs:documentation>
+    </xs:annotation>
+  </xs:element>
+  <xs:element name="Dropdown" type="Dropdown" />
   <xs:element name="Input" type="Input">
     <xs:annotation>
       <xs:documentation>A text input field that allows users to enter and edit text.</xs:documentation>
     </xs:annotation>
   </xs:element>
-  <xs:element name="Crafted" type="CraftedRoot">
+  <xs:element name="Conditional" type="Conditional">
     <xs:annotation>
-      <xs:documentation>Root element of a Crafted document. All other elements must be children of this element</xs:documentation>
+      <xs:documentation>Displays its single child element only while the &apos;expanded&apos; property is true.</xs:documentation>
     </xs:annotation>
   </xs:element>
   <xs:element name="Image" type="Image">
@@ -270,20 +283,9 @@
       <xs:documentation>Displays a texture or sprite on the screen</xs:documentation>
     </xs:annotation>
   </xs:element>
-  <xs:element name="Text" type="Text">
+  <xs:element name="Tab" type="Tab">
     <xs:annotation>
-      <xs:documentation>Displays text on the screen</xs:documentation>
-    </xs:annotation>
-  </xs:element>
-  <xs:element name="TextArea" type="TextArea">
-    <xs:annotation>
-      <xs:documentation>A multiline text input field that allows users to enter and edit text.</xs:documentation>
-    </xs:annotation>
-  </xs:element>
-  <xs:element name="ScrollView" type="ScrollView" />
-  <xs:element name="Tabs" type="Tabs">
-    <xs:annotation>
-      <xs:documentation>A tabbed container element</xs:documentation>
+      <xs:documentation>A tab in a Tabs element</xs:documentation>
     </xs:annotation>
   </xs:element>
   <xs:element name="Checkbox" type="Checkbox">
@@ -291,14 +293,19 @@
       <xs:documentation>Checkbox element, can be checked or unchecked</xs:documentation>
     </xs:annotation>
   </xs:element>
-  <xs:element name="List" type="List">
+  <xs:element name="Either" type="Either">
     <xs:annotation>
-      <xs:documentation>Displays a list of items using a template for each item.</xs:documentation>
+      <xs:documentation>Displays one of the two child elements based on the &apos;value&apos; property.</xs:documentation>
     </xs:annotation>
   </xs:element>
-  <xs:element name="Tab" type="Tab">
+  <xs:element name="Text" type="Text">
     <xs:annotation>
-      <xs:documentation>A tab in a Tabs element</xs:documentation>
+      <xs:documentation>Displays text on the screen</xs:documentation>
+    </xs:annotation>
+  </xs:element>
+  <xs:element name="Crafted" type="CraftedRoot">
+    <xs:annotation>
+      <xs:documentation>Root element of a Crafted document. All other elements must be children of this element</xs:documentation>
     </xs:annotation>
   </xs:element>
   <xs:element name="Box" type="Box">
@@ -306,5 +313,10 @@
       <xs:documentation>A basic box element, used for backgrounds and other simple UI elements</xs:documentation>
     </xs:annotation>
   </xs:element>
-  <xs:element name="Dropdown" type="Dropdown" />
+  <xs:element name="Tabs" type="Tabs">
+    <xs:annotation>
+      <xs:documentation>A tabbed container element</xs:documentation>
+    </xs:annotation>
+  </xs:element>
+  <xs:element name="ScrollView" type="ScrollView" />
 </xs:schema>
