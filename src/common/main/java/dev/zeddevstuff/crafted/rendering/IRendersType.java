@@ -59,4 +59,12 @@ public interface IRendersType<T> extends IRenders
 		if(element.overflow.get() != YogaOverflow.VISIBLE)
 			canvas.endClip();
 	}
+
+	public static class NullRenderer implements IRendersType<CraftedElement>
+	{
+		@Override
+		public Class<?> getElementType() { return CraftedElement.class; }
+		@Override
+		public void render(ICanvas canvas, CraftedElement element) {}
+	}
 }

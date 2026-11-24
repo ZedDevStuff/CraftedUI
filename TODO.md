@@ -27,10 +27,12 @@
     - [x] Input
       - [x] Text Area (Basically just a multi-line input)
     - [x] Checkbox
-    - [x] Scroll
-      - [x] List
+    - [x] ScrollView
+      - [x] List (ScrollView with an item template)
     - [-] Dropdown
-  - [ ] Extra elements
+  - [-] Extra elements
+    - [x] Conditional
+    - [x] Either (Conditional with 2 branches)
     - [ ] Slider
     - [ ] Progress bar
     - [x] Tabs

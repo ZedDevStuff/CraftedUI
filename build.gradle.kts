@@ -11,7 +11,7 @@ plugins {
 }
 
 group = "dev.zeddevstuff"
-version = "0.24.0"
+version = "0.25.0"
 
 repositories {
     mavenCentral()
@@ -194,10 +194,10 @@ publishMods {
             changelogType = "markdown"
             minecraftVersions.add(it.minecraftVersion.get())
             file.set(it.finalJar.get().archiveFile)
-            val javadocJar = tasks.named<Jar>("${it.loaderName}${it.minecraftVersion.get().replace(".", "")}JavadocJar")
-            if(javadocJar.isPresent) {
-                additionalFiles.from(javadocJar.get().archiveFile)
-            }
+//            val javadocJar = tasks.named<Jar>("${it.loaderName}${it.minecraftVersion.get().replace(".", "")}JavadocJar")
+//            if(javadocJar.isPresent) {
+//                additionalFiles.from(javadocJar.get().archiveFile)
+//            }
             client = true
             server = false
             if(it is FabricTarget) {

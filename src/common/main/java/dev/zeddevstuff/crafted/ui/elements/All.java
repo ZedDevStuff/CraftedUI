@@ -17,6 +17,7 @@ public class All
 		ScrollView.register(crafted);
 		Dropdown.register(crafted);
 		List.register(crafted);
+		Conditional.register(crafted);
 		Either.register(crafted);
 		Tabs.register(crafted);
 	}

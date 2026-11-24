@@ -56,6 +56,7 @@ public abstract class CraftedElement
 
 	protected final HashMap<String, IProp<?>> props = new HashMap<>();
 	private final HashMap<String, Binding> bindings = new HashMap<>();
+	private final List<PendingBinding> pendingBindings = new ArrayList<>();
 
 	/**
 	 * Registers a property for this element. <br>
@@ -360,7 +361,7 @@ public abstract class CraftedElement
 				var boundValue = ctx.resolveBinding(attributeValue);
 				if(boundValue != null)
 				{
-					if(boundValue instanceof String) //In what world would i ever want this? This overshadows string props
+					if(boundValue instanceof String)
 						prop.setFromString((String) boundValue);
 					else if(prop.getType() != Object.class && !prop.getType().isInstance(boundValue))
 						throw new IllegalArgumentException("Invalid bound value for prop " + prop.getName() + ": " + boundValue);
@@ -377,19 +378,75 @@ public abstract class CraftedElement
 		}
 	}
 
-	@SuppressWarnings({"rawtypes", "unchecked"})
+	@SuppressWarnings("rawtypes")
 	private void bind(String name, IProp<?> target, String sourceName)
 	{
 		unbind(name);
+		pendingBindings.removeIf(pending -> pending.name().equals(name));
+		var dotIndex = sourceName.indexOf('.');
+		if(dotIndex > 0)
+		{
+			var elementId = sourceName.substring(0, dotIndex);
+			var propName = sourceName.substring(dotIndex + 1);
+			var element = getRoot().getElementById(elementId);
+			if(element == null)
+			{
+				pendingBindings.add(new PendingBinding(name, target, sourceName));
+				return;
+			}
+			var sourceProp = element.props.get(propName);
+			if(sourceProp == null)
+				throw new IllegalArgumentException("Element '" + elementId + "' has no prop '" + propName + "'.");
+			if(!(sourceProp instanceof IObservableProp))
+				throw new IllegalArgumentException("Binding source '" + sourceName + "' is not observable.");
+			if(target.getType() != Object.class && !target.getType().isAssignableFrom(sourceProp.getType()))
+				throw new IllegalArgumentException("Cannot bind prop '" + target.getName() + "' to prop '" + propName + "' of element '" + elementId + "': incompatible types " + sourceProp.getType().getSimpleName() + " -> " + target.getType().getSimpleName());
+			var binding = new Binding(target, (IObservableProp) sourceProp);
+			bindings.put(name, binding);
+			binding.applySourceValue(sourceProp.get());
+			return;
+		}
 		var source = ctx.resolveContextBinding(sourceName);
-		if(!(source instanceof IObservableProp))
+		if(!(source instanceof IObservableProp sourceProp))
 			throw new IllegalArgumentException("Binding source '" + sourceName + "' is not observable.");
-		var sourceProp = (IObservableProp) source;
 		if(target.getType() != Object.class && sourceProp.get() != null && !target.getType().isInstance(sourceProp.get()))
 			throw new IllegalArgumentException("Invalid bound value for prop " + target.getName() + ": " + sourceProp.get());
 		var binding = new Binding(target, sourceProp);
 		bindings.put(name, binding);
 		binding.applySourceValue(sourceProp.get());
+	}
+
+	private void resolvePendingBindings()
+	{
+		if(pendingBindings.isEmpty())
+			return;
+		for(var pending : new ArrayList<>(pendingBindings))
+		{
+			var dotIndex = pending.sourceName().indexOf('.');
+			if(dotIndex <= 0)
+				continue;
+			var elementId = pending.sourceName().substring(0, dotIndex);
+			var element = getRoot().getElementById(elementId);
+			if(element == null)
+				continue;
+			pendingBindings.remove(pending);
+			bind(pending.name(), pending.target(), pending.sourceName());
+		}
+	}
+
+	private void resolveAllPendingBindings()
+	{
+		resolvePendingBindings();
+		for(var child : children)
+			child.resolveAllPendingBindings();
+	}
+
+	private CraftedElement getRoot()
+	{
+		var current = this;
+		while(current.parent != null)
+			current = current.parent;
+		return current;
 	}
 
 	public void unbind(String name)
@@ -404,12 +461,15 @@ public abstract class CraftedElement
 		for(var binding : new ArrayList<>(bindings.values()))
 			binding.close();
 		bindings.clear();
+		pendingBindings.clear();
 		for(var child : new ArrayList<>(children))
 			child.unbind();
 	}
 
+	private record PendingBinding(String name, IProp<?> target, String sourceName) {}
+
 	@SuppressWarnings({"rawtypes", "unchecked"})
-	private final class Binding
+	private static final class Binding
 	{
 		private final IProp target;
 		private final IObservableProp source;
@@ -421,7 +481,7 @@ public abstract class CraftedElement
 		{
 			this.target = target;
 			this.source = source;
-			sourceListener = value -> applySourceValue(value);
+			sourceListener = this::applySourceValue;
 			targetListener = value -> {
 				if(!updating)
 					source.set(value);
@@ -591,6 +651,14 @@ public abstract class CraftedElement
 		return type.cast(this);
 	}
 
+	/**
+	 * Returns the registered prop with the given name, or null if it doesn't exist.
+	 */
+	public IProp<?> getProp(String name)
+	{
+		return props.get(name);
+	}
+
 	public CraftedElement getElementById(String id)
 	{
 		if(this.id.get().equals(id))
@@ -712,6 +780,7 @@ public abstract class CraftedElement
 		child.parent = this;
 		node.addChildAt(child.node, node.getChildCount());
 		markTreeChanged();
+		getRoot().resolveAllPendingBindings();
 	}
 	public void addChildren(Collection<CraftedElement> children)
 	{
@@ -745,6 +814,7 @@ public abstract class CraftedElement
 		child.parent = this;
 		node.addChildAt(child.node, index);
 		markTreeChanged();
+		getRoot().resolveAllPendingBindings();
 	}
 	public void removeChild(CraftedElement child)
 	{
